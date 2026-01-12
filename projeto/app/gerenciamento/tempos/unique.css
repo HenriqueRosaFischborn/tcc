@@ -1,0 +1,58 @@
+article > .content {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: start;
+    row-gap: 50px;
+}
+
+article > .content .form {
+    width: 40%;
+}
+
+article > .content h1 {
+    width: 100%;
+    text-align: center;
+}
+
+article > .content h2 {
+    width: 100%;
+    text-align: start;
+}
+
+
+
+table th {
+    font-weight: 500;
+}
+
+table td {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+}
+
+td p {
+    font-weight: 400;
+}
+
+td img {
+    width: 25px;
+    height: auto;
+    object-fit: contain;
+}
+
+.form div {
+    flex-direction: row;
+    gap: 10px;
+}
+
+.form div input {
+    width: 80px;
+}
+
+.cancel-img {
+    cursor: pointer;
+}

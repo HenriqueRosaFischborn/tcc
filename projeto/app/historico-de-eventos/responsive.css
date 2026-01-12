@@ -1,0 +1,30 @@
+@media(max-width: 768px) {
+    #title img {
+        height: 200px;
+    }
+
+    #historic {
+        width: 95%;
+    }
+
+    #side-bar {
+        width: 100%;
+        padding: 10px 5px;
+    }
+
+    details p{
+        font-size: 10pt;
+        font-weight: 600;
+    }
+
+    #historic .content {
+        flex-direction: column;
+        padding: 10px 10px;
+        gap: 30px;
+    }
+
+    .date {
+        font-size: 10pt;
+        margin-top: 2px;
+    }
+}

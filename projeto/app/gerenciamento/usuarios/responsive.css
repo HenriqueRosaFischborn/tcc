@@ -1,0 +1,21 @@
+@media(max-width: 768px) {
+    #content {
+        width: 95%;
+    }
+
+    table p {
+        font-size: 10pt;
+    }
+
+    td {
+        padding: 0px 3px;
+    }
+
+    #th-padding {
+        padding-right: 10px;
+    }
+
+    #th-padding-2 {
+        padding-right: 35px;
+    }
+}

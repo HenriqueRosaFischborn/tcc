@@ -1,0 +1,33 @@
+@media(max-width: 768px) {
+    #content h1 {
+        text-align: start;
+    }
+
+    .tournment-img {
+        display: none;
+    }
+
+    .event {
+        gap: 10px;
+    }
+
+    .event .content {
+        width: 100%;
+    }
+
+    .event h2 {
+        text-align: start;
+    }
+
+    .body-informations {
+        column-gap: 10px;
+    }
+    
+    .informations > * {
+        font-size: 8pt;
+    }
+
+    .buttons {
+        margin-top: 10px;
+    }
+}

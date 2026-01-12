@@ -1,0 +1,19 @@
+
+
+@media (max-width: 768px) {
+    #tournaments {
+        flex-direction: column;
+    }
+
+    .tournament .buttons {
+        gap: 10px;
+    }
+    
+    .tournament img{
+        width: 140px;
+    }
+
+    .tournament p{
+        font-size: 8pt;
+    }
+}

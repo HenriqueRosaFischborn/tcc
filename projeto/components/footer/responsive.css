@@ -1,0 +1,38 @@
+#footer-content {
+        width: 60%;
+}
+
+@media (max-width: 768px) {
+    #footer-menu {
+        display: none;
+    }
+
+    footer {
+        row-gap: 20px;
+    }
+
+    #footer-menu-cell {
+        display: flex;
+    }
+
+    footer h4 {
+        font-size: 10pt;
+        text-align: center;
+    }
+
+    #footer-content {
+        width: 80%;
+    }
+
+    footer nav {
+        padding: 0px;
+    }
+
+    footer nav a {
+        font-size: 10pt;
+    }
+
+    #social-medias h3 {
+        font-size: 10pt;
+    }
+}

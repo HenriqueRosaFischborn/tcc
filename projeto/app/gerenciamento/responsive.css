@@ -1,0 +1,43 @@
+@media(max-width: 768px) {
+    article {
+        flex-direction: column;
+    }
+
+    #desktop {
+        display: none;
+    }
+
+    #cell {
+        display: flex;
+    }
+    
+    #side-bar {
+        width: 100%;
+        padding: 0px;
+    }
+
+    #side-bar nav {
+        padding: 0px;
+    }
+
+    #arrow-bottom {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+
+    #arrow-bottom img {
+        rotate: -90deg;
+        width: 50px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    article > .content {
+        padding: 30px 5px;
+    }
+
+    #title-admin {
+        display: none;
+    }
+}

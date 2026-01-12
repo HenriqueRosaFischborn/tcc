@@ -1,0 +1,65 @@
+#content {
+    flex-direction: column;
+    width: 90%;
+    gap: 70px;
+}
+
+#body {
+  flex-direction: column;
+  gap: 50px;
+}
+
+.event {
+  align-items: start;
+  column-gap: 30px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.event .content {
+    flex-direction: column;
+    gap: 10px;
+    width: 66%;
+    
+}
+
+.event-img {
+    width: 30%;
+    height: auto;
+    object-fit: contain;
+}
+
+.title {
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.text {
+  font-size: 10pt;
+  font-weight: 500;
+
+  display: -webkit-box; /* Isso tudo faz ter só duas linhas */
+  line-clamp: 2; /* Isso tudo faz ter só duas linhas */
+  -webkit-line-clamp: 2; /* Isso tudo faz ter só duas linhas */
+  -webkit-box-orient: vertical; /* Isso tudo faz ter só duas linhas */
+  overflow: hidden; /* Isso tudo faz ter só duas linhas */
+  
+}
+
+.state {
+  gap: 10px;
+  align-items: center;
+}
+
+.state p {
+  font-weight: 500;
+}
+
+.buttons {
+  margin-top: 20px;
+  gap: 10px;
+  width: 100%;
+}
+
+

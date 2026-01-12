@@ -1,0 +1,45 @@
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 22px;
+}
+
+/* Esconde o checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Fundo do botão */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  
+  border-radius: 999px;
+  transition: 0.3s;
+}
+
+/* Bolinha */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+/* Ligado */
+/* .switch input:checked {
+  background-color: #229614;
+} */
+
+.switch input:checked + .slider::before {
+  transform: translateX(24px);
+}

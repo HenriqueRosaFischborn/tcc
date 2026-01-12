@@ -1,0 +1,39 @@
+@media (max-width: 768px) {
+  h1 {
+    font-size: 20pt;
+  }
+
+  h2 {
+    font-size: 15pt;
+  }
+
+  h3 {
+    font-size: 10pt;
+  }
+
+  label {
+    font-size: 10pt;
+  }
+
+  .button {
+    font-size: 10pt;
+    padding: 10px 10px;
+  }
+
+  .big {
+    font-size: 12pt;
+    width: 250px;
+  }
+
+  p {
+    font-size: 10pt;
+  }
+
+  th {
+    font-size: 12pt;
+  }
+
+  td {
+    font-size: 10pt;
+  }
+}

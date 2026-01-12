@@ -1,0 +1,71 @@
+article {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+#tournaments {
+    align-items: start;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+    width: 80%;
+    gap: 30px;
+}
+
+#tournaments h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.tournament {
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+    row-gap: 10px;
+    align-items: start;
+}
+
+.tournament h3{
+    text-align: start;
+}
+
+
+.tournament p{
+    font-size: 10pt;
+}
+
+.tournament img{
+    width: 240px;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
+}
+
+.tournament .contentImg {
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.tournament .content {
+    flex-direction: column;
+    row-gap: 10px;
+    width: 60%;
+}
+
+.tournament .buttons {
+    width: 100%;
+    
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.tournament .buttons div{
+    flex: 1;
+}
+
+.tournament .buttons a{
+    width: 100%;
+    height: fit-content;
+}
+
+/*margin*/

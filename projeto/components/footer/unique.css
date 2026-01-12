@@ -1,0 +1,58 @@
+#footer-menu-cell {
+    display: none;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(10, 10, 10);
+    color: white; 
+    padding: 30px 0px 30px 0px;
+    align-items: center;
+    row-gap: 50px;
+}
+
+footer img {
+    width: 150px;
+    height: 100%;
+    object-fit: contain;
+}
+
+footer nav {
+    flex-direction: column;
+    gap: 10px;
+    justify-content: right;
+    align-items: start;
+}
+
+footer nav a {
+    font-size: 12pt;
+    font-weight: 300;
+}
+
+footer .selected::after{
+    content: none;
+}
+
+footer nav a:hover::after{
+    content: none;
+}
+
+#social-medias {
+    gap: 10px;
+    flex-direction: column;
+    justify-content: right;
+    align-items: start;
+    flex-wrap: wrap;
+}
+
+#social-medias img {
+    width: 20px;
+    height: auto;
+}
+
+#social-medias h3 {
+    font-size: 12pt;
+    font-weight: 300;
+    text-align: start;
+}

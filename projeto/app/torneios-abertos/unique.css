@@ -1,0 +1,111 @@
+article {
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+#tournaments {
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+    width: 90%;
+    gap: 30px;
+}
+
+#tournaments h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.tournament {
+    flex-direction: column;
+    width: calc(50% - 15px);
+    justify-content: space-between;
+    row-gap: 10px;
+    align-items: start;
+    border: solid 2px var(--ligthgray);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.tournament h3{
+    text-align: start;
+}
+
+
+.tournament p{
+    font-size: 13pt;
+}
+
+.tournament img{
+    width: 240px;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
+}
+
+.tournament .contentImg {
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.tournament .content {
+    flex-direction: column;
+    row-gap: 10px;
+    width: 60%;
+}
+
+.tournament .buttons {
+    width: 100%;
+    margin-top: 20px;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.tournament .buttons div{
+    flex: 1;
+}
+
+.tournament .buttons a{
+    width: 100%;
+    height: fit-content;
+}
+
+#pbuttons {
+    gap: 30px;
+    justify-content: center;
+    width: 100%;
+}
+
+#div-search-bar {
+    width: 70%;
+    height: 50px;
+    border: solid 2px black;
+}
+
+#div-search-bar input {
+    width: 100%;
+}
+
+#div-search-bar input:focus {
+    outline: none;
+    border: none;
+    background-color: var(--ligthgray);
+}
+
+#icon-search {
+    background-color: black;
+    height: 100%;
+    width: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+#icon-search img {
+    height: 60%;
+    width: auto;
+    object-fit: contain;
+}
+
+/* genre */

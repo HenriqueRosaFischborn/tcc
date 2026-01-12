@@ -1,0 +1,14 @@
+@media(max-width: 768px) {
+    #checkboxes {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #checkboxes div {
+        gap: 10px;
+    }
+
+    .td-width {
+        width: 200px;
+    }
+}

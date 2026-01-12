@@ -1,0 +1,25 @@
+@media(max-width: 768px) {
+    #content h1 {
+        text-align: start;
+    }
+
+    .event-img {
+        display: none;
+    }
+
+    .event {
+        gap: 10px;
+    }
+
+    .event .content {
+        width: 100%;
+    }
+
+    .event h2 {
+        text-align: start;
+    }
+
+    .buttons {
+        margin-top: 0px;
+    }
+}

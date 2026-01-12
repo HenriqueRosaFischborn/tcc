@@ -1,0 +1,96 @@
+article > .content {
+    padding: 80px 0px;
+}
+
+#content {
+    flex-direction: column;
+    width: 100%;
+    row-gap: 50px;
+    align-items: end;
+}
+
+#content > .button {
+    margin-right: 50px;
+    text-align: start;
+}
+
+#content > div:not(#gray-area){
+    padding: 0px 50px;
+    
+}
+
+textarea {
+    border: solid 1px var(--darkgray);
+    padding: 10px;
+    font-size: 12pt;
+}
+
+#gray-area {
+    flex-direction: column;
+    width: 100%;
+    padding: 50px 50px;
+    background-color: var(--ligthgray);
+    border-top: solid 4px var(--darkgray);
+    border-bottom: solid 4px var(--darkgray);
+    gap: 50px;
+}
+
+#info {
+    width: calc(50% - 15px);
+}
+
+#podium-inputs {
+    gap: 15px;
+    width: calc(50% - 15px);
+}
+
+#podium-inputs div {
+    flex-direction: row;
+    width: 100%;
+    gap: 15px;
+}
+
+#podium-inputs div input {
+    flex: 1;
+}
+
+#body-tables {
+    gap: 30px;
+    border: solid 2px white;
+    padding: 30px;
+    border-radius: 20px;
+    flex-wrap: wrap;
+}
+
+.table-podium {
+    flex-direction: column;
+    gap: 10px;
+}
+
+#upload-photo {
+    flex-direction: column;
+    align-items: start;
+    gap: 20px;
+
+}
+
+#upload-photo div {
+    gap: 30px;
+}
+
+#upload-photo .button {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#upload-photo img {
+    width: 25px;
+    height: auto;
+    object-fit: contain;
+}
+
+#upload-photo .obs {
+    font-size: 12pt;
+    font-weight: 500;
+}

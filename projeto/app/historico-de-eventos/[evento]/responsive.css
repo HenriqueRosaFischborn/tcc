@@ -1,0 +1,22 @@
+@media(max-width: 768px) {
+    article {
+        gap: 30px;
+    }
+
+    #text-event {
+        width: 95%;
+    }
+
+    #img-event {
+        width: 100%;
+    }
+
+    .tables-body {
+        width: 95%;
+        gap: 10px;
+    }
+
+    #link-photos {
+        font-size: 15pt;
+    }
+}

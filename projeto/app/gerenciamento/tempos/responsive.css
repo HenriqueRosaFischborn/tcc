@@ -1,0 +1,19 @@
+@media(max-width: 768px) {
+    article > .content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    article > .content h2 {
+        text-align: center;
+    }
+
+    article > .content .form {
+        width: 100%;
+        align-items: center;
+    }
+
+    article > .content .form div {
+        justify-content: center;
+    }
+}

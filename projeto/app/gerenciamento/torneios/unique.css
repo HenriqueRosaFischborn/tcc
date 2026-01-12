@@ -1,0 +1,63 @@
+#content {
+    flex-direction: column;
+    width: 90%;
+    gap: 70px;
+}
+
+#body {
+  flex-direction: column;
+  gap: 50px;
+}
+
+.tournment {
+  align-items: start;
+  justify-content: space-between;
+  column-gap: 20px;
+  flex-wrap: wrap;
+}
+
+.tournment .content {
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    
+}
+
+.tournment-img {
+    width: 15%;
+    height: auto;
+    object-fit: contain;
+}
+
+.title {
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.state {
+  gap: 10px;
+  align-items: center;
+}
+
+.state p {
+  font-weight: 500;
+}
+
+.buttons {
+  gap: 10px;
+  width: 100%;
+}
+
+.body-informations {
+  column-gap: 40px;
+}
+
+.informations {
+  flex-direction: column;
+}
+
+.informations > * {
+  font-size: 10pt;
+  font-weight: 500;
+}

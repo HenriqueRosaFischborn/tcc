@@ -1,0 +1,79 @@
+#overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
+#modal {
+    flex-direction: column;
+    position: relative;
+    width: 60%;
+    padding: 50px 0px 20px 0px;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--ligthgray);
+    border: solid var(--darkgray) 2px;
+    border-radius: 10px;
+}
+
+#modal-absolute {
+    position: absolute;
+    align-items: start;
+    top: 20px;
+    left: calc(10% / 2);
+}
+
+#content {
+    width: 60%;
+    display: flex;
+    padding-top: '100px'
+}
+
+#modal #userImg:hover {
+    transform: none;
+    user-select: none;
+    cursor: auto;
+}
+
+#delete-account {
+                     
+    font-size: '15pt';
+    font-weight: '400';
+    cursor: 'pointer';
+                
+}
+
+@media (max-width: 768px) {
+    #modal #userImg {
+        display: none;
+    }
+
+    #modal {
+        width: 90%;
+
+    }
+
+    #modal #content {
+        width: 80%;
+        padding-top: 30px;
+    }
+
+    #modal h2 {
+        font-size: 12pt;
+    }
+
+    #modal h4 {
+        font-size: 12pt;
+    }
+
+    #delete-account {
+        font-size: 10pt;
+    }
+}

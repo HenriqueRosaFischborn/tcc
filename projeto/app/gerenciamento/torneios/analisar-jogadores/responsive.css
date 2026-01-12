@@ -1,0 +1,27 @@
+@media(max-width: 768px) {
+    #content {
+        width: 100%;
+        gap: 30px;
+        align-items: center;
+    }
+
+    #downloads {
+        width: 100%;
+    }
+
+    #folder-img {
+        display: none;
+    }
+
+    #info {
+        justify-content: center;
+    }
+
+    #info div {
+        align-items: center;
+    }
+
+    #info p {
+        text-align: center;
+    }
+}

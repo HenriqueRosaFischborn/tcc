@@ -1,0 +1,307 @@
+/* Poppins Thin */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Thin.ttf') format('truetype');
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* Poppins ExtraLight */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* Poppins Light */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Poppins Regular */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Poppins Medium */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Poppins SemiBold */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Poppins Bold */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Poppins ExtraBold */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Poppins Black */
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+
+@import "tailwindcss";
+
+:root {
+  --mainred: #f61717;
+  --mainblack: #1b1b1b;
+  --ligthgray: #e7e7e7;
+  --darkgray: #a4a4a4;
+}
+
+html {
+  margin: 0px;
+}
+
+div {
+  display: flex;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  margin: 0px;
+  min-height: 100vh;
+}
+
+article {
+  display: flex;
+  color: var(--mainblack);
+  align-items: center;
+  flex-direction: column;
+  flex: 1; /* Ocupa todo o espaço disponível */
+  color: var(--mainblack)
+}
+
+
+h1 {
+  font-size: 30pt;
+  font-weight: 500;
+  text-align: center;
+  width: fit-content;
+  margin: 0px;
+}
+
+h2 {
+  font-size: 20pt;
+  font-weight: 400;
+  text-align: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+h2 {
+  font-size: 20pt;
+  font-weight: 400;
+  text-align: center;
+}
+
+h3 {
+  font-size: 16pt;
+  font-weight: 600;
+  text-align: center;
+}
+
+h4 {
+  font-size: 16pt;
+  font-weight: 300;
+  text-align: center;
+}
+
+p {
+  font-size: 15pt;
+  font-weight: 300;
+}
+
+.button {
+  border-radius: 6px;
+  width: fit-content;
+  padding: 10px 30px 10px 30px;
+  font-size: 15pt;
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+}
+
+.big {
+  min-width: fit-content;
+  width: 350px;
+  font-size: 17pt;
+  text-align: center;
+}
+
+.red {
+  color: white;
+  background-color: var(--mainred);
+}
+
+.yellow {
+  color: white;
+  background-color: #ff8200;
+}
+
+.blue {
+  color: white;
+  background-color: #32a3d7;
+}
+
+.black {
+  color: white;
+  background-color: black;
+}
+
+.gray {
+  background-color: var(--ligthgray);
+  color: var(--mainblack);
+  border: solid 2px var(--mainblack);
+  
+}
+
+.obs {
+  font-style: italic;
+}
+
+form, .form {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 100%;
+  gap: 30px;
+}
+
+label {
+  font-size: 15pt;
+  font-weight: 400;
+  width: fit-content;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+#input-date  {
+  background-color: white;
+  border: solid 1px var(--darkgray);
+  padding: 3px 0px 3px 7px;
+  font-size: 12pt;
+}
+
+input[type="radio"] {
+  accent-color: var(--mainred);
+  zoom: 1.5;
+  cursor: pointer;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+/* 
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+#input-date:focus {
+  outline: none;
+  border: solid 1px red;
+  box-shadow: inset 0px 0px 0px 2px #000;
+} */
+
+.input-user {
+    background-color: white;
+    padding: 0px 13px;
+}
+
+input[type="checkbox"] {
+    -webkit-appearance: none; /* Chrome, Safari, Edge */
+    -moz-appearance: none;    /* Firefox */
+    appearance: none;
+    
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    border: solid 1px black;
+    box-shadow: none;
+    border-radius: 1px;
+}
+
+input[type="checkbox"]:checked {
+    background-color: black;
+    background-image: url('/icons/checked-white.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 15px 15px;
+}
+
+form div, .form div {
+  flex-direction: column;
+}
+
+table {
+    border: solid 1px black;
+}
+
+th {
+    background-color: black;
+    color: white;
+    font-size: 15pt;
+    padding: 10px;
+}
+
+.podium {
+    background-color: black;
+    color: white;
+    font-weight: 600;
+    padding: 5px 10px;
+    text-align: center;
+}
+
+td {
+    font-size: 15pt;
+    border: solid 1px black;
+    background-color: white;
+    padding: 0px 10px;
+}
+
+

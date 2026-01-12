@@ -1,0 +1,312 @@
+/* HEROBAR ===============================================================================================================*/
+
+#herobar {
+    padding: 80px 0px 80px 0px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    color: white;
+    margin-bottom: 50px;
+    position: relative;
+
+    background-image: url('/images/hero-background.png'); /* Url da imagem */
+    background-repeat: no-repeat; /* A imagem não repete*/
+    background-position: center 25%; /* Personalização do eixo vertical, eixo horizontal centralizado*/
+    background-size: cover; /* Vai ocupar todo o espaço da div */
+}
+
+#herobar h1, #herobar h2 {
+    text-align: start;
+    width: auto;
+}
+
+#herobar::before {
+    position: absolute;
+    content: "";
+    z-index: 1;
+    inset: 0px;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+#herobar div {
+    flex-direction: column;
+    align-items: start;
+    row-gap: 30px;
+}
+
+#herobar > * { /* '> *' <- significa todo o conteúdo da div */
+position: relative;
+z-index: 2;
+}
+
+/* HEROBAR ===============================================================================================================*/
+/* COMPARATION ===========================================================================================================*/
+
+#comparation {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+#comparation div {
+    gap: 20px;
+}
+
+#comparation div img {
+    width: calc(50% - 10px);
+    height: auto;
+}
+
+/* COMPARATION ===========================================================================================================*/
+/* SLIDER ================================================================================================================*/
+
+#slider {
+    flex-direction: column;
+    row-gap: 20px;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 50px;
+}
+
+#slider h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.track {
+    width: max-content;
+    animation: scroll 40s linear infinite;
+}
+
+.track img {
+    height: 300px;
+    width: auto;
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+@keyframes scroll {
+    from {
+    transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+/* SLIDER ================================================================================================================*/
+
+/* TOURNAMENTS ===========================================================================================================*/
+
+#tournaments {
+    align-items: start;
+    margin-bottom: 50px;
+    flex-wrap: wrap;
+    width: 90%;
+    gap: 30px;
+}
+
+#tournaments h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.tournament {
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
+    row-gap: 10px;
+    align-items: start;
+}
+
+.tournament h3{
+    text-align: start;
+}
+
+
+.tournament p{
+    font-size: 13pt;
+}
+
+.tournament img{
+    width: 240px;
+    height: auto;
+    flex-shrink: 0;
+    object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
+}
+
+.tournament .contentImg {
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.tournament .content {
+    flex-direction: column;
+    row-gap: 10px;
+    width: 60%;
+}
+
+.tournament .buttons {
+    width: 100%;
+    margin-top: 20px;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.tournament .buttons div{
+    flex: 1;
+}
+
+.tournament .buttons a{
+    width: 100%;
+    height: fit-content;
+}
+
+#pbuttons {
+    gap: 30px;
+    justify-content: center;
+    width: 100%;
+}
+
+
+/* TOURNAMENTS ===========================================================================================================*/
+
+/* FOUNDERS ==============================================================================================================*/
+
+#founders {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+#img-founders {
+    gap: 50px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+#img-founders div {
+    width: calc((90% - 250px)/ 6);
+    flex-direction: column;
+    align-items: center;
+    row-gap: 10px;
+}
+
+#img-founders h3{
+    font-size: 20pt;
+    font-weight: 500;
+}
+
+#img-founders img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    
+}
+
+/* FOUNDERS ==============================================================================================================*/
+
+/* HISTORY ===============================================================================================================*/
+
+#history { 
+    width: 100%;
+    min-height: 80vh;
+    color: white; 
+    background-color: black;
+    margin-bottom: 50px;
+}
+
+#history #img {
+    width: max-content;
+    min-height: 100%;
+    position: relative;
+    object-fit: cover;
+}
+
+#history #img::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  width: 120px;           /* largura do "shadow" */
+  height: 100%;
+
+  background: linear-gradient(
+    to left,
+    rgb(0, 0, 0) 0%,
+  rgba(0, 0, 0, 0.85) 40%,
+  rgba(138, 43, 226, 0) 75%   
+  );
+
+  pointer-events: none;
+}
+
+#p-content {
+    flex: 1;
+    min-width: 50%;
+    flex-direction: column;
+    background-color: black;
+    padding: 50px 30px 55px 30px;
+    align-items: center;
+}
+
+#p-content div{
+    flex-direction: column;
+    width: 70%;
+    row-gap: 20px;
+}
+
+
+#history p {
+    text-indent: 2em;
+    text-align: justify;
+}
+
+
+
+/* HISTORY ===============================================================================================================*/
+
+/* ORIGINS ===============================================================================================================*/
+
+#origins {
+    flex-direction: column;
+    margin-bottom: 80px;
+    width: 100%;
+}
+
+#origins h1 {
+    width: 100%;
+    text-align: center;
+}
+
+.rigth img {
+    height: 250px;
+}
+
+.left img {
+    height: 250px;
+}
+
+.left {
+    animation: scrollleft 40s linear infinite;
+}
+
+@keyframes scrollleft {
+    from {
+    transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(50%);
+    }
+}
+
+/* ORIGINS ===============================================================================================================*/

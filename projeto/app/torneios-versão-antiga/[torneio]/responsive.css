@@ -1,0 +1,43 @@
+#bars-content {
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .bar {
+        display: none;
+    }
+
+    #bars-content {
+        justify-content: center;
+    }
+
+    #form-content {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        width: 95%;
+    }
+
+    #form-content .form h3 {
+        font-size: 10pt;
+    }
+
+    #form-content .form .obs {
+        font-size: 9pt;
+    }
+
+    .form > div{ /* Afeta apenas a primeira div de dentro */
+        justify-content: space-between;
+    }
+
+    input[type="radio"] {
+        zoom: 1.2;
+    }
+
+    #qr-div p {
+        font-size: 10pt;
+    }
+
+    #qr-div img {
+        width: 40%;
+    }
+}

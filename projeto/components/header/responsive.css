@@ -1,0 +1,62 @@
+.menu {
+  padding: 10px 50px 10px 50px;
+}
+
+@media (max-width: 768px) {
+  #icon-menu-cell {
+      display: flex;
+      gap: 30px
+  }
+  
+  .menu {
+    padding: 10px 15px 10px 15px;
+  }
+
+  #menu-desktop {
+  display: none;
+  }
+
+  img:hover {
+    transform: none;
+  }
+
+  header nav {
+    flex-direction: column;
+  }
+
+  nav {
+    justify-content: center;
+    gap: 150px;
+    row-gap: 10px;
+    font-size: 15pt;
+    flex-wrap: wrap;
+    padding: 0px 20px 20px 20px;
+  }
+}
+
+#hamburguer {
+  height: auto;
+  width: 45px;
+  cursor: pointer;
+  border: solid white 2px;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+
+
+#menu-cell {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+}
+
+#menu-cell.open {
+  max-height: 300px;
+  opacity: 1;
+}
+
+#menu-cell.closed {
+  max-height: 0;
+  opacity: 0;
+}

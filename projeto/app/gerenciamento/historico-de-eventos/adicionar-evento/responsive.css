@@ -1,0 +1,43 @@
+@media(max-width: 768px) {
+    #content {
+        gap: 30px;
+    }
+
+    #content > div:not(#gray-area){
+        padding: 0px 30px;
+        
+    }
+
+    #gray-area {
+        padding: 30px;
+    }
+
+    #info {
+        width: 100%;
+    }
+
+    #podium-inputs {
+        width: 100%;
+    }
+
+    #body-tables {
+        justify-content: center;
+        
+        padding: 10px;
+        gap: 10px;
+    }
+
+    #upload-photo div {
+        flex-direction: column;
+        gap: 5px;
+        padding-bottom: 30px;
+    }
+
+    #upload-photo div .obs {
+        font-size: 10pt;
+    }
+
+    #content > .button {
+        margin-right: 30px;
+    }
+}
