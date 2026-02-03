@@ -61,7 +61,7 @@ export default function HistoryEvents() {
                 </div>
 
                 <div id="img">
-                    <img src="/images/img-history-events.png" alt="" />
+                    <img src="/images/img-history-events.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>
                 </div>
                 
             </div>
@@ -69,7 +69,7 @@ export default function HistoryEvents() {
                 <div id='side-bar'>
                     {Array.from({length: 4}).map((el, i) => {return (
                         <details key={i}>
-                            <summary onClick={clickArcodion}><img src="/icons/arrow.png" alt="" style={{width: '20px', height: 'auto', objectFit: 'contain', rotate: '180deg'}}/><p className='year-event'>2025</p></summary>
+                            <summary onClick={clickArcodion}><img src="/icons/arrow.png" alt="" style={{width: '20px', height: 'auto', objectFit: 'contain', rotate: '180deg'}} fetchPriority='low' loading='lazy' decoding='async'/><p className='year-event'>2025</p></summary>
                             <p onClick={(e) => openMonth(e.currentTarget)} className='month-event'>Fevereiro</p>
                             <p onClick={(e) => openMonth(e.currentTarget)} className='month-event'>Janeiro</p>
                         </details>

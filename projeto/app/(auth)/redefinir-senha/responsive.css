@@ -1,0 +1,14 @@
+@media(max-width: 768px) {
+    #img {
+        display: none;
+    }
+
+    article {
+        min-height: 82vh;
+        padding: 30px 0px;
+    }
+
+    #login-content img {
+        width: 100px;
+    }
+}

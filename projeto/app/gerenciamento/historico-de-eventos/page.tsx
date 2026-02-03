@@ -49,7 +49,7 @@ export default function EventsHistoric() {
                         width: '26px',
                         height: 'auto',
                         objectFit: 'contain'
-                    }}/> ADICIONAR POSTAGEM</button>
+                    }} fetchPriority='low' loading='lazy' decoding='async'/> ADICIONAR POSTAGEM</button>
                 </div>
                 <div id='body'>
                     {events.map((el, i) => {return(
@@ -74,7 +74,7 @@ export default function EventsHistoric() {
                                 </div>
                                 <p className='text'>{el.text}</p>
                             </div>
-                            <img src={el.imgSrc} alt="img" className='event-img'/>
+                            <img src={el.imgSrc} alt="img" className='event-img' fetchPriority='low' loading='lazy' decoding='async'/>
                             <div className='buttons'>
                                 <a href="#" className='button red'>Editar informações</a>
                                 <button className='button black'>Deletar evento</button>

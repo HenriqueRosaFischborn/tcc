@@ -10,10 +10,10 @@ export default function Modal( { onClose }: { onClose: () => void }) {
                 <div id="modal" onClick={(e) => e.stopPropagation()}>
                     <div id='modal-absolute' style={{justifyContent: 'space-between', width: '90%'}}>
                         <div style={{alignItems: 'center', gap: '10px', cursor: 'pointer'}} onClick={onClose}>
-                            <img src="/icons/arrow.png" alt="arrow" style={{width: '25px'}}/>
+                            <img src="/icons/arrow.png" alt="arrow" style={{width: '25px'}} fetchPriority='low' loading='lazy' decoding='async'/>
                             <h4>Voltar</h4>
                         </div>
-                        <img id='userImg' src="/icons/user.png" alt="logo" style={{width: '70px'}}/>
+                        <img id='userImg' src="/icons/user.png" alt="logo" style={{width: '70px'}} fetchPriority='low' loading='lazy' decoding='async'/>
                     </div>
                     
                     <h1>Meu Perfil</h1>

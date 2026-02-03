@@ -10,7 +10,7 @@ export default function OpenTournments() {
                 <div id='div-search-bar'>
                     <input type="text" />
                     <div id='icon-search'>
-                        <img src="/icons/search.png" alt="search" />
+                        <img src="/icons/search.png" alt="search" fetchPriority='low' loading='lazy' decoding='async'/>
                     </div>
                 </div>
 
@@ -35,7 +35,7 @@ export default function OpenTournments() {
                             Valor: R$10,00 - R$25,00
                         </p>
                     </div>
-                    <img src="/folderteste.jpeg" alt="torneio" />
+                    <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
                     </div>
                     <div className="buttons">
                     <div>

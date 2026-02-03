@@ -1,0 +1,26 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model usuario {
+  id                 Int                 @id @default(autoincrement())
+  email              String              @unique
+  password           String
+  admin              Boolean             @default(false)
+  passwordresettoken passwordresettoken?
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model passwordresettoken {
+  id        Int      @id(map: "token_pkey") @default(autoincrement())
+  token     String   @unique(map: "token_token_key")
+  createdby Int      @unique
+  createdat DateTime @default(now()) @db.Timestamptz(6)
+  expiresat DateTime @db.Timestamptz(6)
+  usuario   usuario  @relation(fields: [createdby], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "token_createdby_fkey")
+}

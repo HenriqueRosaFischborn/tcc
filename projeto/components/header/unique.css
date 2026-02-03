@@ -74,3 +74,10 @@ header .menu-item {
 #userImg:hover {
   transform: scale(1.1);
 }
+
+header #logout {
+  color: white;
+  font-size: 15pt;
+  font-weight: 500;
+  cursor: pointer;
+}

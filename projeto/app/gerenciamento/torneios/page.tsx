@@ -100,7 +100,7 @@ export default function Tournments() {
                                     </div>
                                 </div>
                             </div>
-                            <img src={el.srcFolder} alt="img" className='tournment-img'/>
+                            <img src={el.srcFolder} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
                             <div className='buttons'>
                                 <a href="#" className='button red'>Editar informações</a>
                                 <button className='button black'>Deletar torneio</button>

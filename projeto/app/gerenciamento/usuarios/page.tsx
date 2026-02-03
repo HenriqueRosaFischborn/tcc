@@ -39,7 +39,7 @@ export default function Users() {
                     <div id='div-search-bar'>
                         <input type="text" />
                         <div id='icon-search'>
-                            <img src="/icons/search.png" alt="search" />
+                            <img src="/icons/search.png" alt="search" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                     </div>
                 

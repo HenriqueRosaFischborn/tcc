@@ -1,0 +1,76 @@
+#icon-menu-cell {
+  display: none;
+}
+
+#icon-menu-cell {
+  display: none;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mainred);
+  align-items: center;
+  position: sticky; /* Fica colado e acompanha depois */
+  top: 0; /*Necessário pro sticky*/
+  width: 100%;
+  z-index: 1000;
+}
+
+nav {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+  justify-content: left;
+}
+
+header .menu-item {
+  position: relative;
+  color: white;
+  font-size: 15pt;
+  font-weight: 500;
+  text-align: center;
+  z-index: 1000;
+}
+
+.menu-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 2px;
+  background-color: green;
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item:hover::after {
+  opacity: 0.75;
+}
+
+.menu-item.active::after {
+  opacity: 1;
+}
+
+.menu-item.selected::after {
+  opacity: 1;
+}
+
+#userImg {
+  width: 40px;
+  cursor: pointer;
+  aspect-ratio: 1 / 1; /* faz a imagem diminuir e não achatar */
+  object-fit: contain; /* faz a imagem diminuir e não achatar */
+  flex-shrink: 0; /* faz a imagem diminuir e não achatar */
+  transition: 0.2s ;
+  margin-right: 3px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+#userImg:hover {
+  transform: scale(1.1);
+}

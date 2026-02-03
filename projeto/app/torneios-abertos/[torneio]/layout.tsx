@@ -1,11 +1,10 @@
 import './unique.css'
 import './responsive.css'
+import { auth } from '@/auth';
 
-export default function layoutTorneio({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default async function layoutTorneio({children}: {children: React.ReactNode}) {
+    
+    
     return (
         <>
             <div id='bars-content' style={{width: '100%', height: '100%', justifyContent: 'center'}}>
@@ -27,7 +26,7 @@ export default function layoutTorneio({
                                     Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora: 19:05
                                 </p>
                             </div>
-                            <img id='folder-img' src="/folderteste.jpeg" alt="folder" />
+                            <img id='folder-img' src="/folderteste.jpeg" alt="folder" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                         <div id='l2' style={{ flexDirection: 'column', alignItems: 'start', rowGap: '30px'}}>
                             <h2>Realizar inscrição:</h2>

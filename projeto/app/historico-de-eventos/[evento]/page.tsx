@@ -9,7 +9,7 @@ export default function Event() {
             <p id='text-event'>
                 O V CIRCUITO BLITZ DE SOMBRIO, promovido pelo Sombrio Xadrez Clube, ocorreu em 12 de outubro de 2025. O evento foi realizado no Centro Cultural de Curitiba
             </p>
-            <img id='img-event' src="/img-event-teste.png" alt="imagem" />
+            <img id='img-event' src="/img-event-teste.png" alt="imagem" fetchPriority='low' loading='lazy' decoding='async'/>
             {Array.from({length: 2}).map((el, i) => {return (
                 <div key={i} className='premiation'>
                     <h2 style={{fontWeight: '600'}} >Premiações das Categorias Masculinas</h2>

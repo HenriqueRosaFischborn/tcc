@@ -149,6 +149,7 @@ p {
 .button {
   border-radius: 6px;
   width: fit-content;
+  min-width: 250px;
   padding: 10px 30px 10px 30px;
   font-size: 15pt;
   font-weight: 500;
@@ -192,6 +193,12 @@ p {
 
 .obs {
   font-style: italic;
+}
+
+.error {
+  color: var(--mainred);
+  font-size: 12pt;
+  font-weight: 500;
 }
 
 form, .form {

@@ -128,7 +128,7 @@ export default function AddTournment() {
                                 <td>
                                     <div>
                                         <p>Sub 14  - 15,00</p>
-                                        <img src="/icons/cancel-red.png" alt="" />    
+                                        <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>    
                                     </div>    
                                 </td>
                             </tr>
@@ -144,7 +144,7 @@ export default function AddTournment() {
                                 <td>
                                     <div>
                                         <p>Sub 14  - 15,00</p>
-                                        <img src="/icons/cancel-red.png" alt="" />    
+                                        <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>    
                                     </div>    
                                 </td>
                             </tr>
@@ -160,7 +160,7 @@ export default function AddTournment() {
                                 <td>
                                     <div>
                                         <p>Sub 14  - 15,00</p>
-                                        <img src="/icons/cancel-red.png" alt="" />    
+                                        <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>    
                                     </div>    
                                 </td>
                             </tr>
@@ -192,7 +192,7 @@ export default function AddTournment() {
                             <td>
                                 <div className='td-width'>
                                     <p>10% para 10 jogadores</p>
-                                    <img src="/icons/cancel-red.png" alt="" />  
+                                    <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>  
                                 </div>
                             </td>
                         </tr>

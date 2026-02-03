@@ -56,3 +56,8 @@ footer nav a:hover::after{
     font-weight: 300;
     text-align: start;
 }
+
+footer #logout{
+    font-size: 12pt;
+    font-weight: 300;
+}

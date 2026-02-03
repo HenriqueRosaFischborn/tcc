@@ -2,6 +2,7 @@ import Image from "next/image";
 import './unique.css'
 import './responsive-unique.css'
 import { headers } from 'next/headers'
+import { auth } from "@/auth";
 
 
 export default async function Home() {
@@ -14,19 +15,20 @@ export default async function Home() {
   return (
     <>
       <div id="herobar">
-        <img src="/logo.png" alt="logo"/>
+        <img src="/logo.png" alt="logo" fetchPriority='low' loading='lazy' decoding='async'/>
         <div>
           <h1 >"O xadrez é a gisnástica da inteligência"</h1>
           <h2>- Johann Wolfgang</h2>
         </div>
       </div>
       
+      
       <div id="comparation">
         <h1 >Bem-vindo ao Sombrio Xadrez Clube!!!</h1>
         <h2 style={{paddingBottom: '10px'}}>Promovendo o xadrez há mais de 20 anos</h2>
         <div>
-          <img src="/images/comp1.png" alt="comp1" />
-          <img src="/images/comp2.png" alt="comp2" />
+          <img src="/images/comp2.png" alt="comp2" fetchPriority='low' loading='lazy' decoding='async'/>
+          <img src="/images/comp1.png" alt="comp1" fetchPriority='low' loading='lazy' decoding='async'/>
         </div>
       </div>
       
@@ -34,17 +36,17 @@ export default async function Home() {
         <h1 >Trazendo torneios que criam amizades!</h1>
         <div className="track">
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img1.png" alt="img1" />
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img3.png" alt="img3" />
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
           </div>
 
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img1.png" alt="img1" />
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img3.png" alt="img3" />
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
           </div>
         </div>
       </div>
@@ -73,7 +75,7 @@ export default async function Home() {
                   Valor: R$10,00 - R$25,00
                 </p>
               </div>
-              <img src="/folderteste.jpeg" alt="torneio" />
+              <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
             </div>
             <div className="buttons">
               <div>
@@ -99,27 +101,27 @@ export default async function Home() {
         <h2>Aqueles que fizeram tudo acontecer</h2>
         <div id="img-founders">
           <div>
-            <img src="/images/f1.png" alt="f" />
+            <img src="/images/f1.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>Athauan Machado</h3>
           </div>
           <div>
-            <img src="/images/f2.png" alt="f" />
+            <img src="/images/f2.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>Mateus de Souza</h3>
           </div>
           <div>
-            <img src="/images/f3.png" alt="f" />
+            <img src="/images/f3.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>Thiago Godinho</h3>
           </div>
           <div>
-            <img src="/images/f4.png" alt="f" />
+            <img src="/images/f4.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>Chesman Emerim</h3>
           </div>
           <div>
-            <img src="/images/f5.png" alt="f" />
+            <img src="/images/f5.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>José <br/> Carlos</h3>
           </div>
           <div>
-            <img src="/images/f6.png" alt="f" />
+            <img src="/images/f6.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
             <h3>Lucas de Souza</h3>
           </div>
         </div>
@@ -128,7 +130,7 @@ export default async function Home() {
 
       <div id="history">
         <div id="img">
-          <img src="/images/img-our-history.png" alt="" />
+          <img src="/images/img-our-history.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/>
         </div>
         
         <div id="p-content">
@@ -152,17 +154,17 @@ export default async function Home() {
 
         <div className="track rigth" style={{marginBottom: '20px'}}>
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img1.png" alt="img1" />
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img3.png" alt="img3" />
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
           </div>
 
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img1.png" alt="img1" />
-            <img src="/images/slider1/img2.png" alt="img2" />
-            <img src="/images/slider1/img3.png" alt="img3" />
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
           </div>
         </div>
 
@@ -171,17 +173,17 @@ export default async function Home() {
 
           <div className="track left">
             <div className="set">
-              <img src="/images/slider1/img2.png" alt="img2" />
-              <img src="/images/slider1/img1.png" alt="img1" />
-              <img src="/images/slider1/img2.png" alt="img2" />
-              <img src="/images/slider1/img3.png" alt="img3" />
+              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
             </div>
 
             <div className="set">
-              <img src="/images/slider1/img2.png" alt="img2" />
-              <img src="/images/slider1/img1.png" alt="img1" />
-              <img src="/images/slider1/img2.png" alt="img2" />
-              <img src="/images/slider1/img3.png" alt="img3" />
+              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
             </div>
           </div>
         </div>

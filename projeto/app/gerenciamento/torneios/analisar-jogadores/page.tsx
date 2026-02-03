@@ -47,7 +47,7 @@ export default function Players() {
                             Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora: 19:05
                         </p>
                     </div>
-                    <img id='folder-img' src="/folderteste.jpeg" alt="folder" />
+                    <img id='folder-img' src="/folderteste.jpeg" alt="folder" fetchPriority='low' loading='lazy' decoding='async'/>
                 </div>
                 <div id='downloads'>
                     <h2>Baixar lista de jogadores:</h2>
@@ -63,7 +63,7 @@ export default function Players() {
                     <div id='div-search-bar'>
                         <input type="text" />
                         <div id='icon-search'>
-                            <img src="/icons/search.png" alt="search" />
+                            <img src="/icons/search.png" alt="search" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                     </div>
 

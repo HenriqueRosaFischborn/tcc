@@ -30,7 +30,7 @@ export default function MyInscriptions() {
                                     <strong>Você só poderá realizar sua inscrição até 28/08 às 18:00</strong>
                                 </p>
                             </div>
-                            <img src="/folderteste.jpeg" alt="torneio" />
+                            <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                         <div className="buttons">
                             <div>
@@ -63,7 +63,7 @@ export default function MyInscriptions() {
                                     <strong>Você só poderá realizar sua inscrição até 28/08 às 18:00</strong>
                                 </p>
                             </div>
-                            <img src="/folderteste.jpeg" alt="torneio" />
+                            <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                         <div className="buttons">
                             <div>

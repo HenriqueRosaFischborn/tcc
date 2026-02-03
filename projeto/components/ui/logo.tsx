@@ -9,7 +9,7 @@ export default function Logo(props?: {width?: string}) {
                     {
                         transition: '0.2s'
                     }
-                }/>
+                } fetchPriority='low' loading='lazy' decoding='async'/>
             </a>
         </>
     )

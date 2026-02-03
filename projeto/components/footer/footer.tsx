@@ -1,9 +1,9 @@
-import Menu from "../header/menu";
+import Menu from "../header/menuList";
 import Logo from "../ui/logo";
 import './unique.css'
 import './responsive.css'
 
-export default function Footer() {
+export default function Footer({user, admin}: {user: boolean, admin: boolean}) {
     const year = new Date().getFullYear();
     
     return (
@@ -16,11 +16,11 @@ export default function Footer() {
                 }}>
                     <div id="footer-menu" style={{gap: '20px', alignItems: 'stretch'}}>
                         <Logo />
-                        <Menu />
+                        <Menu user={user} admin={admin}/>
                     </div>
 
                     <div id="footer-menu-cell">
-                        <Menu />
+                        <Menu user={user} admin={admin}/>
                     </div>
 
                     <div id="social-medias">

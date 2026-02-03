@@ -44,7 +44,7 @@ export default function Times() {
                     </thead>
                     <tbody>
                         {times.map((el, i) => { return (  
-                            <tr key={i} ><td><p>{el.time} + {el.plus}</p><img className='cancel-img' src="/icons/cancel-red.png" alt="x" onClick={(e) => removeItem(e)} /></td></tr>
+                            <tr key={i} ><td><p>{el.time} + {el.plus}</p><img className='cancel-img' src="/icons/cancel-red.png" alt="x" onClick={(e) => removeItem(e)} fetchPriority='low' loading='lazy' decoding='async'/></td></tr>
                         )})}
                     </tbody>
                 </table>

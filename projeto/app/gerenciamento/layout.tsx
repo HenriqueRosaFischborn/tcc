@@ -31,7 +31,7 @@ export default function MenuAdmin({
               <div id='arrow-bottom'  onClick={() => {
                 setOpen(!open)
               }}>
-                <img  src="/icons/arrow-white.png" alt="arrow"/>
+                <img  src="/icons/arrow-white.png" alt="arrow" fetchPriority='low' loading='lazy' decoding='async'/>
               </div>
 
 

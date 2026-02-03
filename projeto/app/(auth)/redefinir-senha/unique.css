@@ -1,0 +1,36 @@
+article {
+    flex-direction: row;
+}
+
+
+
+#img {
+    width: 35%;
+}
+
+#img img {
+    width: 100%;
+    height: 86vh;
+    object-fit: cover;
+}
+
+#login-content {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#login-content .form {
+    width: 50%;
+    align-items: center;
+}
+
+#login-content h1 {
+    margin-bottom: 30px;
+}
+
+#forgot-my-password {
+    color: var(--mainred);
+    
+}
