@@ -1,15 +1,20 @@
 'use client'
 
+import { FormState } from "@/lib/types";
 import IMask from "imask";
 import { useEffect, useRef } from "react";
 
 
-export default function InputDate() {
+export default function InputDate({blur, state}: {blur?: Function, state?: FormState}) {
     const yearNow = new Date().getFullYear()
-    
-    
-
     const inputRef = useRef<HTMLInputElement | null>(null)
+
+    function handleEnterBlur(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            e.currentTarget.blur()
+        }
+    }
 
     useEffect(() => {
         if (!inputRef.current) return
@@ -55,7 +60,11 @@ export default function InputDate() {
         <input
         ref={inputRef}
         id="input-date"
+        className="needed"
         name="borndate"
+        onKeyDown={handleEnterBlur}
+        onBlur={blur ? (e) => blur(e.currentTarget.value) : () => {}}
+        defaultValue={state && state.values && state.values[0] ? state.values[0].borndate : ''}
         />
     )
 }

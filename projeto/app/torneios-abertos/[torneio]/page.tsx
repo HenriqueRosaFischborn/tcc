@@ -1,4 +1,5 @@
-import FormInscriIndividual from '@/components/forms/inscription/individual'
+import FormInscriIndividual from "./form/individual";
+
 
 
 export default function Torneio() {

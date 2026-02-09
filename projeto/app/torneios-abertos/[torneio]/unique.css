@@ -69,47 +69,10 @@ input[type="radio"] {
     align-items: start;
 }
 
-#qr-div {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: start;
-    flex-wrap: wrap;
-    padding: 20px;
-    border: solid 3px var(--darkgray);
-    border-radius: 10px;
-}
-
-
-#qr-div img{
-    width: 30%;
-    height: auto;
-    object-fit: contain;
-}
-
-#qr-div p {
-    font-size: 15pt;
-    font-weight: 400;
-}
-
-#qr-key {
-    margin-top: 30px;
-    row-gap: 0px;
-    width: 100%;  
-}
-
-#qr-key .input {
-    width: 100%;
-    margin-top: 0px;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-}
-
-#qr-key .input img {
-    width: auto;
-    max-height: 30px;
-    object-fit: contain;
-    cursor: pointer;
+.fide-link {
+    color: blue;
+    text-decoration: underline;
+    font-weight: 500;
 }
 
 .form .buttons {
@@ -146,3 +109,26 @@ summary p {
 }
 
 /* --mainred */
+
+.disable {
+    pointer-events: none;
+}
+
+.disableDiv {
+    pointer-events: none;
+    opacity: 50%;
+}
+
+#warning-box {
+    color: white;
+    width: 100%;
+    
+    padding: 10px 20px;
+    background-color: #ff8200;
+    border-radius: 10px;
+    border: solid 4px #e47600;
+}
+
+#warning-box p{
+    font-weight: 500;
+}

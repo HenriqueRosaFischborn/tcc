@@ -201,6 +201,13 @@ p {
   font-weight: 500;
 }
 
+.ast {
+  color: var(--mainred);
+  font-size: 16pt;
+  padding-left: 0px;
+  font-weight: 500;
+}
+
 form, .form {
   display: flex;
   flex-wrap: wrap;
@@ -213,6 +220,7 @@ label {
   font-size: 15pt;
   font-weight: 400;
   width: fit-content;
+  display: flex;
 }
 
 input[type="text"],
@@ -311,4 +319,7 @@ td {
     padding: 0px 10px;
 }
 
+td div{
+  flex-direction: row;
+}
 

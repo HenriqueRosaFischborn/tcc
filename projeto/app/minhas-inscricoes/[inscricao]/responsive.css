@@ -1,0 +1,40 @@
+@media(max-width: 768px) {
+    article {
+        padding: 50px 20px;
+    }
+
+    .content {
+        flex-direction: column;
+    }
+
+    #qr-div {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: start;
+        gap: 10px;
+    }
+
+    #qr-div img {
+        width: 20%;
+    }
+
+    #qr-key {
+        flex: 1;
+    }
+
+    .info-div {
+        column-gap: 5px;
+        padding: 10px;
+        
+    }
+
+    .info-div div {
+        
+        width: 70%;
+    }
+
+    #buttons button{
+        width: 50%;
+    }
+}

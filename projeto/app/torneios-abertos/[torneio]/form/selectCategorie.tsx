@@ -1,0 +1,228 @@
+'use client'
+export const dynamic= "force-dynamic"
+
+import InputDate from "@/components/ui/input-date"
+import React, { useEffect, useState } from "react"
+import searchCat from "./search-cat"
+import { FormState } from "@/lib/types"
+
+
+type FieldsCat = Array<'genre' | 'date'> //array com os elementos permitidos
+
+enum ErrorCat {
+    TRUE = 'true',
+    FALSE = 'false',
+    NONE = 'sem'
+}
+
+export function SelectCategorie({setindividualPrice, blur, state, setDivisions}: {setindividualPrice?: Function, blur?: Function, setDivisions?: Function, state: FormState}) {
+    const [fieldsCat, setFields] = useState<FieldsCat>(['genre'])
+    const [updateCat, setUpdate] = useState<Boolean>(false) // essa const só serve pra quando atualizar, chamar o useEffect de novo, atualizando a cat, ela muda sempre no complete
+    
+    const [errorCat, setErrorCat] = useState<ErrorCat>(ErrorCat.NONE)
+    
+
+    const [cat, setCat] = useState<any>({})
+     
+
+    useEffect(() => {
+        async function searchCate() {
+            
+                if (fieldsCat.indexOf('genre') !== -1 && fieldsCat.indexOf('date') !== -1) {              
+                    const inputDate = document.getElementById('input-date')
+                    if (!(inputDate instanceof HTMLInputElement)) return 
+                    const date = inputDate.value
+                    const res = await searchCat(date)
+
+                    if (res.error) {
+                        setErrorCat(ErrorCat.TRUE)
+                    } else {
+                        setErrorCat(ErrorCat.FALSE)
+                    }
+
+                    
+                    if (res.value && res.name && res.uuidCat && res.value) {
+                        setCat({
+                            hasDivision: res.division,
+                            name: res.name,
+                            value: res.value,
+                            uuidCat: res.uuidCat
+                        })
+                        
+                        if (setindividualPrice) {
+                            setindividualPrice(res.value)
+                        }
+                        if (setDivisions) {
+                            setDivisions({
+                                fide: res.fide,
+                                cbx: res.cbx
+                            })
+                        }
+                    
+                    } else {
+                        setCat({
+                            hasDivision: false,
+                            fide: false,
+                            cbx: false,
+                            value: 0,
+                            name: '',
+                            uuidCat: ''
+                        })
+                        if (setindividualPrice) {
+                            setindividualPrice(0)
+                        }
+                        if (setDivisions) {
+                            setDivisions({
+                                fide: false,
+                                cbx: false
+                            })
+                        }
+                    }
+                }
+            
+        }
+
+        searchCate()
+
+        function xBlur() {
+            if (blur) {
+                blur()
+            }
+        }
+        if (blur) {
+            document.getElementById('input-date')?.removeEventListener('blur', xBlur)
+            document.getElementById('input-date')?.addEventListener('blur', xBlur)
+        }
+    }, [updateCat, fieldsCat])
+
+    const [dfChecked, setChek] = useState<boolean>(true)
+    const [dfChecked2, setChek2] = useState<boolean>(true)
+
+    useEffect(() => {
+
+        if (state.values && state.values[0] && state.values[0]) {
+            console.log(state.values[0].genre)
+            console.log(state.values[0].division)
+        }
+
+        if (state.values && state.values[0] && state.values[0].genre === 'fem') {
+            setChek2(false)
+            
+            document.getElementById('input-date')?.focus()
+            document.getElementById('input-date')?.blur()
+            
+            
+        } 
+
+        if (state.values && state.values[0] && state.values[0].division === 'superior') {
+            setChek(false)
+            document.getElementById('input-date')?.focus()
+            document.getElementById('input-date')?.blur()
+            
+            
+        }
+    }, [state.values])
+
+    useEffect(() => {
+        setChek(dfChecked)
+        setChek2(dfChecked2)
+    },  [state.values])
+
+    // function divClick(e: React.MouseEvent) { // serve pra poder clicar na div tbm
+    //         const x = e.currentTarget.querySelector('input')
+    //         if (!x) return
+    //         if (x.checked == false) {
+    //             setChek(!dfChecked)
+    //         } 
+    // }
+
+    // function divClick2(e: React.MouseEvent) { // serve pra poder clicar na div tbm
+    //         const x = e.currentTarget.querySelector('input')
+    //         if (!x) return
+    //         if (x.checked == false) {
+    //             setChek2(!dfChecked2)
+    //         } 
+    // }
+
+    function defineDate(date: string) {
+        const complete = date.split('').length == 10
+        if (complete) {
+            setUpdate(!updateCat)
+            if (fieldsCat.indexOf('date') == -1) {
+                setFields(prev => [...prev, 'date'])
+            }
+        } else {
+            if (fieldsCat.indexOf('date') !== -1) {
+                setFields(prev => prev.filter((el, i) => el !== 'date'))
+            }
+            if (setindividualPrice) {
+                setindividualPrice(0)
+            }
+        }
+    }
+
+    
+    
+    return (
+
+        <>
+            <div style={{width: '35%'}}>
+                <label htmlFor="borndate">Data de nascimento: <p className="ast">*</p></label>
+                <InputDate blur={defineDate} state={state}/>
+            </div>
+            
+            <div className="genre" style={{flexDirection: 'column', alignItems: 'start'}}>
+                <div style={{flexDirection: 'row', gap: '10px', cursor: 'pointer'}}>
+                    <input  checked={dfChecked2} type="radio" name="genre" value={'masc'} onChange={() => setChek2(true)} /><h3>Masculino</h3>
+                </div>
+                <div style={{flexDirection: 'row', gap: '10px', cursor: 'pointer'}}>
+                    <input  id="df2" checked={!dfChecked2} type="radio" name="genre" value={'fem'} onChange={() => setChek2(false)} /><h3>Feminino</h3>
+                </div>
+            </div>
+            
+            {errorCat == 'true' ? (
+                <p className="error">Nenhuma categoria deste torneio abraange sua idade</p>
+            ) : ('')}
+
+            {fieldsCat.indexOf('genre') !== -1 && fieldsCat.indexOf('date') !== -1 && !(errorCat == 'true') ? (
+                <div className="div-categorie" style={{width: '100%', flexDirection: 'row', gap: '30px'}}>
+                    <div style={{width: 'calc(50% - 15px)', alignItems: 'start'}}>
+                        <label htmlFor="">Categoria:</label>
+                        <input type="text" hidden={true} name="uuidCat" value={String(cat.uuidCat)}/>
+                        
+                        <div className="categorie input">
+                            <h3 style={{textAlign: 'start'}}>{isNaN(Number(cat.value)) ? ('Carregando...') : (`     
+                                ${cat.name} - ${dfChecked2 ? 'Masculino' : 'Feminino'} - ${new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(Number(cat.value))}
+                            `)} 
+                            </h3>
+                        </div>
+
+                        <p className="obs">*A categoria selecionada pode não corresponder exatamente a sua idade por não estar disponível neste torneio. Nesse caso, o sistema escolherá automaticamente a categoria mais adequada</p>  
+                    </div>
+                    
+                    {cat.hasDivision ? (
+                        <div className="division" style={{width: 'calc(50% - 15px)'}}>
+                            <label>Divisão:</label>
+                            <div style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
+                                <input name='division' type="radio"  checked={dfChecked}  onChange={() => setChek(true)} value={'escolar'}/><div style={{flexDirection:'row', gap:'10px', alignItems: 'center'}}><h3>Escolar</h3><p className="obs">(recomendado)</p></div>
+                            </div>
+                            <div  style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
+                                <input id="df" name='division' type="radio" checked={!dfChecked} onChange={() => setChek(false)} value={'superior'}/><h3>Superior</h3>
+                            </div>
+                        </div>
+
+                    ) : ('')}
+                </div>
+
+    
+            ) : (
+                <div id="warning-box">
+                    <p>*Preencha a data de nascimento e o gênero para obter sua categoria</p>
+                </div>
+            )}
+        </>
+    )
+}

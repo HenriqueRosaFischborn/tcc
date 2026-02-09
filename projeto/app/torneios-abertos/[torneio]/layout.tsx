@@ -1,10 +1,16 @@
 import './unique.css'
 import './responsive.css'
-import { auth } from '@/auth';
+import redirectTournment from './redirect'
+import { redirect } from 'next/navigation'
 
-export default async function layoutTorneio({children}: {children: React.ReactNode}) {
-    
-    
+export default async function layoutTorneio({children, params}: {children: React.ReactNode, params: Promise<{ torneio: string }>}) {
+    const {torneio} = await params
+
+    const redirectV = await redirectTournment(torneio)
+    if (redirectV) {
+        redirect('/torneios-abertos')
+    }
+
     return (
         <>
             <div id='bars-content' style={{width: '100%', height: '100%', justifyContent: 'center'}}>
@@ -29,7 +35,11 @@ export default async function layoutTorneio({children}: {children: React.ReactNo
                             <img id='folder-img' src="/folderteste.jpeg" alt="folder" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
                         <div id='l2' style={{ flexDirection: 'column', alignItems: 'start', rowGap: '30px'}}>
-                            <h2>Realizar inscrição:</h2>
+                            <h2>Realizar nova inscrição:</h2>
+                            <p className="error">Preencha todos os campos obrigatórios (*)</p>
+                            <p className="error">*Em caso de uso de ID FIDE, preencha as informações exatamente como declaradas oficialmente: <br/>
+                            <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui, forneça seu ID FIDE e veja como suas informações <br/> estão oficialmente cadastradas</a> </p>
+
                             {children}
                         </div>
                     </div>
