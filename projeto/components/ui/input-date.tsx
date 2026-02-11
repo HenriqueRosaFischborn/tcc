@@ -5,9 +5,24 @@ import IMask from "imask";
 import { useEffect, useRef } from "react";
 
 
-export default function InputDate({blur, state}: {blur?: Function, state?: FormState}) {
+export default function InputDate({blur, state, multiple, now}: {blur?: Function, state?: FormState, multiple?: string, now?: boolean}) {
     const yearNow = new Date().getFullYear()
     const inputRef = useRef<HTMLInputElement | null>(null)
+    
+    function nowBlur(input: HTMLInputElement) {
+        
+        if (now && input.value.length == 10) {
+            const [d, m, y] = input.value.split('/').map(Number)
+            
+            const dateNow = new Date(Date.now())
+
+            const dateinput = new Date(y, m -1, d)
+
+            if (dateinput < dateNow) {
+                input.value = dateNow.toLocaleDateString('pt-BR')
+            }
+        }
+    }
 
     function handleEnterBlur(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') {
@@ -39,7 +54,7 @@ export default function InputDate({blur, state}: {blur?: Function, state?: FormS
             Y: {
             mask: IMask.MaskedRange,
             from: yearNow - 100,
-            to: yearNow,
+            to: now ? 9999 : yearNow,
             },
         },
         format: (date: any) => {
@@ -59,11 +74,11 @@ export default function InputDate({blur, state}: {blur?: Function, state?: FormS
     return (
         <input
         ref={inputRef}
-        id="input-date"
-        className="needed"
+        id={multiple && multiple == 'sim' ? '' : "input-date"}
+        className={`needed ${multiple && multiple == 'sim' ? 'input-date' : ''}`}
         name="borndate"
         onKeyDown={handleEnterBlur}
-        onBlur={blur ? (e) => blur(e.currentTarget.value) : () => {}}
+        onBlur={blur ? (e) => {blur(e.currentTarget.value); nowBlur(e.currentTarget)} : () => {}}
         defaultValue={state && state.values && state.values[0] ? state.values[0].borndate : ''}
         />
     )

@@ -114,11 +114,6 @@ summary p {
     pointer-events: none;
 }
 
-.disableDiv {
-    pointer-events: none;
-    opacity: 50%;
-}
-
 #warning-box {
     color: white;
     width: 100%;

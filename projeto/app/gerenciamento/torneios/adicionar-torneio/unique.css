@@ -45,7 +45,7 @@ article > .content {
 }
 
 #times label {
-    width: 35%;
+    width: 40%;
 }
 
 #times div {
@@ -201,6 +201,17 @@ td {
     object-fit: contain;
 }
 
+.upload-file {
+    flex-direction: row;
+    align-items: end;
+    gap: 10px;
+}
+
+.upload-file p{
+    font-weight: 500;
+    font-style: italic;
+}
+
 .buttons {
     flex-direction: column;
     gap: 10px;
@@ -213,5 +224,12 @@ td {
 }
 
 #times div {
+    gap: 10px;
+}
+
+div .division {
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
     gap: 10px;
 }

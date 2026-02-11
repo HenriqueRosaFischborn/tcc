@@ -206,6 +206,7 @@ p {
   font-size: 16pt;
   padding-left: 0px;
   font-weight: 500;
+  margin-left: 2px;
 }
 
 form, .form {
@@ -227,7 +228,8 @@ input[type="text"],
 input[type="email"],
 input[type="number"],
 input[type="password"],
-#input-date  {
+#input-date,
+.input-date  {
   background-color: white;
   border: solid 1px var(--darkgray);
   padding: 3px 0px 3px 7px;
@@ -323,3 +325,7 @@ td div{
   flex-direction: row;
 }
 
+.disableDiv {
+    pointer-events: none;
+    opacity: 50%;
+}

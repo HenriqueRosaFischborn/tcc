@@ -7,7 +7,6 @@ import getTimes from './getTimes'
 export default async function AddTournment() {
     
     const times = await getTimes()
-    console.log(times)
     
     return (
         <>
