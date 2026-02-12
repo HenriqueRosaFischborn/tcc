@@ -28,17 +28,17 @@ model passwordresettoken {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model categoria {
-  id_torneio   BigInt
-  name         String     @db.VarChar
-  value        Float      @default(0)
-  fide         Boolean    @default(false)
-  cbx          Boolean    @default(false)
-  has_division Boolean    @default(false)
-  min_y        Int
-  max_y        Int
-  uuid         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  torneio      torneio    @relation(fields: [id_torneio], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  incricao     incricao[]
+  id_torneio    BigInt
+  name          String     @db.VarChar
+  value         Float      @default(0)
+  fide          Boolean    @default(false)
+  cbx           Boolean    @default(false)
+  just_superior Boolean    @default(false)
+  min_y         Int
+  max_y         Int
+  uuid          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  torneio       torneio    @relation(fields: [id_torneio], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  incricao      incricao[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -65,10 +65,22 @@ model incricao {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model torneio {
-  id        BigInt      @id @default(autoincrement())
-  name      String      @unique @db.VarChar
-  categoria categoria[]
-  incricao  incricao[]
+  id                                BigInt      @id @default(autoincrement())
+  title                             String      @unique(map: "torneio_name_key")
+  time_analog                       BigInt?
+  time_digital                      BigInt?     @map("time-digital")
+  local                             String
+  local_link                        String?
+  date_event                        DateTime    @db.Timestamptz(6)
+  date_inscri                       DateTime    @db.Timestamptz(6)
+  has_division                      Boolean     @default(false)
+  folder_path                       String?
+  reg_path                          String?
+  categoria                         categoria[]
+  emails                            emails[]
+  incricao                          incricao[]
+  tempo_torneio_time_digitalTotempo tempo?      @relation("torneio_time_digitalTotempo", fields: [time_digital], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tempo_torneio_time_analogTotempo  tempo?      @relation("torneio_time_analogTotempo", fields: [time_analog], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -82,9 +94,19 @@ model ids_mp {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model tempo {
-  id   BigInt @id @default(autoincrement())
-  time Int
-  plus Int    @default(0) @db.SmallInt
+  id                                  BigInt    @id @default(autoincrement())
+  time                                Int
+  plus                                Int       @default(0) @db.SmallInt
+  torneio_torneio_time_digitalTotempo torneio[] @relation("torneio_time_digitalTotempo")
+  torneio_torneio_time_analogTotempo  torneio[] @relation("torneio_time_analogTotempo")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model emails {
+  id         BigInt  @id @default(autoincrement())
+  id_torneio BigInt
+  email      String
+  torneio    torneio @relation(fields: [id_torneio], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum division {

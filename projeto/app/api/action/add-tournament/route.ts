@@ -1,14 +1,16 @@
-'use server'
-
 import db from "@/lib/db"
 import { getSupabaseAdmin } from "@/lib/supabase"
-import { NewTournment } from "@/lib/types"
+import { NextResponse } from "next/server"
 
-export default async function addTournmentForm(prev: NewTournment, formdata: FormData): Promise<NewTournment> {
-    console.log(formdata)
-  
+
+export async function POST(req: Request) {
+    const formdata = await req.formData()
+
     const dataTimeAnalog = String(formdata.get('timeAnalog')).split('+').map(Number)
     const dataTimeDigital = String(formdata.get('timeDigital')).split('+').map(Number)
+
+    const fileFolder = formdata.get('fileFolder') as File
+    const fileReg = formdata.get('fileReg') as File
     
     const timeAnalog = await db.tempo.findFirst({
         where: {
@@ -52,7 +54,9 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
             local: formdata.get('local') as string,
             local_link: formdata.get('local') as string,
             date_event: date_e,
-            date_inscri: date_i
+            date_inscri: date_i,
+            folder_path: fileFolder.size != 0 ? `folders/${fileFolder.name}` : null,
+            reg_path: fileReg.size != 0 ? `regulamentos/${fileReg.name}` : null,
         }
     })
 
@@ -68,11 +72,11 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
     }
 
     const categories = JSON.parse(String(formdata.get('categories')))
-    console.log(categories)
+    
 
     for (let i = 0 ; i < categories.length ; i++) {
         const value = Number(categories[i].value.replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
-        console.log(value)
+        
         
         await db.categoria.create({
             data: {
@@ -88,7 +92,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
         })
     }
 
-    const fileFolder = formdata.get('fileFolder') as File
+    
     if (fileFolder.size != 0) {
         const filePath = `folders/${fileFolder?.name}`
         
@@ -99,7 +103,6 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
         })
     }
 
-    const fileReg = formdata.get('fileReg') as File
     if (fileReg.size != 0) {
         const filePath = `regulamentos/${fileReg.name}`
         
@@ -110,5 +113,5 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
         })
     }
 
-    return {message: 'Sucesso'}
+    return NextResponse.redirect(new URL('/gerenciamento/torneios', req.url))
 }

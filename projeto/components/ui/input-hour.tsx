@@ -4,35 +4,31 @@ import { useState } from "react"
 
 export default function InputHour({blur, multiple}: {blur?: Function, multiple?: string}) {
     function change(input: HTMLInputElement) {
-        const value = input.value.split('')
+        let numbers = input.value.replace(/\D/g, '')
 
-        if (value.length > 2 && !(value.includes(':'))) {
-            value.splice(2, 0, ':')
-            
+        
+        numbers = numbers.slice(0, 4)
+
+        let hours = numbers.slice(0, 2)
+        let minutes = numbers.slice(2, 4)
+
+        if (hours.length === 2) {
+            let h = Number(hours)
+            if (h > 23) h = 23
+            hours = h.toString().padStart(2, '0')
         }
 
-        if (value.length == 3 && value.includes(':')) {
-            value.pop()
+        if (minutes.length === 2) {
+            let m = Number(minutes)
+            if (m > 59) m = 59
+            minutes = m.toString().padStart(2, '0')
         }
 
-        if (value.length == 1 && Number(value[0]) > 2) {
-            value[0] = '2'
+        if (numbers.length <= 2) {
+            input.value = hours
+        } else {
+            input.value = `${hours}:${minutes}`
         }
-
-        if (value.length == 2 && value[0] == '2' && Number(value[1]) > 4) {
-            value[1] = '4'
-        } 
-
-        if (value.length == 4 && Number(value[3]) > 6) {
-            value[3] = '6'
-            value.push('0')
-        }
-
-        if (value.length == 5 && value[3] == '6' && Number(value[4]) > 0) {
-            value[4] = '0'
-        }
-
-        input.value = value.join('')
     }
 
     const [error, setError] = useState<boolean>(false)
@@ -56,11 +52,12 @@ export default function InputHour({blur, multiple}: {blur?: Function, multiple?:
             <input 
                 type="text" 
                 inputMode="numeric" 
-                pattern="[0-9]" 
+                pattern="[0-9]{2}:[0-9]{2}" 
                 name='hour' 
                 className='needed' 
                 onBlur={(e) => ownBlur(e.currentTarget)}
                 placeholder="00:00"
+                defaultValue={'18:00'}
                 maxLength={5}
                 onChange={(e) => change(e.currentTarget)}
             />

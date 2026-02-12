@@ -13,6 +13,12 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
     const initialValue: NewTournment = {}
     const [state, formAction] = useActionState(addTournmentForm, initialValue)
 
+    const [errorCategories, setErrorCategories] = useState<boolean>(true)
+
+    function changeErrorCategories(value: boolean) {
+        setErrorCategories(value)
+    }
+
     const [dateError, setDateError] = useState<boolean>(false)
 
     const [emails, setEmails] = useState<string[]>([])
@@ -155,10 +161,13 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
         }
     }
     
+    if (state.message && state.message == 'Sucesso') {
+        window.location.href = '/gerenciamento/torneios'
+    }
+
     return (
         <>
             <Form action={formAction}>
-
                 <div id='content'>
                     <div className='form' style={{width: '100%'}}>
                     <h1>Adicionar torneio</h1>
@@ -242,10 +251,10 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                     </div>
                 </div>
                 
-                <CategorieArea hasDivision={hasDivision}/>
+                <CategorieArea hasDivision={hasDivision} setErrorCategories={changeErrorCategories}/>
 
 
-                <div id='discount' className='content' hidden>
+                {/* <div id='discount' className='content' hidden>
                     <h3>Descontos:</h3>
                     <div className='form' style={{width: 'calc(50% - 15px)'}}>
                         <div style={{width: 'calc(50% - 15px)'}}>
@@ -274,15 +283,15 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </div> */}
                 
 
                 <div id='emails'>
                     <h3>Emails de envio da lista de jogadores:</h3>
                     <div className='form' style={{width: 'calc(50% - 15px)'}}>
                         <div  style={{width: '100%'}}>
-                            <label htmlFor="email">Email:</label>
-                            <input id='input-email' type="text" name='email' onBlur={completeBlur}/>
+                            <label >Email:</label>
+                            <input id='input-email' type="text" onBlur={completeBlur}/>
                             {emailError != '' ? (
                                 <p className='error'>{emailError}</p>
                             ) : ('')}
@@ -328,6 +337,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         
                     
                 </div>
+                <input name='emails' type="text" hidden value={JSON.stringify(emails)} />
 
                 <div className='buttons'>
                     <div className='upload-file'>
@@ -350,9 +360,8 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         widows: '100%',
                         justifyContent: 'end',
                         flexDirection: 'row',
-                        
                     }}>
-                        <button type='submit' className={`button red big ${!txtNeed || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
+                        <button type='submit' className={`button red big ${!txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
                     </div>
                 </div>
             </Form> 
