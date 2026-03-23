@@ -38,7 +38,7 @@ export default async function layoutTorneio({children, params}: {children: React
                             <h2>Realizar nova inscrição:</h2>
                             <p className="error">Preencha todos os campos obrigatórios (*)</p>
                             <p className="error">*Em caso de uso de ID FIDE, preencha as informações exatamente como declaradas oficialmente: <br/>
-                            <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui, forneça seu ID FIDE e veja como suas informações <br/> estão oficialmente cadastradas</a> </p>
+                            <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui e veja como suas informações estão oficialmente cadastradas</a> </p>
 
                             {children}
                         </div>

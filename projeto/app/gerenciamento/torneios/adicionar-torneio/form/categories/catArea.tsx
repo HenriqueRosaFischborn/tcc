@@ -81,8 +81,14 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
                         
                         const res = await verifyCategorieDates(newCategories.filter(el => el.justSuperior == categorie.justSuperior))
                         
+                        
+                        const res2 = await verifyCategorieDates(newCategories)
+
+
                         if (res?.error) {
                             setMessageError('*Os intervalos de datas não podem se chocar')
+                        } else if (res2?.error) {
+                            setMessageError('*O intervalo de datas de categorias SUPERIOR não deve se chocar com ESCOLAR')
                         } else {
                             setMessageError('')
                             

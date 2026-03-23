@@ -6,7 +6,7 @@ export default async function redirectTournment(tournmentName: string) {
 
     const tournment = await db.torneio.findUnique({
         where: {
-            name: name
+            title: name
         }
     })
     
