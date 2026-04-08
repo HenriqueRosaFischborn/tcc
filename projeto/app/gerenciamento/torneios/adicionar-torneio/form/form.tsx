@@ -33,16 +33,20 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
 
     const [nameFolder, setNameFolder] = useState<string>('')
     const [nameReg, setNameReg] = useState<string>('')
+    const [nameQr, setNameQr] = useState<string>('')
 
-    function uploadFile(file: string) {
+    function uploadFile(file: string, qr?: boolean) {
         const fileName = String(file.split('\\').at(-1))
-        console.log(file.split('\\'))
         const extension = fileName.split('.').at(-1)
 
         if (extension == 'pdf') {
             setNameReg(fileName)
         } else {
-            setNameFolder(fileName)
+            if (qr) {
+                setNameQr(fileName)
+            } else {
+                setNameFolder(fileName)
+            }
         }
     }
 
@@ -214,6 +218,11 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                             <label htmlFor="fide">{hasDivision ? 'COM' : 'SEM'} DIVISÃO (ESCOLAR/SUPERIOR)</label>
                         </div>
 
+                        <div style={{width: '100%'}}>
+                            <label htmlFor="link-chess-results">Link chess results:</label>
+                            <input type="text" name='link-chess-results' onBlur={completeBlur}/>
+                        </div>
+
                         <div style={{width: '100%'}} id='local'>
                             <div>
                                 <label htmlFor="local">Local:<p className='ast'>*</p></label>
@@ -340,6 +349,22 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                 <input name='emails' type="text" hidden value={JSON.stringify(emails)} />
 
                 <div className='buttons'>
+                    <div id='qr-area' className='upload-file'>
+                        
+                        <button onClick={() => document.getElementById('input-qr')?.click()} type='button' className='button red'>Anexar Qr Code <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
+                        <input onChange={(e) => uploadFile(e.currentTarget.value, true)} type='file' id='input-qr' name='fileQr' accept='.jpg,.jpeg,.png' hidden={true}/>     
+                    
+                        <div style={{flex: 1}}>
+                            <h3>Chave pix:</h3>
+                            <input type="text" name='chave-pix'/>
+                        </div>
+                        <div style={{width: '100%'}}>
+                            {nameQr != '' ? (
+                                <p>({nameQr})</p>
+                            ) : ('')}
+                        </div>
+                    </div>
+
                     <div className='upload-file'>
                         <button onClick={() => document.getElementById('input-folder')?.click()} type='button' className='button red'>Anexar folder <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
                         {nameFolder != '' ? (
@@ -355,6 +380,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         ) : ('')}
                         <input onChange={(e) => uploadFile(e.currentTarget.value)} type='file' id='input-reg' name='fileReg' accept='.pdf' hidden={true}/>     
                     </div>
+
 
                     <div style={{
                         widows: '100%',
