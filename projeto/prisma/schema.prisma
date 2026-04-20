@@ -28,39 +28,41 @@ model passwordresettoken {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model categoria {
-  id_torneio    BigInt
-  name          String     @db.VarChar
-  value         Float      @default(0)
-  fide          Boolean    @default(false)
-  cbx           Boolean    @default(false)
-  just_superior Boolean    @default(false)
-  min_y         Int
-  max_y         Int
-  uuid          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  torneio       torneio    @relation(fields: [id_torneio], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  incricao      incricao[]
+  id_torneio       BigInt
+  name             String     @db.VarChar
+  value            Float      @default(0)
+  fide             Boolean    @default(false)
+  cbx              Boolean    @default(false)
+  just_superior    Boolean    @default(false)
+  min_y            Int
+  max_y            Int
+  uuid             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  default_division BigInt
+  divisoes         divisoes   @relation(fields: [default_division], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  torneio          torneio    @relation(fields: [id_torneio], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  incricao         incricao[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model incricao {
-  city       String              @db.VarChar
-  club       String?             @db.VarChar
-  genre      Boolean             @default(true)
-  data_nasc  DateTime            @db.Date
-  id_fide    BigInt?
-  id_cbx     BigInt?
-  division   division            @default(sem)
-  uuid_cat   String              @db.Uuid
-  status     status_inscripition @default(pending)
-  id_usuario Int
-  uuid       String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  n_group    Int?                @db.SmallInt
-  name       String
-  id_torneio BigInt              @default(0)
-  ids_mp     ids_mp[]
-  torneio    torneio             @relation(fields: [id_torneio], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  usuario    usuario             @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  categoria  categoria           @relation(fields: [uuid_cat], references: [uuid], onDelete: NoAction, onUpdate: NoAction)
+  city        String              @db.VarChar
+  club        String?             @db.VarChar
+  genre       Boolean             @default(true)
+  data_nasc   DateTime            @db.Date
+  id_fide     BigInt?
+  id_cbx      BigInt?
+  division    division            @default(sem)
+  uuid_cat    String              @db.Uuid
+  status      status_inscripition @default(pending)
+  id_usuario  Int
+  uuid        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  n_group     Int?                @db.SmallInt
+  name        String
+  id_division BigInt?
+  ids_mp      ids_mp[]
+  divisoes    divisoes?           @relation(fields: [id_division], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario     usuario             @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  categoria   categoria           @relation(fields: [uuid_cat], references: [uuid], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -73,15 +75,14 @@ model torneio {
   local_link                        String?
   date_event                        DateTime    @db.Timestamptz(6)
   date_inscri                       DateTime    @db.Timestamptz(6)
-  has_division                      Boolean     @default(false)
   folder_path                       String?
   reg_path                          String?
   qr_path                           String?
   chave_pix                         String?
   link_chessresults                 String?
   categoria                         categoria[]
+  divisoes                          divisoes[]
   emails                            emails[]
-  incricao                          incricao[]
   tempo_torneio_time_digitalTotempo tempo?      @relation("torneio_time_digitalTotempo", fields: [time_digital], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tempo_torneio_time_analogTotempo  tempo?      @relation("torneio_time_analogTotempo", fields: [time_analog], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -112,6 +113,18 @@ model emails {
   torneio    torneio @relation(fields: [id_torneio], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model divisoes {
+  id         BigInt      @id @default(autoincrement())
+  id_torneio BigInt
+  name       String
+  genre      genero      @default(ambos)
+  isAbsolute Boolean     @default(false)
+  categoria  categoria[]
+  torneio    torneio     @relation(fields: [id_torneio], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  incricao   incricao[]
+}
+
 enum division {
   escolar
   superior
@@ -121,4 +134,10 @@ enum division {
 enum status_inscripition {
   pending
   confirmed
+}
+
+enum genero {
+  masculino
+  feminino
+  ambos
 }

@@ -5,9 +5,9 @@ type Categorie = {
     value: string,
     from: number,
     to: number,
-    justSuperior: boolean,
     fide: boolean,
-    cbx: boolean
+    cbx: boolean,
+    divisionFor: string
 }
 
 type Res = {

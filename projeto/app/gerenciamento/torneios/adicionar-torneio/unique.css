@@ -27,6 +27,8 @@ article > .content {
     border-top: solid 4px var(--darkgray);
     border-bottom: solid 4px var(--darkgray);
     gap: 30px;
+
+    align-items: start;
     justify-content: space-between;
 }
 
@@ -253,3 +255,48 @@ div .division {
     width: 100%;
 }
 
+#divisions {
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
+    gap: 30px;
+    padding: 0px 100px;
+    justify-content: space-between;
+    align-items: start;
+    margin: 30px 0px;
+}
+
+#divisions h3 {
+    width: 100%;
+    display: flex;
+    
+}
+
+#divisions img {
+    width: 25px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* disableDiv */
+
+#radios-divisions {
+    width: 50%;
+    align-items: start;
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    row-gap: 10px;
+}
+
+.genre-division {
+    flex-direction: row;
+    gap: 15px;
+    margin-top: -10px;
+}
+
+.genre-division div {
+    flex-direction: row;
+    gap: 5px;
+    align-items: center
+}

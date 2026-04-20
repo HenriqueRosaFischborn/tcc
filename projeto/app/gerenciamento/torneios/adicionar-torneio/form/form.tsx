@@ -9,6 +9,12 @@ import { NewTournment } from '@/lib/types'
 import { verifyEmail } from '@/app/(auth)/cadastro/form/verify-types'
 import InputHour from '@/components/ui/input-hour'
 
+type Division = {
+    name: string,
+    isAbsolute: boolean,
+    genre: string
+}
+
 export default function AddTournmentForm({times}: {times?: {time: number, plus: number}[]}) {
     const initialValue: NewTournment = {}
     const [state, formAction] = useActionState(addTournmentForm, initialValue)
@@ -169,6 +175,64 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
         window.location.href = '/gerenciamento/torneios'
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const [divisions, setDivisions] = useState<Division[]>([])
+    const [divisionError, setDivisionError] = useState<string>('')
+
+    async function giveDivision() {
+        const inputName = document.querySelector('#input-division') as HTMLInputElement
+        
+        const genre = Array.from(document.querySelectorAll('.genre-division-radio')).filter(el => el instanceof HTMLInputElement && el.checked)[0].parentElement?.querySelector('label')?.innerText as string
+        const isAbsolute = document.querySelector('#isAbsolute') as HTMLInputElement
+        const name = inputName.value
+
+        
+        if (divisions.some(el => el.name == name)) {
+            setDivisionError('Uma divisão de mesmo nome já foi cadastrada')
+        } else {
+            if (isAbsolute.checked && divisions.some(el => el.isAbsolute == true)) {
+                setDivisionError('Só pode haver uma divisão com esta opção selecionada')
+            } else {
+                setDivisionError('')
+                setDivisions(prev => [...prev, {
+                    genre: genre,
+                    name: name,
+                    isAbsolute: isAbsolute.checked
+                }])
+                inputName.value = ''
+                console.log(divisions)
+            }
+        }        
+        
+    }
+
+    function removeDivision(index: number) {
+        setDivisions(prev => prev.filter((el, i) => i != index))
+    }
+
+
+
     return (
         <>
             <Form action={formAction}>
@@ -213,10 +277,10 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                             </div>
                         </div>
 
-                        <div className='division'>
+                        {/* <div className='division'>
                             <input type="checkbox" name='division' onChange={() => {setHasDivision(!hasDivision)}}/>
                             <label htmlFor="fide">{hasDivision ? 'COM' : 'SEM'} DIVISÃO (ESCOLAR/SUPERIOR)</label>
-                        </div>
+                        </div> */}
 
                         <div style={{width: '100%'}}>
                             <label htmlFor="link-chess-results">Link chess results:</label>
@@ -259,8 +323,108 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+
+
+
+
+                <div id='divisions' style={{width: '100%'}}>
+                    <h3 style={{width: '100%'}}>Divisões de adversários:<p className='ast'>*</p></h3>
+                    <div className='form' style={{width: 'calc(50% - 15px)'}}>
+                        <div  style={{width: '100%'}}>
+                            <label >Nome da divisão:</label>
+                            <input id='input-division' type="text" onBlur={completeBlur}/>
+                        </div>
+                        <div className='genre-division' style={{width: '100%', flexDirection: 'row'}}>
+                            <div>
+                                <input className='genre-division-radio' name='genre-division' type="radio" defaultChecked/>
+                                <label>Masculino/Feminino</label>
+                            </div>
+                            <div>
+                                <input className='genre-division-radio' name='genre-division' type="radio"/>
+                                <label>Masculino</label>
+                            </div>
+                            <div>
+                                <input className='genre-division-radio' name='genre-division' type="radio"/>
+                                <label>Feminino</label>
+                            </div>
+                        </div>
+                        <div style={{width: '100%', flexDirection: 'row', gap: '15px', alignItems: 'center'}}>
+                            <input id='isAbsolute' type="checkbox"/>
+                            <label htmlFor="">Permitir que jogadores de outras categorias possam jogar nesta categoria <br />(recomendado para divisões do tipo absoluto)</label>
+                        </div>
+                        {divisionError != '' ? (
+                            <p className='error'>{divisionError}</p>
+                        ) : ('')}
+                        <button onClick={() => giveDivision()} type='button' className='button black'>Adicionar divisão</button>
+                    </div>                
+                    <table>
+                        <thead>
+                            <tr><th>Divisões:</th></tr>
+                        </thead>
+                        <tbody>
+                            {divisions.length > 0 ? (
+                                <>
+                                    {divisions.map((el, i) => {
+                                        return (
+                                            <tr key={i}>
+                                                <td>
+                                                    <div className='td-width'>
+                                                        <p>{el.name}</p>
+                                                        <img onClick={(e) => {
+                                                            
+                                                            if (!(e.currentTarget.parentElement?.firstChild instanceof HTMLElement)) return
+                                                            removeDivision(i)
+                                                        }} style={{cursor: 'pointer'}} src="/icons/cancel-red.png" alt="" />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </>
+                            ) : (
+                                <tr>
+                                    <td>
+                                        <div className='td-width'>
+                                            <p>Não há divisões cadastrados</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                    
+                    {divisions.length > 0 ? '' : <p style={{width: '100%'}} className='error'>*Adicione ao menos uma divisão de adversários para adicionar categorias ao torneio</p>}
+                </div>
+                <input name='divisions' type="text" hidden value={JSON.stringify(divisions)} />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 
-                <CategorieArea hasDivision={hasDivision} setErrorCategories={changeErrorCategories}/>
+                <CategorieArea divisionsBasic={divisions} setErrorCategories={changeErrorCategories}/>
 
 
                 {/* <div id='discount' className='content' hidden>
@@ -387,7 +551,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         justifyContent: 'end',
                         flexDirection: 'row',
                     }}>
-                        <button type='submit' className={`button red big ${!txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
+                        <button type='submit' className={`button red big ${!(divisions.length > 0) || !txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
                     </div>
                 </div>
             </Form> 

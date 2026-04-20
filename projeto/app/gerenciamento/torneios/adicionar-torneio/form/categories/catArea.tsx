@@ -2,19 +2,28 @@
 
 import { useEffect, useState } from "react"
 import verifyCategorieDates from "./verifydates"
+import { isAbsolute } from "path"
 
 type Categorie = {
     name: string,
     value: string,
     from: number,
     to: number,
-    justSuperior: boolean,
     fide: boolean,
-    cbx: boolean
+    cbx: boolean,
+    divisionFor: string
 }
 
-export default function CategorieArea({hasDivision, setErrorCategories}: {hasDivision: boolean, setErrorCategories?: Function}) {
+type Division = {
+    name: string,
+    isAbsolute: boolean,
+    genre: string,
+    categories?: Categorie[]
+}
 
+export default function CategorieArea({divisionsBasic, setErrorCategories}: {divisionsBasic: Division[], setErrorCategories?: Function}) {
+
+    const [divisions, setDivisions] = useState<Division[]>([...divisionsBasic])
     const [categories, setCategories] = useState<Categorie[]>([])
 
     const [dateError, setDateError] = useState<string>('')
@@ -38,20 +47,23 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
     async function sendCategorie() {
         const nameInput = document.querySelector('#nameCategorie') as HTMLInputElement
         const valueInput = document.querySelector('#valueCategorie') as HTMLInputElement
-        const justSuperiorInput = document.querySelector('#superiorCategorie') as HTMLInputElement
         const toInput = document.querySelector('#toCategorie') as HTMLInputElement
         const fromInput = document.querySelector('#fromCategorie') as HTMLInputElement
         const fideInput = document.querySelector('#fideCategorie') as HTMLInputElement
         const cbxInput = document.querySelector('#cbxCategorie') as HTMLInputElement
+        
+
+        
+        const divisionFor = Array.from(document.querySelectorAll('.division-for')).filter(el  => el instanceof HTMLInputElement && el.checked)[0].parentElement?.querySelector('label')?.innerText
 
         const categorie: Categorie = {
             name: nameInput.value,
             value: valueInput.value,
-            justSuperior: justSuperiorInput ? justSuperiorInput.checked : false,
             fide: fideInput.checked,
             cbx: cbxInput.checked,
             to: Number(toInput.value),
-            from: Number(fromInput.value)
+            from: Number(fromInput.value),
+            divisionFor: divisionFor as string
         }
 
         if (categorie.name == '' || categorie.value == '' || toInput.value == '' || fromInput.value == '') {
@@ -72,37 +84,43 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
 
                     // const isX = x.some(el => el.name == categorie.name)
     
-                    if (categories.filter(el => el.justSuperior == categorie.justSuperior).some(el => el.name == categorie.name)) {
+                    if (categories.filter(el => el.divisionFor == categorie.divisionFor).some(el => el.name == categorie.name)) {
                         setMessageError('*Uma categoria com este nome já foi adicionada')
                     } else {
                         setMessageError('')
-    
+                        
                         const newCategories = [...categories, categorie]
                         
-                        const res = await verifyCategorieDates(newCategories.filter(el => el.justSuperior == categorie.justSuperior))
+                        const thisDivision = divisionsBasic.filter(el => el.name == categorie.divisionFor)[0]
                         
-                        
-                        const res2 = await verifyCategorieDates(newCategories)
+                        const genreThisDivision = thisDivision.genre
 
+                        const divisionsSameGenreNames = divisionsBasic.filter(el => el.genre == genreThisDivision || el.genre == 'Masculino/Feminino').map(el => el.name)
+
+                        
+                        const res = await verifyCategorieDates(newCategories.filter(el => divisionsSameGenreNames.includes(el.divisionFor)))
+                        const res2 = await verifyCategorieDates(newCategories.filter(el => el.divisionFor == categorie.divisionFor))
 
                         if (res?.error) {
-                            setMessageError('*Os intervalos de datas não podem se chocar')
-                        } else if (res2?.error) {
-                            setMessageError('*O intervalo de datas de categorias SUPERIOR não deve se chocar com ESCOLAR')
+                            setMessageError('*Os intervalos de datas não podem se chocar entre divisões de mesmo gênero')
                         } else {
                             setMessageError('')
                             
-                            const x = [...newCategories.filter(el => el.justSuperior != categorie.justSuperior), ...res.organized]
+                            const x = [...newCategories.filter(el => el.divisionFor != categorie.divisionFor), ...res2.organized]
                             setCategories(x)
                         
-                        
+                            thisDivision.categories = res2.organized
+                            const y = [...divisions.filter(el => el.name != categorie.divisionFor), ...[thisDivision]]
+                            setDivisions(y)
+
                             nameInput.value = ''
                             valueInput.value = ''
                             toInput.value = ''
                             fromInput.value = ''
                             fideInput.checked = false
                             cbxInput.checked = false
-                            if (justSuperiorInput && justSuperiorInput.checked === true ) justSuperiorInput.checked = false
+                           
+                            console.log('divisions', divisions)
                         }
                     }
                 }
@@ -112,8 +130,18 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
 
     }
 
-    function removeCategorie(index: number) {
-        setCategories(prev => prev.filter((el, i) => i != index))
+    function removeCategorie(table: string, cat: string) {
+        
+        const el = divisions.find(el => el.name == table)?.categories?.find(el => el.name == cat)
+
+
+        const newDivision = divisions.find(el => el.name == table)
+        if (newDivision && newDivision.categories) {
+            newDivision.categories = newDivision.categories.filter(el2 => el2 != el)
+
+            setDivisions(prev => [...prev.filter(el2 => el2.name != table), newDivision])
+            setCategories(prev => prev.filter(el2 => el2 != el))
+        }
     }
 
     useEffect(() => {
@@ -128,7 +156,7 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
 
     return (
         <>
-            <div id='gray-area'>
+            <div id='gray-area'  className={divisionsBasic.length > 0 ? '' : 'disableDiv'}>
                 <h2>Categorias: </h2>
                 <div className='form' style={{width: 'calc(50% - 15px)'}}>
                     <h3>Adicionar categoria:</h3>
@@ -170,14 +198,17 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
                             </div>
                         
                         </div>
-                        {hasDivision ? (
-                            <div>
-                                <div>
-                                    <input id="superiorCategorie" type="checkbox"/>
-                                    <label htmlFor="cbx">Exclusivo SUPERIOR</label>
-                                </div>
-                            </div>
-                        ) : ('')}
+                        <div id="radios-divisions">
+                            {divisionsBasic.map((el, i) => {
+                                return (
+                                    <div key={i}>
+                                        <input name="division-for" className="division-for" type='radio' defaultChecked={i == 0}/>
+                                        <label htmlFor="division-for">{el.name}</label>
+                                    </div>
+                                )
+                            })}
+            
+                        </div>
                     </div>
 
                     <div>
@@ -187,76 +218,45 @@ export default function CategorieArea({hasDivision, setErrorCategories}: {hasDiv
                 </div>
 
                 <div id='body-tables'>
-                    <table>
-                        <thead>
-                            <tr><th>Categorias {hasDivision ? '(ESCOLAR/SUPERIOR)' : ('')}</th></tr>
-                        </thead>
-                        <tbody>
-                            {categories.filter((el) => !el.justSuperior).length > 0 ? (
-                                <>
-                                    {categories.map((el, i) => {
-                                        if (!el.justSuperior) {
-                                            return (
-                                                <tr key={i}>
-                                                    <td>
-                                                        <div>
-                                                            <p>{el.name} / {el.value} / ({el.from} - {el.to})</p>
-                                                            <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async' onClick={() => removeCategorie(i)}/>    
-                                                        </div>    
-                                                    </td>
-                                                </tr>
-                                            )
-                                        }
-                                    })}
-                                </>
-                            ) : (
-                                <tr>
-                                    <td>
-                                        <div>
-                                            <p>Não há categorias cadastradas</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-
-                    {hasDivision ? (
-                        <table>
-                            <thead>
-                                <tr><th>EXCLUSIVO SUPERIOR</th></tr>
-                            </thead>
-                            <tbody>
-
-                                {categories.filter(el => el.justSuperior).length > 0 ? (
-                                    <>
-                                        {categories.map((el, i) => {
-                                            if (el.justSuperior) {
-                                                return (
-                                                    <tr key={i}>
-                                                        <td>
-                                                            <div>
-                                                                <p>{el.name} / {el.value} / ({el.from} - {el.to})</p>
-                                                                <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async' onClick={() => removeCategorie(i)}/>    
-                                                            </div>    
-                                                        </td>
-                                                    </tr>
-                                                )
-                                            }
-                                        })}
-                                    </>
-                                ) : (
-                                    <tr>
-                                        <td>
-                                            <div>
-                                                <p>Não há categorias cadastradas</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    ) : ('')}
+                    {divisionsBasic.map((el, i) => {
+                        
+                        const division = divisions.find(div => div.name == el.name)
+                        
+                        return (
+                                <table key={i}>
+                                    <thead>
+                                        <tr><th>{el.name} - {el.genre}</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        { division?.categories && division.categories.length > 0 ? (
+                                            <>
+                                                {division.categories.map((el2, i2) => {
+                                                    return (
+                                                        <tr key={i2}>
+                                                            <td>
+                                                                <div>
+                                                                    <p>{el2.name} / {el2.value} / ({el2.from} - {el2.to})</p>
+                                                                    <img src="/icons/cancel-red.png" alt="" fetchPriority='low' loading='lazy' decoding='async' onClick={() => removeCategorie(el.name, el2.name)}/>    
+                                                                </div>    
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                                })}
+                                            </>
+                                        ) : (
+                                            <tr>
+                                                <td>
+                                                    <div>
+                                                        <p>Não há categorias cadastradas</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            
+                        )
+                    })}
                 </div>
                 <input name="categories" type="text" hidden value={JSON.stringify(categories)} />
             </div>
