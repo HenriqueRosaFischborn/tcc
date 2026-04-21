@@ -171,6 +171,8 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
         }
     }
     
+
+
     if (state.message && state.message == 'Sucesso') {
         window.location.href = '/gerenciamento/torneios'
     }
@@ -401,7 +403,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                     
                     {divisions.length > 0 ? '' : <p style={{width: '100%'}} className='error'>*Adicione ao menos uma divisão de adversários para adicionar categorias ao torneio</p>}
                 </div>
-                <input name='divisions' type="text" hidden value={JSON.stringify(divisions)} />
+                
 
 
 
@@ -551,7 +553,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         justifyContent: 'end',
                         flexDirection: 'row',
                     }}>
-                        <button type='submit' className={`button red big ${!(divisions.length > 0) || !txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
+                        <button type='submit' className={`button red big ${/*!(divisions.length > 0) || !txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''*/''}`} >Adicionar torneio</button>
                     </div>
                 </div>
             </Form> 

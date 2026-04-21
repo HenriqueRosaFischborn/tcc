@@ -17,25 +17,26 @@ export default function LoginForm() {
     const params = useSearchParams()
     const urlBack = params.get('urlBack')
     
-
-
-    if (state.message && typeof state.message[0] == 'string' && state.message[0] === 'Sucesso') {
-        
-        if (urlBack) {
-            window.location.href = urlBack
-        } else {
-            window.location.href = '/'
+    useEffect(() => {
+        if (state.message && typeof state.message[0] == 'string' && state.message[0] === 'Sucesso') {
+            
+            if (urlBack) {
+                window.location.href = urlBack
+            } else {
+                window.location.href = '/'
+            }
+            
         }
-        
-    }
+    
+        if (state.emptyFields?.includes('email')) {
+            setEmailError('*Este campo é obrigatório')
+        } else if (state.message?.includes('Email inválido')) {
+            setEmailError('*Email inválido')
+        } else if (state.message?.includes('Senha ou usuário incorretos')) {
+            setEmailError('*Senha ou usuário incorretos')
+        }
+    }, [state])
 
-    if (state.emptyFields?.includes('email')) {
-        setEmailError('*Este campo é obrigatório')
-    } else if (state.message?.includes('Email inválido')) {
-        setEmailError('*Email inválido')
-    } else if (state.message?.includes('Senha ou usuário incorretos')) {
-        setEmailError('*Senha ou usuário incorretos')
-    }
 
     
     

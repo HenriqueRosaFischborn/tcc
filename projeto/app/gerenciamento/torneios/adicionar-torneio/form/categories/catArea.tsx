@@ -258,7 +258,8 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
                         )
                     })}
                 </div>
-                <input name="categories" type="text" hidden value={JSON.stringify(categories)} />
+                {/* <input name="categories" type="text" hidden value={JSON.stringify(categories)} /> */}
+                <input name='divisions' type="text" hidden value={JSON.stringify(divisions)} />
             </div>
         </>
     )

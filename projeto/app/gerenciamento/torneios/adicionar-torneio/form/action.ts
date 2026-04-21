@@ -106,26 +106,47 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
         })
     }
 
-    const categories = JSON.parse(String(formdata.get('categories')))
-    console.log(categories)
+    const divisions = JSON.parse(String(formdata.get('divisions')))
+    
+    console.dir(divisions, { depth: null })
 
-    for (let i = 0 ; i < categories.length ; i++) {
-        const value = Number(categories[i].value.replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
-        console.log(value)
-        
-        await db.categoria.create({
+
+    for (let i = 0 ; i < divisions.length ; i++) {
+        const div = await db.divisoes.create({
             data: {
-                name: categories[i].name as string,
+                name: divisions[i].name,
                 id_torneio: tournment.id,
-                value: value as number,
-                fide: categories[i].fide as boolean,
-                cbx: categories[i].cbx as boolean,
-                just_superior: categories[i].justSuperior as boolean,
-                min_y: categories[i].from as number,
-                max_y: categories[i].to as number,
+                isAbsolute: divisions[i].isAbsolute,
+                genre: divisions[i].genre == 'Masculino/Feminino' ? 'ambos' : divisions[i].genre.toLowerCase()
             }
         })
+
+
+        const categories = divisions[i].categories
+    
+        for (let i2 = 0 ; i2 < categories.length ; i2++) {
+            const value = Number(categories[i2].value.replace('R$', '').replace(/\./g, '').replace(',', '.').trim())
+            
+            await db.categoria.create({
+                data: {
+                    name: categories[i2].name as string,
+                    id_torneio: tournment.id,
+                    value: value as number,
+                    fide: categories[i2].fide as boolean,
+                    cbx: categories[i2].cbx as boolean,
+                    min_y: categories[i2].from as number,
+                    max_y: categories[i2].to as number,
+                    default_division: div.id
+                }
+            })
+        }
+
     }
+    
+    
+
+
+    
 
     return {message: 'Sucesso'}
 }
