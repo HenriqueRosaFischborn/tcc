@@ -12,6 +12,7 @@ model usuario {
   email              String              @unique
   password           String
   admin              Boolean             @default(false)
+  socio              Boolean             @default(false)
   incricao           incricao[]
   passwordresettoken passwordresettoken?
 }
@@ -31,8 +32,7 @@ model categoria {
   id_torneio       BigInt
   name             String     @db.VarChar
   value            Float      @default(0)
-  fide             Boolean    @default(false)
-  cbx              Boolean    @default(false)
+  vale_fide        Boolean    @default(false)
   just_superior    Boolean    @default(false)
   min_y            Int
   max_y            Int

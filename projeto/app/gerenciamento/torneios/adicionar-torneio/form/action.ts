@@ -132,8 +132,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
                     name: categories[i2].name as string,
                     id_torneio: tournment.id,
                     value: value as number,
-                    fide: categories[i2].fide as boolean,
-                    cbx: categories[i2].cbx as boolean,
+                    vale_fide: categories[i2].fide as boolean,
                     min_y: categories[i2].from as number,
                     max_y: categories[i2].to as number,
                     default_division: div.id

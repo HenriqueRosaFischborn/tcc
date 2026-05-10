@@ -190,12 +190,9 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
                         <div>
                             <div>
                                 <input id="fideCategorie" type="checkbox" />
-                                <label  htmlFor="fide">Fide obrigatório</label>
+                                <label  htmlFor="fide">Vale FIDE</label>
                             </div>
-                            <div>
-                                <input id="cbxCategorie"  type="checkbox" />
-                                <label htmlFor="cbx">CBX obrigatório</label>
-                            </div>
+                           
                         
                         </div>
                         <div id="radios-divisions">
