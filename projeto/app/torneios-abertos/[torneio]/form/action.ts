@@ -41,10 +41,6 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
         }
     }
 
-    if (cat.has_division) {needed.push('division')}
-    if (cat.fide) {needed.push('idfide')}
-    if (cat.cbx) {needed.push('idcbx')}
-
     const emptyFields = dataArray.filter((el) => {
         if (needed.includes(el[0]) && el[1].trim() == '') {
             return true

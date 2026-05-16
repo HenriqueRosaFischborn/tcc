@@ -127,3 +127,9 @@ summary p {
 #warning-box p{
     font-weight: 500;
 }
+
+.select-radios div {
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+}

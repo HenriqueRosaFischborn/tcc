@@ -10,7 +10,6 @@ type Categorie = {
     from: number,
     to: number,
     fide: boolean,
-    cbx: boolean,
     divisionFor: string
 }
 
@@ -60,7 +59,6 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
             name: nameInput.value,
             value: valueInput.value,
             fide: fideInput.checked,
-            cbx: cbxInput.checked,
             to: Number(toInput.value),
             from: Number(fromInput.value),
             divisionFor: divisionFor as string
@@ -261,3 +259,5 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
         </>
     )
 }
+
+//cbx: 

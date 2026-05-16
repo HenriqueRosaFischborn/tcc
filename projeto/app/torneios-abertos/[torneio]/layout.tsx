@@ -15,7 +15,7 @@ export default async function layoutTorneio({children, params}: {children: React
         <>
             <div id='bars-content' style={{width: '100%', height: '100%', justifyContent: 'center'}}>
                 <div id='form-content'>
-                    <h1 style={{width: '100%', textAlign: 'start'}}>IV CIRCUITO BLITZ SOMBRIO</h1>
+                    <h1 style={{width: '100%', textAlign: 'start'}}>{torneio.split('~').join(' ')}</h1>
                     <div id='informations'>
                         <div id='l1' style={{marginBottom: '20px', gap: '30px'}}>
                             <div style={{flexDirection: 'column', gap: '30px'}}>
@@ -37,8 +37,7 @@ export default async function layoutTorneio({children, params}: {children: React
                         <div id='l2' style={{ flexDirection: 'column', alignItems: 'start', rowGap: '30px'}}>
                             <h2>Realizar nova inscrição:</h2>
                             <p className="error">Preencha todos os campos obrigatórios (*)</p>
-                            <p className="error">*Em caso de uso de ID FIDE, preencha as informações exatamente como declaradas oficialmente: <br/>
-                            <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui e veja como suas informações estão oficialmente cadastradas</a> </p>
+                
 
                             {children}
                         </div>

@@ -6,7 +6,7 @@ import { NewTournment } from "@/lib/types"
 
 export default async function addTournmentForm(prev: NewTournment, formdata: FormData): Promise<NewTournment> {
     const fileFolder = formdata.get('fileFolder') as File
-    const fileFolderPath = fileFolder.size != 0 ? `folders/${fileFolder?.name}` : ''
+    const fileFolderPath = fileFolder.size != 0 ? `folders/${formdata.get('title')}` : ''
     if (fileFolder.size != 0) {
         
         const supabaseAdmin = await getSupabaseAdmin()
@@ -17,7 +17,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
     }
 
     const fileReg = formdata.get('fileReg') as File
-    const fileRegPath = fileReg.size != 0 ? `regulamentos/${fileReg.name}` : ''
+    const fileRegPath = fileReg.size != 0 ? `regulamentos/${formdata.get('title')}` : ''
     if (fileReg.size != 0) {
         
         const supabaseAdmin = await getSupabaseAdmin()
@@ -28,7 +28,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
     }
 
     const fileQr = formdata.get('fileQr') as File
-    const fileQrPath = fileQr.size != 0 ? `qrCodes/${fileQr.name}` : ''
+    const fileQrPath = fileQr.size != 0 ? `qrCodes/${formdata.get('title')}` : ''
     if (fileQr.size != 0) {
         const supabaseAdmin = await getSupabaseAdmin()
         const {error} = await supabaseAdmin.storage.from('publics').upload(fileQrPath, fileQr, {

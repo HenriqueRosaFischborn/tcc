@@ -6,14 +6,46 @@ import Fields from "./fields";
 import actionInscriIndividual from "./action";
 import Form from "next/form";
 import { FormState } from "@/lib/types";
-import { Funnel_Sans } from "next/font/google";
+import { searchCbx, searchFide } from "./searchID";
+
+type DataPlayer = {
+    name: string,
+    bornYear: string,
+    genre: string,
+    title: string,
+    idFide: string,
+    ratings: {
+        standard: string,
+        rapid: string,
+        blitz: string
+    }
+}
 
 export default function FormInscriIndividual() {
+    
+    
+    function handleEnterBlur(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            e.currentTarget.blur()
+        }
+    }
+
     const initialValue: FormState= {}
     const [qr, setQr] = useState(false)
     const [state, formAction] = useActionState(actionInscriIndividual, initialValue)
     const [button, setUButton] = useState<Boolean>(false)
-    const [errorId, setErrorId] = useState<Boolean>(false)
+    const [comprovante, setComprovante] = useState<string>('')
+
+    function uploadFile(file: string) {
+        const fileName = String(file.split('\\').at(-1))
+        const extension = fileName.split('.').at(-1)
+
+        if (extension == 'jpeg' || extension == 'png' || extension == '.jpg') {
+            setComprovante(fileName)
+        }
+    }
+   
 
     const [price, setPrice] = useState<Number>(0)
 
@@ -23,10 +55,6 @@ export default function FormInscriIndividual() {
 
     function setButton(isComplete: Boolean) {
         setUButton(isComplete)
-    }
-
-    function setErrorIdF(idError: boolean) {
-        setErrorId(idError)
     }
 
     console.log(state.values)
@@ -46,29 +74,143 @@ export default function FormInscriIndividual() {
         window.location.href = state.message[1]
     }
 
+    const [hasFide, setHasFide] = useState(true)
+    const [idFide, setIdFide] = useState<string>('')
+    const [idCbx, setIdCbx] = useState<string>('')
+    const [errorIdFide, setErrorIdFide] = useState<string>('')
+    const [errorIdCbx, setErrorIdCbx] = useState<string>('')
+    const [playerFide, setPlayerFide] = useState<DataPlayer>()
+    const [playerCbx, setPlayerCbx] = useState<DataPlayer>()
+    
+    async function sendIds(input: HTMLInputElement) {
+        const id = input.value
+        const type = input.name == 'idfide' ? 'fide' : 'cbx'
+
+        if (type == 'fide') {
+            if (id.length != 8 && id.length != 7) {
+                setErrorIdFide('*Insira um ID válido')
+            } else {
+                setErrorIdFide('')
+                
+                if (id != idFide) {
+                    const dataPlayerFide = await searchFide(id) as DataPlayer
+                    
+                    if (dataPlayerFide.name == 'Usuário FIDE não encontrado') {
+                        setErrorIdFide('*Usuário FIDE não encontrado')
+                    } else {
+                        setErrorIdFide('')
+                        setIdFide(id)
+                        setPlayerFide(dataPlayerFide)
+                    }
+                    
+                }
+            }
+            
+            
+        } else {
+            if (id.length > 6 || id.length < 4) {
+                setErrorIdCbx('*Insira um ID válido')
+               
+            } else {
+                
+                setErrorIdCbx('')
+
+                if (id != idCbx) {
+                    const dataPlayerCbx = await searchCbx(id) as DataPlayer
+                    
+                    if (dataPlayerCbx.name == 'Usuário CBX não encontrado') {
+                        setErrorIdCbx('*Usuário CBX não encontrado')
+                    } else {
+                        setErrorIdCbx('')
+                        setIdCbx(id)
+                        setPlayerCbx(dataPlayerCbx)
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (playerCbx && playerFide && playerCbx.idFide != playerFide.idFide) {
+            setErrorIdCbx('*Os IDs informados não represenam a mesma pessoa')
+            setErrorIdFide('*Os IDs informados não represenam a mesma pessoa')
+        } else {
+            setErrorIdCbx('')
+            setErrorIdFide('')
+        }
+    }, [playerFide, playerCbx])
+
     return (
         <>
             
                 <div className="form">
                     
                     <Form action={formAction}>
-                        <Fields setindividualPrice={setVPrice} state={state} setButton={setButton} setIdError={setErrorIdF}/>
-                        <div style={{gap: '20px', marginTop: '30px'}} className={price != 0 && button && !errorId ? '' : 'disableDiv'}>
-                            <h1 style={{marginBottom: '0px'}}>Valor total: {price == 0 ? '' : new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL'
-                            }).format(Number(price))}</h1>
-                            <button type="submit" className="button red big" style={{textAlign: 'start'}}>Efetuar Pagamento</button>
+                        {/* <p className="error">*Para checar sua informação, <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui</a> </p> */}
+                        <div style={{width: '100%'}} className="select-radios">
+                            <div>
+                                <input className="division-for" type='radio' defaultChecked name='hasFide' onChange={() => setHasFide(!hasFide)}/>
+                                <label htmlFor="division-for">Possuo ID FIDE e ID CBX</label>
+                            </div>
+                            <div>
+                                <input className="division-for" type='radio' name='hasFide' onChange={() => setHasFide(!hasFide)}/>
+                                <label htmlFor="division-for">Não possuo ID FIDE e ID CBX</label>
+                                <p className="obs">*Se não possuir cadastro FIDE, selecione esta opção</p>
+                            </div>
+                        </div>
+                        
+                        {hasFide ? (<>
+                            <div style={{width: 'calc(50% - 15px)'}}>
+                                <label htmlFor="idfide">ID Fide: <p className="ast">*</p></label>
+                                <input id="form-fide" type="text" name="idfide" defaultValue={idFide} onKeyDown={handleEnterBlur} maxLength={8} inputMode="numeric"  onInput={(e) => {e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')}} onBlur={(e) => sendIds(e.currentTarget)}/>
+                                {errorIdFide != '' ? <p className="error">{errorIdFide}</p> : ''}
+                            </div>
+                        
+                            <div style={{width: 'calc(50% - 15px)'}}>
+                                <label htmlFor="idcbx">ID CBX:<p className="ast">*</p></label>
+                                <input id="form-cbx" type="text" name="idcbx" defaultValue={idCbx} onKeyDown={handleEnterBlur} maxLength={8} inputMode="numeric" onInput={(e) => {e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')}} onBlur={(e) => sendIds(e.currentTarget)}/>
+                                {errorIdCbx != '' ? <p className="error">{errorIdCbx}</p> : ''}
+                            </div> 
+                        </>): ''}
+                        
+                        {(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? (<> 
+                            <p className="error">*Preencha os campos acima antes de continuar</p> 
+                        </>): ''}
+
+                        
+                        <div className={`form ${(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? 'disableDiv' : ''}`} style={{width: '100%'}}> 
+                            <Fields playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
                             
-                            
-                            {state.message && state.values && state.message.includes('error-info-id') ? 
-                                <p className="error pErr">As informações preenchidas não correspondem às oficialmente cadastradas na FIDE <br />
-                                <p className="error">*Obs.: Preencha as informações (inclusive nome) exatamente como são demonstradas oficialmente na FIDE</p>
-                                <a href={`https://ratings.fide.com/profile/${state.values[0].idfide}`} target="_blank" className="fide-link">Ver meu perfil FIDE</a> </p> 
-                            : ('') }
-                            {state.message && state.values && state.message.includes('Você já está inscrito') ? 
-                                <p className="error pErr">Este ID FIDE já está inscrito</p>
-                            : ('') }
+                            <div className='upload-file' style={{width: '100%'}}>
+                                <button onClick={() => document.getElementById('input-comprovante')?.click()} type='button' className='button red'>Anexar comprovante <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
+                                {comprovante != '' ? (
+                                    <p>({comprovante})</p>
+                                ) : ('')}
+                                <input onChange={(e) => uploadFile(e.currentTarget.value)} type='file' id='input-comprovante' name='fileComprovante' accept='.jpg,.jpeg,.png' hidden={true}/>     
+                            </div>
+
+
+                            <div style={{gap: '20px', marginTop: '30px'}} className={price != 0 && button && comprovante != '' ? '' : 'disableDiv'}>
+
+                                <h1 style={{marginBottom: '0px'}}>Valor total: {price == 0 ? '' : new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(Number(price))}</h1>
+
+                                
+                                <button type="submit" className="button red big" style={{textAlign: 'start'}}>Solicitar inscrição</button>
+                                
+                                
+                                {/* {state.message && state.values && state.message.includes('error-info-id') ? 
+                                    <p className="error pErr">As informações preenchidas não correspondem às oficialmente cadastradas na FIDE <br />
+                                    <p className="error">*Obs.: Preencha as informações (inclusive nome) exatamente como são demonstradas oficialmente na FIDE</p>
+                                    <a href={`https://ratings.fide.com/profile/${state.values[0].idfide}`} target="_blank" className="fide-link">Ver meu perfil FIDE</a> </p> 
+                                : ('') }
+                                {state.message && state.values && state.message.includes('Você já está inscrito') ? 
+                                    <p className="error pErr">Este ID FIDE já está inscrito</p>
+                                : ('') } */}
+                            </div>
                         </div>
                     </Form>
                 </div>

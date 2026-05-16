@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { SelectCategorie } from "./selectCategorie"
 import { usePathname } from "next/navigation"
 import { FormState } from "@/lib/types"
+import { error } from "console"
 
 type Divisions = {
     fide?: string,
@@ -15,7 +16,20 @@ type ErrorID = {
     error?: Boolean
 }
 
-export default function Fields({setindividualPrice, state, setButton, setIdError, player}: {setIdError?: Function, setindividualPrice?: Function, setButton?: Function, player?: any, state: FormState}) {
+type DataPlayer = {
+    name: string,
+    bornYear: string,
+    genre: string,
+    title: string,
+    idFide: string,
+    ratings: {
+        standard: string,
+        rapid: string,
+        blitz: string
+    }
+}
+
+export default function Fields({playerCbx, playerFide, hasFide, setindividualPrice, state, setButton, setIdError, player}: {playerCbx?: DataPlayer, playerFide?: DataPlayer, hasFide: boolean, setIdError?: Function, setindividualPrice?: Function, setButton?: Function, player?: any, state: FormState}) {
     function handleEnterBlur(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') {
             e.preventDefault()
@@ -24,62 +38,56 @@ export default function Fields({setindividualPrice, state, setButton, setIdError
     }
     
     const pathname = usePathname()
-    const [idFide, setIdFide] = useState<String>('')
     
     const [divisions, setDivisions] = useState<Divisions>({})
 
-    const [errorId, setErrorId] = useState<ErrorID>({error: false})
-    function idVerify(e: React.FocusEvent<HTMLInputElement>) {
-        const value = e.currentTarget.value
-        
-        if (value.split('').length < 8 && value != '') {
-            const name = e.currentTarget.name
-            if (name == 'idfide') {
-                setErrorId({
-                    error: true,
-                    id: 'fide'
-                })
-            } else {
-                setErrorId({
-                    error: true,
-                    id: 'cbx'
-                })
-            }
-        } else {
-            setErrorId({
-                error: false,
-            })
-            setIdFide(value)
-        }
-
-        if (setIdError) {      
-            if (value.split('').length == 8 || (value == '' && !e.currentTarget.classList.contains('needed'))) {
-                setIdError(false)
-            } else {
-                setIdError(true)
-            }
-        }
-    }
+    const [errorName, setErrorName] = useState<string>('')
+    const [errorInfo, setErrorInfo] = useState<string>('')
 
     function completeBlur() {
+        if (hasFide && playerCbx && playerFide) {
+            const name = document.getElementById('nome')
+            if (name instanceof HTMLInputElement && name.value.trim() != '' && name.value != playerCbx.name) {
+                setErrorName(`*Nome incorreto, o nome fornecido no ID é: ${playerCbx.name}`)
+            } else {
+                setErrorName('')
+            }
+
+            
+            const date = document.getElementById('input-date')
+            const genre = Array.from(document.querySelectorAll('.radio-genre')).filter((el) => {
+                if (el instanceof HTMLInputElement && el.checked) {
+                    return true
+                }
+            })[0].parentElement?.querySelector('h3')?.innerText
+
+            
+            if ((date instanceof HTMLInputElement && date.value.trim() != '' && date.value != playerCbx.bornYear) || (genre == 'Masculino' ? 'm' : 'f') != playerFide.genre) {
+                console.log((genre == 'Masculino' ? 'm' : 'f') != playerFide.genre)
+                
+                setErrorInfo(`*Informações inválidas, as informações cadastradas são: ${playerCbx.bornYear} - ${playerFide.genre == 'm' ? 'Masculino' : 'Feminino' }`)
+            } else {
+                setErrorInfo('')
+            }
+
+        }
+        
         const neededs = Array.from(document.querySelectorAll('.needed')).map(el => {
             if (el instanceof HTMLInputElement) {
                 return el.value
             }
         })
-        
 
         const isComplete = neededs.every(el => el?.trim() != '')
 
         
         if (setButton) {
-            setButton(isComplete)
+            setButton(isComplete && ((hasFide && errorName == '' && errorInfo == '') || !hasFide))
         }
     }
     
     function division(divisionss: Divisions) {
         setDivisions(divisionss)
-        
     }
     
     useEffect(() => {
@@ -89,7 +97,7 @@ export default function Fields({setindividualPrice, state, setButton, setIdError
     return (
         <>
             <div style={{width: '70%'}}>
-                <label htmlFor="name">Nome completo: {idFide != '' ? '(Exatamente como cadastrado na FIDE)' : ''}<p className="ast">*</p></label>
+                <label htmlFor="name">Nome completo: <p className="ast">*</p></label>
                 <input className="needed" id="nome" type="text" name="name" onBlur={completeBlur} {...(pathname.includes('em-grupo') ? {
                     onChange: (e) => {
                         const father = e.currentTarget.parentElement?.parentElement?.parentElement?.parentElement?.firstChild?.firstChild
@@ -98,7 +106,7 @@ export default function Fields({setindividualPrice, state, setButton, setIdError
                         if (father.innerText == '') father.innerText = 'Henrique'
                     }
                 } :{})} defaultValue={state.values && state.values[0] ? state.values[0].name : ''} onKeyDown={handleEnterBlur}/> 
-                
+                {hasFide && errorName != '' ? <p className="error">{errorName}</p> : ''}
             </div>
             
             {pathname.includes('em-grupo') ? ('') : (
@@ -115,19 +123,7 @@ export default function Fields({setindividualPrice, state, setButton, setIdError
                 </>
             )}
 
-            <SelectCategorie setindividualPrice={setindividualPrice} state={state} setDivisions={division} blur={completeBlur}/>
-
-            <div style={{width: 'calc(50% - 15px)'}}>
-                <label htmlFor="idfide">ID Fide: {divisions.fide ? <p className="ast">*</p> : ''}</label>
-                <input id="form-fide" className={divisions.fide ? 'needed' : ''} type="text" name="idfide" onKeyDown={handleEnterBlur} onBlur={(e) => {completeBlur(); idVerify(e)}} maxLength={8} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')} defaultValue={state.values && state.values[0] ? state.values[0].idfide : ''}/>
-                {errorId.error && errorId.id == 'fide' ? <p className="error">Este ID é inválido</p> : ''}
-            </div>
-
-            <div style={{width: 'calc(50% - 15px)'}}>
-                <label htmlFor="idcbx">ID CBX: {divisions.cbx ? <p className="ast">*</p> : ''}</label>
-                <input id="form-cbx" className={divisions.cbx ? 'needed' : ''} type="text" onKeyDown={handleEnterBlur} onBlur={(e) => {completeBlur(); idVerify(e)}} maxLength={8} onInput={(e) => e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')} name="idcbx" defaultValue={state.values && state.values[0] ? state.values[0].idcbx : ''}/>
-                {errorId.error && errorId.id == 'cbx' ? <p className="error">Este ID é inválido</p> : ''}
-            </div>      
+            <SelectCategorie hasFide={hasFide} errorInfo={errorInfo} setindividualPrice={setindividualPrice} state={state} setDivisions={division} blur={completeBlur}/>     
         </>
-    )
+    )//console
 }

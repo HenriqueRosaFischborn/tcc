@@ -6,7 +6,6 @@ type Categorie = {
     from: number,
     to: number,
     fide: boolean,
-    cbx: boolean,
     divisionFor: string
 }
 

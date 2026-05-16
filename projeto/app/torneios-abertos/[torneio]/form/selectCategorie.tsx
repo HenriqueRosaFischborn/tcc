@@ -15,10 +15,11 @@ enum ErrorCat {
     NONE = 'sem'
 }
 
-export function SelectCategorie({setindividualPrice, blur, state, setDivisions}: {setindividualPrice?: Function, blur?: Function, setDivisions?: Function, state: FormState}) {
+
+
+export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, state, setDivisions}: {hasFide: boolean, errorInfo?: string, setindividualPrice?: Function, blur?: Function, setDivisions?: Function, state: FormState}) {
     const [fieldsCat, setFields] = useState<FieldsCat>(['genre'])
     const [updateCat, setUpdate] = useState<Boolean>(false) // essa const só serve pra quando atualizar, chamar o useEffect de novo, atualizando a cat, ela muda sempre no complete
-    
     const [errorCat, setErrorCat] = useState<ErrorCat>(ErrorCat.NONE)
     
 
@@ -32,7 +33,20 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
                     const inputDate = document.getElementById('input-date')
                     if (!(inputDate instanceof HTMLInputElement)) return 
                     const date = inputDate.value
-                    const res = await searchCat(date)
+
+
+
+
+
+
+
+                    const genre = Array.from(document.querySelectorAll('.radio-genre')).filter((el) => {
+                        if (el instanceof HTMLInputElement && el.checked) {
+                            return true
+                        }
+                    })[0].parentElement?.querySelector('h3')?.innerText
+
+                    const res = await searchCat(date, String(genre))
 
                     if (res.error) {
                         setErrorCat(ErrorCat.TRUE)
@@ -43,21 +57,18 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
                     
                     if (res.value && res.name && res.uuidCat && res.value) {
                         setCat({
-                            hasDivision: res.division,
+                          
                             name: res.name,
                             value: res.value,
-                            uuidCat: res.uuidCat
+                            uuidCat: res.uuidCat,
+                            default_division: res.default_division,
+                            absolute_division: res.absolute_division
                         })
                         
                         if (setindividualPrice) {
                             setindividualPrice(res.value)
                         }
-                        if (setDivisions) {
-                            setDivisions({
-                                fide: res.fide,
-                                cbx: res.cbx
-                            })
-                        }
+                        
                     
                     } else {
                         setCat({
@@ -66,7 +77,9 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
                             cbx: false,
                             value: 0,
                             name: '',
-                            uuidCat: ''
+                            uuidCat: '',
+                            default_division: res.default_division,
+                            absolute_division: res.absolute_division
                         })
                         if (setindividualPrice) {
                             setindividualPrice(0)
@@ -93,6 +106,7 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
             document.getElementById('input-date')?.removeEventListener('blur', xBlur)
             document.getElementById('input-date')?.addEventListener('blur', xBlur)
         }
+
     }, [updateCat, fieldsCat])
 
     const [dfChecked, setChek] = useState<boolean>(true)
@@ -161,7 +175,7 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
         }
     }
 
-    
+    //genre
     
     return (
 
@@ -173,18 +187,43 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
             
             <div className="genre" style={{flexDirection: 'column', alignItems: 'start'}}>
                 <div style={{flexDirection: 'row', gap: '10px', cursor: 'pointer'}}>
-                    <input  checked={dfChecked2} type="radio" name="genre" value={'masc'} onChange={() => setChek2(true)} /><h3>Masculino</h3>
+                    <input className="radio-genre" checked={dfChecked2} type="radio" name="genre" value={'masc'} onChange={() => {
+                        setChek2(true)
+                        
+                        const date = document.querySelector('#input-date')
+
+                        if (date instanceof HTMLInputElement && date.value.trim() != '') {
+                            defineDate(date.value)
+                        }
+
+                        if (blur) {
+                            blur()
+                        }
+                    }} /><h3>Masculino</h3>
                 </div>
                 <div style={{flexDirection: 'row', gap: '10px', cursor: 'pointer'}}>
-                    <input  id="df2" checked={!dfChecked2} type="radio" name="genre" value={'fem'} onChange={() => setChek2(false)} /><h3>Feminino</h3>
+                    <input className="radio-genre" id="df2" checked={!dfChecked2} type="radio" name="genre" value={'fem'} onChange={() => {
+                        setChek2(false)
+                        
+                        const date = document.querySelector('#input-date')
+
+                        if (date instanceof HTMLInputElement && date.value.trim() != '') {
+                            defineDate(date.value)
+                        }
+
+                        if (blur) {
+                            blur()
+                        }
+                    }} /><h3>Feminino</h3>
                 </div>
-            </div>
+            </div> 
+            {hasFide && errorInfo != '' ? <p className="error">{errorInfo}</p> : ''}
             
             {errorCat == 'true' ? (
                 <p className="error">Nenhuma categoria deste torneio abraange sua idade</p>
             ) : ('')}
 
-            {fieldsCat.indexOf('genre') !== -1 && fieldsCat.indexOf('date') !== -1 && !(errorCat == 'true') ? (
+            {fieldsCat.indexOf('genre') !== -1 && fieldsCat.indexOf('date') !== -1 && !(errorCat == 'true') && ((hasFide && !errorInfo) || !hasFide) ? (
                 <div className="div-categorie" style={{width: '100%', flexDirection: 'row', gap: '30px'}}>
                     <div style={{width: 'calc(50% - 15px)', alignItems: 'start'}}>
                         <label htmlFor="">Categoria:</label>
@@ -203,14 +242,14 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
                         <p className="obs">*A categoria selecionada pode não corresponder exatamente a sua idade por não estar disponível neste torneio. Nesse caso, o sistema escolherá automaticamente a categoria mais adequada</p>  
                     </div>
                     
-                    {cat.hasDivision ? (
+                    {cat.absolute_division && cat.absolute_division != cat.default_division ? (
                         <div className="division" style={{width: 'calc(50% - 15px)'}}>
                             <label>Divisão:</label>
                             <div style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
-                                <input name='division' type="radio"  checked={dfChecked}  onChange={() => setChek(true)} value={'escolar'}/><div style={{flexDirection:'row', gap:'10px', alignItems: 'center'}}><h3>Escolar</h3><p className="obs">(recomendado)</p></div>
+                                <input name='division' type="radio"  checked={dfChecked}  onChange={() => setChek(true)} value={'escolar'}/><div style={{flexDirection:'row', gap:'10px', alignItems: 'center'}}><h3>{cat.default_division}</h3><p className="obs">(recomendado)</p></div>
                             </div>
                             <div  style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
-                                <input id="df" name='division' type="radio" checked={!dfChecked} onChange={() => setChek(false)} value={'superior'}/><h3>Superior</h3>
+                                <input id="df" name='division' type="radio" checked={!dfChecked} onChange={() => setChek(false)} value={'superior'}/><h3>{cat.absolute_division}</h3>
                             </div>
                         </div>
 
@@ -220,9 +259,11 @@ export function SelectCategorie({setindividualPrice, blur, state, setDivisions}:
     
             ) : (
                 <div id="warning-box">
-                    <p>*Preencha a data de nascimento e o gênero para obter sua categoria</p>
+                    <p>*Preencha a data de nascimento e o gênero corretamente para obter sua categoria</p>
                 </div>
             )}
         </>
     )
 }
+
+// console.log
