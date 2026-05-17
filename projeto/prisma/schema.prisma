@@ -51,16 +51,17 @@ model incricao {
   data_nasc   DateTime            @db.Date
   id_fide     BigInt?
   id_cbx      BigInt?
-  division    division            @default(sem)
   uuid_cat    String              @db.Uuid
   status      status_inscripition @default(pending)
   id_usuario  Int
   uuid        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  n_group     Int?                @db.SmallInt
   name        String
   id_division BigInt?
-  ids_mp      ids_mp[]
+  id_torneio  BigInt
+  rtg_fide    BigInt?
+  rtg_cbx     BigInt?
   divisoes    divisoes?           @relation(fields: [id_division], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  torneio     torneio             @relation(fields: [id_torneio], references: [id], onDelete: Cascade, onUpdate: NoAction)
   usuario     usuario             @relation(fields: [id_usuario], references: [id], onDelete: NoAction, onUpdate: NoAction)
   categoria   categoria           @relation(fields: [uuid_cat], references: [uuid], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -83,17 +84,9 @@ model torneio {
   categoria                         categoria[]
   divisoes                          divisoes[]
   emails                            emails[]
+  incricao                          incricao[]
   tempo_torneio_time_digitalTotempo tempo?      @relation("torneio_time_digitalTotempo", fields: [time_digital], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tempo_torneio_time_analogTotempo  tempo?      @relation("torneio_time_analogTotempo", fields: [time_analog], references: [id], onDelete: NoAction, onUpdate: NoAction)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model ids_mp {
-  id            BigInt    @id @default(autoincrement())
-  id_individual String?   @db.Uuid
-  id_group      Int?      @db.SmallInt
-  id_mp         String
-  incricao      incricao? @relation(fields: [id_individual], references: [uuid], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -134,6 +127,7 @@ enum division {
 enum status_inscripition {
   pending
   confirmed
+  canceled
 }
 
 enum genero {

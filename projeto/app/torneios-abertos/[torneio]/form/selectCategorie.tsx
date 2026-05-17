@@ -224,7 +224,7 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
             ) : ('')}
 
             {fieldsCat.indexOf('genre') !== -1 && fieldsCat.indexOf('date') !== -1 && !(errorCat == 'true') && ((hasFide && !errorInfo) || !hasFide) ? (
-                <div className="div-categorie" style={{width: '100%', flexDirection: 'row', gap: '30px'}}>
+                <div className="div-categorie" style={{width: '100%', flexDirection: 'row'}}>
                     <div style={{width: 'calc(50% - 15px)', alignItems: 'start'}}>
                         <label htmlFor="">Categoria:</label>
                         <input type="text" hidden={true} name="uuidCat" value={String(cat.uuidCat)}/>
@@ -246,10 +246,10 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
                         <div className="division" style={{width: 'calc(50% - 15px)'}}>
                             <label>Divisão:</label>
                             <div style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
-                                <input name='division' type="radio"  checked={dfChecked}  onChange={() => setChek(true)} value={'escolar'}/><div style={{flexDirection:'row', gap:'10px', alignItems: 'center'}}><h3>{cat.default_division}</h3><p className="obs">(recomendado)</p></div>
+                                <input name='division' type="radio"  checked={dfChecked}  onChange={() => setChek(true)} value={cat.default_division}/><div style={{flexDirection:'row', gap:'10px', alignItems: 'center'}}><h3>{cat.default_division}</h3><p className="obs">(recomendado)</p></div>
                             </div>
                             <div  style={{flexDirection: 'row', gap: '10px', alignItems: 'center', cursor: 'pointer'}} >
-                                <input id="df" name='division' type="radio" checked={!dfChecked} onChange={() => setChek(false)} value={'superior'}/><h3>{cat.absolute_division}</h3>
+                                <input id="df" name='division' type="radio" checked={!dfChecked} onChange={() => setChek(false)} value={cat.absolute_division}/><h3>{cat.absolute_division}</h3>
                             </div>
                         </div>
 

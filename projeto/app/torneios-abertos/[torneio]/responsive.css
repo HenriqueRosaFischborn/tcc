@@ -16,7 +16,9 @@
 }
 
 @media (max-width: 768px) {
-    
+    .informations {
+        font-size: 10pt;
+    }
 
     #form-content h1{
         margin-bottom: 30px;
@@ -29,6 +31,34 @@
     #l1 {
         width: 100%;
         flex-direction: row;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    #l2 .genre {
+        justify-content: start;
+        gap: 5px;
+    }
+
+    #final-button {
+        margin-top: 0px;
+    }
+
+    .obs-fide {
+        margin-left: -25px;
+    }
+
+    .form .div-categorie {
+        gap: 10px;
+        justify-content: start;
+    }
+
+    #qr-div {
+        align-items: center;
+    }
+
+    #l2 h3 {
+        text-align: start;
     }
 
     #l1 img {

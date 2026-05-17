@@ -1,38 +1,104 @@
 import './unique.css'
 import './responsive.css'
+
 import redirectTournment from './redirect'
 import { redirect } from 'next/navigation'
+
+import { getSupabaseAdmin } from '@/lib/supabase'
+import classifyTime from '@/lib/classifyTime'
 
 export default async function layoutTorneio({children, params}: {children: React.ReactNode, params: Promise<{ torneio: string }>}) {
     const {torneio} = await params
 
-    const redirectV = await redirectTournment(torneio)
-    if (redirectV) {
+    const tournment = await redirectTournment(torneio)
+    if (!tournment) {
         redirect('/torneios-abertos')
     }
+
+    const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
+    const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+
+    const dateEvent = tournment.date_event.toLocaleDateString('pt-BR')
+    const timeEvent = tournment.date_event.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+
+
+   
+    const supabaseAdmin = await getSupabaseAdmin()
+
+    
+    
+    const path = `folders/${torneio.split('~').join(' ')}`
+    const { data } = supabaseAdmin.storage.from('publics').getPublicUrl(path)
+    const folder = data.publicUrl
+    
+    
+    const times = {
+        digital: {
+            time: Number(tournment.tempo_torneio_time_digitalTotempo?.time),
+            plus: Number(tournment.tempo_torneio_time_digitalTotempo?.plus)
+        },
+        analog: {
+            time: Number(tournment.tempo_torneio_time_analogTotempo?.time),
+            plus: Number(tournment.tempo_torneio_time_analogTotempo?.plus)
+        }
+    }
+    const diference = times.digital.time + ' + ' + times.digital.plus != times.analog.time + ' + ' + times.analog.plus
+
+    const classTime = await classifyTime(times.digital.time, times.digital.plus)
+    const classTime2 = await classifyTime(times.analog.time, times.analog.plus)
+    
+    const path2 = `regulamentos/${torneio.split('~').join(' ')}`
+    const data2 = supabaseAdmin.storage.from('publics').getPublicUrl(path2).data
+    const reg = data2.publicUrl
+    
 
     return (
         <>
             <div id='bars-content' style={{width: '100%', height: '100%', justifyContent: 'center'}}>
                 <div id='form-content'>
-                    <h1 style={{width: '100%', textAlign: 'start'}}>{torneio.split('~').join(' ')}</h1>
+                    <h1 style={{width: '100%', textAlign: 'start'}} id='torneio-title'>{torneio.split('~').join(' ')}</h1>
+                    <h1 id='qr-key' hidden>{tournment.chave_pix}</h1>
                     <div id='informations'>
                         <div id='l1' style={{marginBottom: '20px', gap: '30px'}}>
                             <div style={{flexDirection: 'column', gap: '30px'}}>
                                 <h2 id='info' style={{textAlign: 'start', fontSize: '22pt'}}>Informações do torneio:</h2>
-                                <a href="#" className='button red'>Regulamento</a>
-                                <p>
-                                    Tempo: 3 + 5 <br />
-                                    Local: CITI, Rua João Goularte, Sombrio <br />
+                                {reg ? 
+                                    <a href={reg} className='button red' target='_blank' rel="noopener noreferrer">Regulamento</a>
+                                : ''}
+                                <p className='informations'>
+                                    Tempo: 
+                                    {diference ? (<>
+                                        <br />
+                                        Digital: {classTime.charAt(0).toUpperCase() + classTime.slice(1)} ({times.digital.time + ' + ' + times.digital.plus}) <br />
+                                        Analógico: {classTime2.charAt(0).toUpperCase() + classTime2.slice(1)} ({times.analog.time + ' + ' + times.analog.plus}) <br />
+                                    </>)
+                                     : `
+                                        ${classTime.charAt(0).toUpperCase() + classTime.slice(1)} (${times.digital.time + ' + ' + times.digital.plus})
+                                    `}<br />
+
+                                    Local: <a className='link' target='_blank' href={tournment.local_link ? tournment.local_link : '#'}>{tournment.local}</a><br />
                                     <br />
+                                    
+                                    {tournment.link_chessresults ? (<>
+                                        Chessresults:  <a className='link' target='_blank' href={tournment.link_chessresults}>Clique aqui</a><br />
+                                    </>) : ''} 
+                                    <br />
+                                   
                                     Encerramento das inscrições: <br />
-                                    Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora:  18:00 <br />
+                                    Data: {dateInscri}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora:  {timeInscri} <br />
                                     <br />
                                     Início: <br />
-                                    Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora: 19:05
+                                    Data: {dateEvent}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora: {timeEvent}
                                 </p>
                             </div>
-                            <img id='folder-img' src="/folderteste.jpeg" alt="folder" fetchPriority='low' loading='lazy' decoding='async'/>
+
+                            {folder ? <img id='folder-img' src={folder} alt="folder" fetchPriority='low' loading='lazy' decoding='async'/> : ''} 
                         </div>
                         <div id='l2' style={{ flexDirection: 'column', alignItems: 'start', rowGap: '30px'}}>
                             <h2>Realizar nova inscrição:</h2>

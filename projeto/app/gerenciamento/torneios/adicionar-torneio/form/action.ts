@@ -84,7 +84,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
             time_analog: timeAnalog,
             time_digital: timeDigital,
             local: formdata.get('local') as string,
-            local_link: formdata.get('local') as string,
+            local_link: formdata.get('localLink') as string,
             date_event: date_e,
             date_inscri: date_i,
             chave_pix: formdata.get('chave-pix') as string,

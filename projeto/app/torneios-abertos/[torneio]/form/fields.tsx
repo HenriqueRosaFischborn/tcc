@@ -118,7 +118,7 @@ export default function Fields({playerCbx, playerFide, hasFide, setindividualPri
                     
                     <div style={{width: 'calc(50% - 15px)'}}>
                         <label htmlFor="team">Clube que representa (se houver):</label>
-                        <input type="text" name="team" onBlur={completeBlur} defaultValue={state.values && state.values[0] ? state.values[0].club : ''} onKeyDown={handleEnterBlur}/>
+                        <input type="text" name="team" defaultValue={state.values && state.values[0] ? state.values[0].club : ''} onKeyDown={handleEnterBlur}/>
                     </div>
                 </>
             )}

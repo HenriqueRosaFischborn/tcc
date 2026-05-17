@@ -37,4 +37,12 @@
   td {
     font-size: 10pt;
   }
+
+  input[type="text"], input[type="email"], input[type="number"], input[type="password"], #input-date, .input-date {
+    font-size: 10pt;
+  }
+
+  .ast {
+    font-size: 12pt;
+  }
 }

@@ -18,12 +18,6 @@ export default async function searchCat(date: string, genre: string) {
 
 
 
-
-
-
-
-
-
     let cat2 = await db.categoria.findMany({
         where: {
             min_y: {

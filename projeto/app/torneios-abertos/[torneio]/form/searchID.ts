@@ -74,10 +74,26 @@ export async function searchCbx(id: string) {
 
     const idFide = texto.match(/ID FIDE:\s*(\d+)/)?.[1];
 
+    const table = $('#ContentPlaceHolder1_gdvRating').text().trim()
+   
+    const match= table.match(/[A-Za-zÀ-ÿ]{3}\/\d{4}(\d{4})(\d{4})(\d{4})/)
+
+    let ratings = {
+        rapid: '',
+        standard: '',
+        blitz: ''
+    }
+
+    if (match) {
+        ratings.rapid = match[1]
+        ratings.standard = match[2]
+        ratings.blitz = match[3]
+    }
     
     return {
         name: name,
         bornYear: bornYear,
-        idFide: idFide
+        idFide: idFide,
+        ratings: ratings
     }
 }

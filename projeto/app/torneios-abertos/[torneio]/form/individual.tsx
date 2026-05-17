@@ -7,6 +7,7 @@ import actionInscriIndividual from "./action";
 import Form from "next/form";
 import { FormState } from "@/lib/types";
 import { searchCbx, searchFide } from "./searchID";
+import { supabase } from "@/lib/supabaseClient";
 
 type DataPlayer = {
     name: string,
@@ -32,7 +33,7 @@ export default function FormInscriIndividual() {
     }
 
     const initialValue: FormState= {}
-    const [qr, setQr] = useState(false)
+   
     const [state, formAction] = useActionState(actionInscriIndividual, initialValue)
     const [button, setUButton] = useState<Boolean>(false)
     const [comprovante, setComprovante] = useState<string>('')
@@ -68,6 +69,22 @@ export default function FormInscriIndividual() {
             p.focus()
         }
     }, [state])
+
+    const [qr, setQr] = useState<string>('')
+    const [qrKey, setQrKey] = useState<string>('')
+    useEffect(() => {
+        async function loadQr() {
+            const torneio = String(document.getElementById('torneio-title')?.innerText) 
+            const pathQr = `qrCodes/${torneio.split('~').join(' ')}`
+            const {data}= supabase.storage.from('publics').getPublicUrl(pathQr)
+
+            const chave = String(document.getElementById('qr-key')?.innerText)
+            
+            setQrKey(chave)
+            setQr(data.publicUrl)
+        } 
+        loadQr()
+    }, [])
 
 
     if (state.message && state.message.includes('Sucesso') && state.message[1].startsWith('/minhas-inscricoes/')) {
@@ -150,13 +167,13 @@ export default function FormInscriIndividual() {
                         {/* <p className="error">*Para checar sua informação, <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui</a> </p> */}
                         <div style={{width: '100%'}} className="select-radios">
                             <div>
-                                <input className="division-for" type='radio' defaultChecked name='hasFide' onChange={() => setHasFide(!hasFide)}/>
+                                <input className="division-for" type='radio' defaultChecked name='hasFide' value={'true'} onChange={() => setHasFide(!hasFide)}/>
                                 <label htmlFor="division-for">Possuo ID FIDE e ID CBX</label>
                             </div>
                             <div>
-                                <input className="division-for" type='radio' name='hasFide' onChange={() => setHasFide(!hasFide)}/>
+                                <input className="division-for" type='radio' name='hasFide' value={'false'} onChange={() => setHasFide(!hasFide)}/>
                                 <label htmlFor="division-for">Não possuo ID FIDE e ID CBX</label>
-                                <p className="obs">*Se não possuir cadastro FIDE, selecione esta opção</p>
+                                <p className="obs obs-fide">*Se não possuir cadastro FIDE, selecione esta opção</p>
                             </div>
                         </div>
                         
@@ -166,12 +183,14 @@ export default function FormInscriIndividual() {
                                 <input id="form-fide" type="text" name="idfide" defaultValue={idFide} onKeyDown={handleEnterBlur} maxLength={8} inputMode="numeric"  onInput={(e) => {e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')}} onBlur={(e) => sendIds(e.currentTarget)}/>
                                 {errorIdFide != '' ? <p className="error">{errorIdFide}</p> : ''}
                             </div>
+                            <input type="text" hidden name="playerFide" value={JSON.stringify(playerFide)}/>
                         
                             <div style={{width: 'calc(50% - 15px)'}}>
                                 <label htmlFor="idcbx">ID CBX:<p className="ast">*</p></label>
                                 <input id="form-cbx" type="text" name="idcbx" defaultValue={idCbx} onKeyDown={handleEnterBlur} maxLength={8} inputMode="numeric" onInput={(e) => {e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')}} onBlur={(e) => sendIds(e.currentTarget)}/>
                                 {errorIdCbx != '' ? <p className="error">{errorIdCbx}</p> : ''}
                             </div> 
+                            <input type="text" hidden name="playerCbx" value={JSON.stringify(playerCbx)}/>
                         </>): ''}
                         
                         {(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? (<> 
@@ -182,6 +201,25 @@ export default function FormInscriIndividual() {
                         <div className={`form ${(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? 'disableDiv' : ''}`} style={{width: '100%'}}> 
                             <Fields playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
                             
+                            <div id="qr-div" >
+                                <div>
+                                    <h2>Efetuar pagamento e confirmar inscrição:</h2>
+                                    <p>Escaneie o QRcode com sua conta bancária ou use a chave PIX e confirme sua inscrição</p>    
+                                    <div id="qr-key">
+                                        <p><strong>Ou copie o código:</strong></p>
+                                        <div className="input">
+                                            <p>{qrKey}</p>
+                                            <img src="/icons/copy.png" alt="copy" onClick={() => {
+                                                navigator.clipboard.writeText(String(qrKey))
+                                                alert('Copiado para área de transferência...')
+                                            }}/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <img src={qr} alt="qrcode" />
+                            </div>
+                            
                             <div className='upload-file' style={{width: '100%'}}>
                                 <button onClick={() => document.getElementById('input-comprovante')?.click()} type='button' className='button red'>Anexar comprovante <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
                                 {comprovante != '' ? (
@@ -191,7 +229,7 @@ export default function FormInscriIndividual() {
                             </div>
 
 
-                            <div style={{gap: '20px', marginTop: '30px'}} className={price != 0 && button && comprovante != '' ? '' : 'disableDiv'}>
+                            <div id="final-button" className={price != 0 && button && comprovante != '' ? '' : 'disableDiv'}>
 
                                 <h1 style={{marginBottom: '0px'}}>Valor total: {price == 0 ? '' : new Intl.NumberFormat('pt-BR', {
                                     style: 'currency',
@@ -206,10 +244,10 @@ export default function FormInscriIndividual() {
                                     <p className="error pErr">As informações preenchidas não correspondem às oficialmente cadastradas na FIDE <br />
                                     <p className="error">*Obs.: Preencha as informações (inclusive nome) exatamente como são demonstradas oficialmente na FIDE</p>
                                     <a href={`https://ratings.fide.com/profile/${state.values[0].idfide}`} target="_blank" className="fide-link">Ver meu perfil FIDE</a> </p> 
-                                : ('') }
+                                : ('') } */}
                                 {state.message && state.values && state.message.includes('Você já está inscrito') ? 
                                     <p className="error pErr">Este ID FIDE já está inscrito</p>
-                                : ('') } */}
+                                : ('') } 
                             </div>
                         </div>
                     </Form>
