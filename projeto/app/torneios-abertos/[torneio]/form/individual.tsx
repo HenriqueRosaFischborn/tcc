@@ -57,8 +57,6 @@ export default function FormInscriIndividual() {
     function setButton(isComplete: Boolean) {
         setUButton(isComplete)
     }
-
-    console.log(state.values)
     
     useEffect(() => {
         if (state.message && state.values && state.message.includes('error-info-id')) {
@@ -99,64 +97,71 @@ export default function FormInscriIndividual() {
     const [playerFide, setPlayerFide] = useState<DataPlayer>()
     const [playerCbx, setPlayerCbx] = useState<DataPlayer>()
     
+    
     async function sendIds(input: HTMLInputElement) {
-        const id = input.value
-        const type = input.name == 'idfide' ? 'fide' : 'cbx'
+        const id = input.value.trim()
+        const type = input.name === 'idfide' ? 'fide' : 'cbx'
 
-        if (type == 'fide') {
-            if (id.length != 8 && id.length != 7) {
+        if (type === 'fide' && id != idFide) {
+            setPlayerFide(undefined)
+
+            if (id.length !== 7 && id.length !== 8) {
                 setErrorIdFide('*Insira um ID válido')
-            } else {
-                setErrorIdFide('')
-                
-                if (id != idFide) {
-                    const dataPlayerFide = await searchFide(id) as DataPlayer
-                    
-                    if (dataPlayerFide.name == 'Usuário FIDE não encontrado') {
-                        setErrorIdFide('*Usuário FIDE não encontrado')
-                    } else {
-                        setErrorIdFide('')
-                        setIdFide(id)
-                        setPlayerFide(dataPlayerFide)
-                    }
-                    
-                }
+                setIdFide('')
+                return
             }
-            
-            
-        } else {
-            if (id.length > 6 || id.length < 4) {
-                setErrorIdCbx('*Insira um ID válido')
-               
-            } else {
-                
-                setErrorIdCbx('')
 
-                if (id != idCbx) {
-                    const dataPlayerCbx = await searchCbx(id) as DataPlayer
-                    
-                    if (dataPlayerCbx.name == 'Usuário CBX não encontrado') {
-                        setErrorIdCbx('*Usuário CBX não encontrado')
-                    } else {
-                        setErrorIdCbx('')
-                        setIdCbx(id)
-                        setPlayerCbx(dataPlayerCbx)
-                    }
-                    
+            setErrorIdFide('')
+
+            
+                const dataPlayerFide = await searchFide(id) as DataPlayer
+
+                if (
+                    !dataPlayerFide ||
+                    dataPlayerFide.name === 'Usuário FIDE não encontrado'
+                ) {
+                    setPlayerFide(undefined)
+                    setErrorIdFide('*Usuário FIDE não encontrado')
+                    setIdFide('')
+                    return
                 }
+
+                setIdFide(id)
+                setPlayerFide(dataPlayerFide)
+                setErrorIdFide('')
+            
+        }
+
+        if (type === 'cbx' && id != idCbx) {
+            setPlayerCbx(undefined)
+
+            if (id.length < 4 || id.length > 6) {
+                setErrorIdCbx('*Insira um ID válido')
+                setIdCbx('')
+                return
             }
+
+            setErrorIdCbx('')
+
+            
+                const dataPlayerCbx = await searchCbx(id) as DataPlayer
+
+                if (
+                    !dataPlayerCbx ||
+                    dataPlayerCbx.name === 'Usuário CBX não encontrado'
+                ) {
+                    setPlayerCbx(undefined)
+                    setErrorIdCbx('*Usuário CBX não encontrado')
+                    setIdCbx('')
+                    return
+                }
+
+                setIdCbx(id)
+                setPlayerCbx(dataPlayerCbx)
+                setErrorIdCbx('')
+            
         }
     }
-
-    useEffect(() => {
-        if (playerCbx && playerFide && playerCbx.idFide != playerFide.idFide) {
-            setErrorIdCbx('*Os IDs informados não represenam a mesma pessoa')
-            setErrorIdFide('*Os IDs informados não represenam a mesma pessoa')
-        } else {
-            setErrorIdCbx('')
-            setErrorIdFide('')
-        }
-    }, [playerFide, playerCbx])
 
     return (
         <>
@@ -221,11 +226,11 @@ export default function FormInscriIndividual() {
                             </div>
                             
                             <div className='upload-file' style={{width: '100%'}}>
-                                <button onClick={() => document.getElementById('input-comprovante')?.click()} type='button' className='button red'>Anexar comprovante <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
+                                <button onClick={() => document.getElementById('input-comprovante')?.click()} type='button' className='button red'><img src="/icons/upload.png" alt="" id="uploadIcon" fetchPriority='low' loading='lazy' decoding='async'/> Anexar comprovante <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
                                 {comprovante != '' ? (
                                     <p>({comprovante})</p>
                                 ) : ('')}
-                                <input onChange={(e) => uploadFile(e.currentTarget.value)} type='file' id='input-comprovante' name='fileComprovante' accept='.jpg,.jpeg,.png' hidden={true}/>     
+                                <input onChange={(e) => {uploadFile(e.currentTarget.value)}} type='file' id='input-comprovante' name='fileComprovante' accept='.jpg,.jpeg,.png' hidden={true}/>     
                             </div>
 
 

@@ -4,26 +4,27 @@ import Form from "next/form"
 
 import registerAction from "./action"
 import { FormState } from "@/lib/types"
-import { useActionState } from "react"
+import { useActionState, useEffect, useState } from "react"
 
 
 export default function RegisterForm() {
     const initialState: FormState = {}
     const [state, formAction] = useActionState(registerAction, initialState)
-    
-    
-    if (state.message && typeof state.message[0] == 'string' && state.message[0] === 'Sucesso') {
-        window.location.href = '/'
-    }
-    let emailError
+    const [emailError, setEmailError] = useState<string>()
 
-    if (state.emptyFields?.includes('email')) {
-        emailError = '*Este campo é obrigatório'
-    } else if (state.message?.includes('Email inválido')) {
-        emailError = 'Email inválido'
-    } else if (state.message?.includes('Este email já existe')) {
-        emailError = 'Este usuário já foi cadastrado'
-    }
+    useEffect(() => {
+        if (state.message && typeof state.message[0] == 'string' && state.message[0] === 'Sucesso') {
+            window.location.href = '/'
+        }
+    
+        if (state.emptyFields?.includes('email')) {
+            setEmailError('*Este campo é obrigatório')
+        } else if (state.message?.includes('Email inválido')) {
+            setEmailError('Email inválido')
+        } else if (state.message?.includes('Este email já existe')) {
+            setEmailError('Este usuário já foi cadastrado')
+        }
+    }, [state])
 
     return(
         <>

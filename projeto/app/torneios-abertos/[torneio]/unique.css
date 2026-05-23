@@ -242,3 +242,16 @@ summary p {
     font-weight: 400;
     font-size: 13pt;
 }
+
+.upload-file button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.upload-file button #uploadIcon {
+    width: 20px;
+    height: auto;
+    object-fit: contain;
+}

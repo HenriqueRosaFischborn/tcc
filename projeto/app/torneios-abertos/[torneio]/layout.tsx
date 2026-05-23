@@ -29,9 +29,7 @@ export default async function layoutTorneio({children, params}: {children: React
 
 
    
-    const supabaseAdmin = await getSupabaseAdmin()
-
-    
+    const supabaseAdmin = await getSupabaseAdmin()  
     
     const path = `folders/${torneio.split('~').join(' ')}`
     const { data } = supabaseAdmin.storage.from('publics').getPublicUrl(path)

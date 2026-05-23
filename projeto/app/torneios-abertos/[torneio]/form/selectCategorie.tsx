@@ -97,16 +97,6 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
 
         searchCate()
 
-        function xBlur() {
-            if (blur) {
-                blur()
-            }
-        }
-        if (blur) {
-            document.getElementById('input-date')?.removeEventListener('blur', xBlur)
-            document.getElementById('input-date')?.addEventListener('blur', xBlur)
-        }
-
     }, [updateCat, fieldsCat])
 
     const [dfChecked, setChek] = useState<boolean>(true)
@@ -161,10 +151,10 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
     function defineDate(date: string) {
         const complete = date.split('').length == 10
         if (complete) {
-            setUpdate(!updateCat)
             if (fieldsCat.indexOf('date') == -1) {
                 setFields(prev => [...prev, 'date'])
             }
+            setUpdate(!updateCat)
         } else {
             if (fieldsCat.indexOf('date') !== -1) {
                 setFields(prev => prev.filter((el, i) => el !== 'date'))
@@ -173,9 +163,9 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
                 setindividualPrice(0)
             }
         }
+        if (blur) blur()
     }
-
-    //genre
+    
     
     return (
 

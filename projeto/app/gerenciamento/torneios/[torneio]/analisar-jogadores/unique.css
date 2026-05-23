@@ -1,11 +1,20 @@
+article > .content {
+    padding: 50px 50px;
+}
+
 #content {
     flex-direction: column;
-    width: 80%;
-    gap: 50px;
+    width: 100%;
+    gap: 30px;
+}
+
+.link {
+    color: blue;
+    text-decoration: underline;
 }
 
 #folder-img {
-    width: 300px;
+    width: 150px;
     height: auto;
     object-fit: contain;
 }
@@ -14,6 +23,17 @@
     width: 100%;
     justify-content: space-between;
     align-items: start;
+}
+
+.texts {
+    width: 100%;
+    gap: 30px;
+    flex-direction: row;
+}
+
+.informations {
+    font-weight: 400;
+    font-size: 13pt;
 }
 
 #downloads {
@@ -28,18 +48,46 @@
 }
 
 #downloads .buttons button {
+    font-size: 12pt;
+    padding: 10px;
+    border-radius: 5px;
     display: flex;
-    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+#downloads .buttons button img {
+    width: 20px;
+    height: auto;
+    object-fit: contain;
 }
 
 #players {
     flex-direction: column;
     align-items: start;
     gap: 10px;
+    max-width: 100%;
+}
+
+#table {
+    max-width: 100%;
+    overflow-x: auto;
+    transform: rotateX(180deg)
+}
+
+table {
+    transform: rotateX(180deg)
 }
 
 th {
     text-align: start;
+    white-space: nowrap;
+}
+
+td{
+    white-space: nowrap;
+    padding: 5px 10px;
 }
 
 td a {
@@ -48,7 +96,6 @@ td a {
     font-style: italic;
     text-decoration: underline;
 }
-
 
 
 

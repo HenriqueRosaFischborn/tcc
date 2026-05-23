@@ -1,5 +1,7 @@
 'use server'
 
+import { UUID } from "crypto"
+
 export type FormState = {
     message?: string[]
     emptyFields?: string[]
@@ -33,4 +35,31 @@ export type NewTournment = {
     values?: {
         title: string
     }
+}
+
+export type Player = {
+  city: string
+  club: string
+  genre: boolean
+  data_nasc: Date
+  id_fide: bigint
+  id_cbx: bigint
+  uuid_cat: string
+  status: string
+  id_usuario: number
+  uuid: string
+  name: string
+  id_division: bigint
+  id_torneio: bigint
+  rtg_fide: bigint
+  rtg_cbx: bigint
+  categoria: {
+    name: string
+  }
+  divisoes: {
+    name: string
+  }
+  usuario: {
+    id: number
+  }
 }
