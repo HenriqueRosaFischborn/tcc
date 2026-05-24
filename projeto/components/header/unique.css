@@ -2,10 +2,6 @@
   display: none;
 }
 
-#icon-menu-cell {
-  display: none;
-}
-
 header {
   display: flex;
   flex-direction: column;
@@ -31,7 +27,10 @@ header .menu-item {
   font-weight: 500;
   text-align: center;
   z-index: 1000;
+  display: inline-block;
 }
+
+/* #icon-menu-cell*/
 
 .menu-item::after {
   content: "";
@@ -45,6 +44,8 @@ header .menu-item {
 
   opacity: 0;
   transition: opacity 0.3s ease;
+
+  pointer-events: none;
 }
 
 .menu-item:hover::after {

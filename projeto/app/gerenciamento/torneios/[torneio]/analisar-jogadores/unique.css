@@ -19,6 +19,8 @@ article > .content {
     object-fit: contain;
 }
 
+
+
 #info {
     width: 100%;
     justify-content: space-between;
@@ -66,15 +68,27 @@ article > .content {
 #players {
     flex-direction: column;
     align-items: start;
-    gap: 10px;
     max-width: 100%;
+    gap: 20px;
+    justify-content: space-between;
 }
 
 #table {
     max-width: 100%;
     overflow-x: auto;
-    transform: rotateX(180deg)
+    transform: rotateX(180deg);
+    width: 100%;
 }
+
+#save-changes {
+    font-size: 12pt;
+    border-radius: 5px;
+    padding: 5px 20px;
+    margin-top: -15px;
+}
+
+
+
 
 table {
     transform: rotateX(180deg)
@@ -87,7 +101,12 @@ th {
 
 td{
     white-space: nowrap;
-    padding: 5px 10px;
+    padding: 5px 0px;
+}
+
+td .obs {
+    font-size: 10pt;
+    
 }
 
 td a {
@@ -97,9 +116,38 @@ td a {
     text-decoration: underline;
 }
 
+td select:focus {
+    outline: none;
+    border: none;
+}
 
+select {
+    display: flex;
+    cursor: pointer;
+    appearance: none;
+    flex: 1;
+    padding-left: 5px;
+    padding-right: 50px;
+}
 
+.select {
+    position: relative;
+}
 
+.select::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    
+    pointer-events: none;
+    background-image: url('/icons/arrow.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: translateY(-50%) rotate(-90deg);
+}
 
 
 

@@ -5,8 +5,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import './unique.css'
 import './responsive.css'
 import classifyTime from "@/lib/classifyTime";
-import {getplayers} from "./getInformations";
-import { Player } from "@/lib/types";
+import {getCategories, getDivisons, getplayers} from "./getInformations";
+import { Cat, Div, Player } from "@/lib/types";
 
 export default async function Players({params}: {params: Promise<{ torneio: string }>}) {
     const {torneio} = await params
@@ -62,6 +62,9 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
         const comprovante = dataComprovante.publicUrl
         comprovantes[el.uuid] = comprovante
     })
+
+    const categories = await getCategories(Number(tournment.id)) as Cat[]
+    const diviisons = await getDivisons(Number(tournment.id)) as Div[]
     
     return (
         <>
@@ -105,7 +108,7 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
                     {folder ? <img id='folder-img' src={folder} alt="folder" fetchPriority='low' loading='lazy' decoding='async'/> : ''}
                 </div>
            
-                <BodyClient comprovantes={comprovantes} players={inscricoes}/>
+                <BodyClient categories={categories} divisions={diviisons} comprovantes={comprovantes} players={inscricoes}/>
             </div>
         </>
     )

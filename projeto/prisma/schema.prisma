@@ -52,7 +52,7 @@ model incricao {
   id_fide     BigInt?
   id_cbx      BigInt?
   uuid_cat    String              @db.Uuid
-  status      status_inscripition @default(pending)
+  status      status_inscripition @default(Pendente)
   id_usuario  Int
   uuid        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String
@@ -125,9 +125,9 @@ enum division {
 }
 
 enum status_inscripition {
-  pending
-  confirmed
-  canceled
+  Pendente
+  Confirmada
+  Recusada
 }
 
 enum genero {

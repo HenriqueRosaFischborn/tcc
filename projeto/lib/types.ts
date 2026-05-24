@@ -55,11 +55,27 @@ export type Player = {
   rtg_cbx: bigint
   categoria: {
     name: string
+    uuid: string
+    id_torneio: bigint
   }
   divisoes: {
-    name: string
+    name: string,
+    id: bigint
   }
   usuario: {
-    id: number
+    id: number,
+
   }
+}
+
+export type Cat = {
+  uuid: string,
+  name: string,
+  default_division: bigint
+}
+
+export type Div = {
+  id: bigint,
+  name: string,
+  isAbsolute: boolean
 }
