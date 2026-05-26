@@ -42,25 +42,25 @@ export type Player = {
   club: string
   genre: boolean
   data_nasc: Date
-  id_fide: bigint
-  id_cbx: bigint
+  id_fide: number
+  id_cbx: number
   uuid_cat: string
   status: string
   id_usuario: number
   uuid: string
   name: string
-  id_division: bigint
-  id_torneio: bigint
-  rtg_fide: bigint
-  rtg_cbx: bigint
+  id_division: number
+  id_torneio: number
+  rtg_fide: number
+  rtg_cbx: number
   categoria: {
     name: string
     uuid: string
-    id_torneio: bigint
+    id_torneio: number
   }
   divisoes: {
     name: string,
-    id: bigint
+    id: number
   }
   usuario: {
     id: number,
@@ -71,11 +71,13 @@ export type Player = {
 export type Cat = {
   uuid: string,
   name: string,
-  default_division: bigint
+  default_division: number
 }
 
 export type Div = {
-  id: bigint,
+  id: number,
   name: string,
   isAbsolute: boolean
 }
+
+//number

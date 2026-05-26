@@ -5,7 +5,7 @@ import IMask from "imask";
 import { useEffect, useRef } from "react";
 
 
-export default function InputDate({blur, state, multiple, now}: {blur?: Function, state?: FormState, multiple?: string, now?: boolean}) {
+export default function InputDate({uuid, updateObjNowSelect, reguleSize, size, defaultValue, blur, state, multiple, now}: {uuid?: string, updateObjNowSelect?: Function, reguleSize: Function, size?: number, defaultValue?: string, blur?: Function, state?: FormState, multiple?: string, now?: boolean}) {
     const yearNow = new Date().getFullYear()
     const inputRef = useRef<HTMLInputElement | null>(null)
     
@@ -79,7 +79,10 @@ export default function InputDate({blur, state, multiple, now}: {blur?: Function
         name="borndate"
         onKeyDown={handleEnterBlur}
         onBlur={blur ? (e) => {blur(e.currentTarget.value); nowBlur(e.currentTarget)} : () => {}}
-        defaultValue={state && state.values && state.values[0] ? state.values[0].borndate : ''}
+        defaultValue={defaultValue ? defaultValue : state && state.values && state.values[0] ? state.values[0].borndate : ''}
+        size={size ? size : undefined}
+        onInput={reguleSize ? (e) => reguleSize(e.currentTarget) : undefined}
+        onChange={updateObjNowSelect && uuid ? (e) => {updateObjNowSelect(uuid, 'data_nasc', e.currentTarget.value, 'date')} : undefined}
         />
     )
 }
