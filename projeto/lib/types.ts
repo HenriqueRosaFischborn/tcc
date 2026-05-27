@@ -63,8 +63,7 @@ export type Player = {
     id: number
   }
   usuario: {
-    id: number,
-
+    email: string,
   }
 }
 
@@ -81,3 +80,21 @@ export type Div = {
 }
 
 //number
+
+export type Differences = {
+  city: string
+  club: string
+  genre: boolean
+  data_nasc: Date
+  id_fide: number
+  id_cbx: number
+  uuid_cat: string
+  status: string
+  id_usuario: number
+  uuid: string
+  name: string
+  id_division: number
+  id_torneio: number
+  rtg_fide: number
+  rtg_cbx: number
+}

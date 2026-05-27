@@ -4,22 +4,19 @@ import InputDate from '@/components/ui/input-date'
 // Crtl + alt + j vai pro próximo bookmark e ctrl + alt + k adiciona ou tira
 
 import { Cat, Div, Player } from '@/lib/types'
-import { useEffect, useState } from 'react'
+import Form from 'next/form'
+import { useActionState, useEffect, useState } from 'react'
+import updateDataBase from './updateDataBase'
 
 type Inscricoes = {
     [key: string]: Player
 }
 
 export default function BodyClient({players, comprovantes, categories, divisions}: {categories: Cat[], divisions: Div[], players: Player[], comprovantes: {[key: string]: string}}) {
-
-
+    const initialValue: {message: string} = {message: ''}
+    const [state, formAction] = useActionState(updateDataBase, initialValue)
     const [defaultInscri, setDefaultInscri] = useState<Inscricoes>({})
     const [nowInscri, setNowInscri] = useState<Inscricoes>({})
-
-    useEffect(() => {
-        console.log('defaultInscri: ', defaultInscri)
-        console.log('nowInscri: ', nowInscri)
-    }, [nowInscri])
     
     useEffect(() => {
         const dataInscri: Inscricoes = {}
@@ -74,6 +71,12 @@ export default function BodyClient({players, comprovantes, categories, divisions
     function reguleSize(input: HTMLInputElement) {
         input.size = input.value.length
     }
+
+    useEffect(() => {
+        if (state.message == 'Alterações salvas') {
+            setDefaultInscri(nowInscri)
+        }
+    }, [state])
     
     return (
         <>
@@ -194,7 +197,11 @@ export default function BodyClient({players, comprovantes, categories, divisions
                             </tbody>
                         </table>
                     </div>
-                    <button id='save-changes' className={`button red ${(JSON.stringify(defaultInscri) != JSON.stringify(nowInscri)) && Array.from(document.querySelectorAll('.date')).map(el => el.firstChild).every(el => el instanceof HTMLInputElement && el.value.length == 10) ? '' : 'disableDiv'}`}>Salvar Alterações</button>
+                    <Form action={formAction}>
+                        <input type="text" hidden name='defaultInscri' value={JSON.stringify(defaultInscri)}/>
+                        <input type="text" hidden name='nowInscri' value={JSON.stringify(nowInscri)}/>
+                        <button id='save-changes' type='submit' className={`button red ${(JSON.stringify(defaultInscri) != JSON.stringify(nowInscri)) && Array.from(document.querySelectorAll('.date')).map(el => el.firstChild).every(el => el instanceof HTMLInputElement && el.value.length == 10) ? '' : 'disableDiv'}`}>Salvar Alterações</button>
+                    </Form>
                     {Array.from(document.querySelectorAll('.date')).map(el => el.firstChild).every(el => el instanceof HTMLInputElement && el.value.length == 10) ? '' : <p style={{marginTop: '-15px'}} className='error'>*Preencha as datas corretamente</p>}
                 </div>
         </>

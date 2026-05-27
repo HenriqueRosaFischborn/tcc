@@ -114,7 +114,7 @@ export async function getplayers(id: number) {
             },
             usuario: {
                 select: {
-                    id: true
+                    email: true
                 }
             }
         },
