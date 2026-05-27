@@ -12,7 +12,11 @@ type Inscricoes = {
     [key: string]: Player
 }
 
-export default function BodyClient({players, comprovantes, categories, divisions}: {categories: Cat[], divisions: Div[], players: Player[], comprovantes: {[key: string]: string}}) {
+async function routeGenerateXLS(players: Inscricoes) {
+    
+}
+
+export default function BodyClient({nameTournment, players, comprovantes, categories, divisions}: {nameTournment: string, categories: Cat[], divisions: Div[], players: Player[], comprovantes: {[key: string]: string}}) {
     const initialValue: {message: string} = {message: ''}
     const [state, formAction] = useActionState(updateDataBase, initialValue)
     const [defaultInscri, setDefaultInscri] = useState<Inscricoes>({})
@@ -37,8 +41,8 @@ export default function BodyClient({players, comprovantes, categories, divisions
         }
 
         setNowInscri(prev => {
-            const newValue = type === 'string' ? value : type === 'date' ? '' : Number(value)
-
+            const newValue = type === 'string' ? value : type === 'date' ? '' : type === 'boolean' ? Boolean(value) : Number(value)
+            console.log(newValue)
             const updatedPlayer = {
                 ...prev[uuid],
                 [collumn]: type === 'date' ? dateValue : newValue
@@ -84,9 +88,9 @@ export default function BodyClient({players, comprovantes, categories, divisions
                 <div id='downloads'>
                     <h2>Baixar lista de jogadores:</h2>
                     <div className='buttons'>
-                        <button className='button gray'><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> PDF</button>
-                        <button className='button gray'><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xls)</button>
-                        <button className='button gray'><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button>
+                        <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> PDF</button>
+                        <button className='button gray' onClick={() => routeGenerateXLS(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xls)</button>
+                        <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button>
                     </div>
                 </div>
 
@@ -106,6 +110,7 @@ export default function BodyClient({players, comprovantes, categories, divisions
                                     <th>Status:</th>
                                     <th>Nome:</th>
                                     <th>Comprovante:</th>
+                                    <th>Email: </th>
                                     <th>ID FIDE:</th>
                                     <th>ID CBX:</th>
                                     <th>Cidade:</th>
@@ -113,6 +118,7 @@ export default function BodyClient({players, comprovantes, categories, divisions
                                     <th>Rating FIDE:</th>
                                     <th>Rating CBX:</th>
                                     <th>Data de nascimento:</th>
+                                    <th>Gênero:</th>
                                     <th>Divisão:</th>
                                     <th>Categoria:</th>
                                 </tr>
@@ -151,11 +157,16 @@ export default function BodyClient({players, comprovantes, categories, divisions
                                         <td className='comprovante' style={{paddingLeft: '5px'}}>
                                             <a href={comprovantes[el.uuid]} target='_blank'>Ver comprovante</a>
                                         </td>
+
+                                        <td className='email'>
+                                            {el.usuario.email}
+                                        </td>
+
                                         <td style={{backgroundColor: nowInscri[el.uuid].id_fide !== defaultInscri[el.uuid]?.id_fide ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.id_fide} size={String(el.id_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_fide', e.currentTarget.value, 'number')}/>
+                                            <input placeholder='Nenhum' type="text" defaultValue={el.id_fide} size={String(el.id_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_fide', e.currentTarget.value, 'number')}/>
                                         </td>
                                         <td style={{backgroundColor: nowInscri[el.uuid].id_cbx !== defaultInscri[el.uuid]?.id_cbx ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.id_cbx} size={String(el.id_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_cbx', e.currentTarget.value, 'number')}/>
+                                            <input placeholder='Nenhum' type="text" defaultValue={el.id_cbx} size={String(el.id_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_cbx', e.currentTarget.value, 'number')}/>
                                         </td>
                                         <td style={{backgroundColor: nowInscri[el.uuid].city !== defaultInscri[el.uuid]?.city ? 'var(--ligthgray)' : ''}}>
                                             <input type="text" defaultValue={el.city} size={el.city.length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'city', e.currentTarget.value, 'string')}/>
@@ -172,6 +183,13 @@ export default function BodyClient({players, comprovantes, categories, divisions
                                         
                                         <td className='date' style={{backgroundColor: nowInscri[el.uuid].data_nasc !== defaultInscri[el.uuid]?.data_nasc ? 'var(--ligthgray)' : ''}}>
                                             <InputDate uuid={el.uuid} updateObjNowSelect={updateObjNowSelect} reguleSize={reguleSize} size={el.data_nasc.toLocaleDateString('pt-BR', {timeZone: 'UTC'}).length} defaultValue={el.data_nasc.toLocaleDateString('pt-BR', {timeZone: 'UTC'})}/>
+                                        </td>
+                                        
+                                        <td className='select' style={{backgroundColor: nowInscri[el.uuid]?.genre !== defaultInscri[el.uuid]?.genre ? 'var(--ligthgray)' : ''}}>
+                                            <select name="" id="" defaultValue={el.genre ? 'true' : 'false'} onChange={(e) => {updateObjNowSelect(el.uuid, 'genre', e.currentTarget.value, 'boolean')}}>
+                                                <option value={'true'}>Masculino</option>
+                                                <option value={''}>Feminino</option>
+                                            </select>
                                         </td>
                                         
                                         <td className='select' style={{backgroundColor: nowInscri[el.uuid]?.id_division !== defaultInscri[el.uuid]?.id_division ? 'var(--ligthgray)' : ''}}>
@@ -198,6 +216,7 @@ export default function BodyClient({players, comprovantes, categories, divisions
                         </table>
                     </div>
                     <Form action={formAction}>
+                        <input type="text" hidden name='nameTournment' value={nameTournment}/>
                         <input type="text" hidden name='defaultInscri' value={JSON.stringify(defaultInscri)}/>
                         <input type="text" hidden name='nowInscri' value={JSON.stringify(nowInscri)}/>
                         <button id='save-changes' type='submit' className={`button red ${(JSON.stringify(defaultInscri) != JSON.stringify(nowInscri)) && Array.from(document.querySelectorAll('.date')).map(el => el.firstChild).every(el => el instanceof HTMLInputElement && el.value.length == 10) ? '' : 'disableDiv'}`}>Salvar Alterações</button>

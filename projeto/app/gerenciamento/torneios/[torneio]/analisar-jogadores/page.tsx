@@ -108,7 +108,7 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
                     {folder ? <img id='folder-img' src={folder} alt="folder" fetchPriority='low' loading='lazy' decoding='async'/> : ''}
                 </div>
            
-                <BodyClient categories={categories} divisions={diviisons} comprovantes={comprovantes} players={inscricoes}/>
+                <BodyClient nameTournment={tournment.title} categories={categories} divisions={diviisons} comprovantes={comprovantes} players={inscricoes}/>
             </div>
         </>
     )

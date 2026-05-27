@@ -63,6 +63,7 @@ export type Player = {
     id: number
   }
   usuario: {
+    id: number
     email: string,
   }
 }

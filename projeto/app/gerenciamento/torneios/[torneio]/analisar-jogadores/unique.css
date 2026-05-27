@@ -126,6 +126,10 @@ td{
     
 }
 
+.email {
+    padding: 0px 5px;
+}
+
 td a {
     color: rgb(58, 58, 58);
     font-size: 12pt;

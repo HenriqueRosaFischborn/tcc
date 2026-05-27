@@ -1,8 +1,8 @@
 'use server'
 
 import { Player } from "@/lib/types"
-import { sendConfirmedEmail } from "./sendConfirmedEmail"
 import db from "@/lib/db"
+import { sendConfirmedMessageEmail } from "@/app/api/email/confirmed-inscription/send"
 
 type Inscricoes = {
     [key: string]: Player
@@ -35,6 +35,8 @@ function setDiff<K extends keyof UniqueDifferences>(obj: Partial<UniqueDifferenc
 }
 
 export default async function updateDataBase(prev: {message: string}, formdata: FormData) {
+    const nameTournment = String(formdata.get('nameTournment')) 
+    
     const defaultIncri = JSON.parse(String(formdata.get('defaultInscri'))) as Inscricoes
 
     const nowIncri = JSON.parse(String(formdata.get('nowInscri'))) as Inscricoes
@@ -55,8 +57,8 @@ export default async function updateDataBase(prev: {message: string}, formdata: 
             const isDifferent = typeof oldValue === 'object' && oldValue !== null ? JSON.stringify(oldValue) !== JSON.stringify(newValue) : oldValue !== newValue
             
             if (isDifferent) {
-                if (key == 'status') {
-                    await sendConfirmedEmail(nowIncri[uuid])
+                if (key == 'status' && nowIncri[uuid][key] == 'Confirmada') {
+                    await sendConfirmedMessageEmail(nowIncri[uuid], nameTournment)
                 }
 
                 setDiff(diff, key, newValue)
@@ -66,7 +68,7 @@ export default async function updateDataBase(prev: {message: string}, formdata: 
         differences[uuid] = diff
     }
     
-    console.log(differences)
+    
 
     try {
     Object.keys(differences).map(async (k) => {
