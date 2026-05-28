@@ -29,12 +29,6 @@ export default function Header({user, admin}: {user: boolean, admin: boolean}) {
                 <div id="menu-cell" className={`${!menuOpen ? 'closed' : 'open'}`} style={{flexDirection: 'column'}}>
                     <Menu user={user} admin={admin}/>
                 </div>
-
-                <div style={{
-                    height: '15px',
-                    width: '100%',
-                    backgroundColor: 'var(--mainblack)',
-                }}></div>
             </header>
         </>
     )

@@ -13,7 +13,51 @@ type Inscricoes = {
 }
 
 async function routeGenerateXLS(players: Inscricoes) {
-    
+    const response = await fetch('/api/tables/xls',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(players),
+      }
+    )
+
+    const blob = await response.blob()
+
+    const url =
+      window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'NationalRatings.xlsx'
+    a.click()
+
+    window.URL.revokeObjectURL(url)
+}
+
+async function routeGenerateCSV(players: Inscricoes) {
+    const response = await fetch('/api/tables/csv',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(players),
+      }
+    )
+
+    const blob = await response.blob()
+
+    const url =
+      window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'NationalRatings.csv'
+    a.click()
+
+    window.URL.revokeObjectURL(url)
 }
 
 export default function BodyClient({nameTournment, players, comprovantes, categories, divisions}: {nameTournment: string, categories: Cat[], divisions: Div[], players: Player[], comprovantes: {[key: string]: string}}) {
@@ -88,9 +132,9 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                 <div id='downloads'>
                     <h2>Baixar lista de jogadores:</h2>
                     <div className='buttons'>
-                        <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> PDF</button>
-                        <button className='button gray' onClick={() => routeGenerateXLS(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xls)</button>
-                        <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button>
+                        {/* <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> PDF</button> */}
+                        <button className='button gray' onClick={() => routeGenerateXLS(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xlsx)</button>
+                        <button className='button gray' onClick={() => routeGenerateCSV(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button>
                     </div>
                 </div>
 
@@ -110,7 +154,6 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                     <th>Status:</th>
                                     <th>Nome:</th>
                                     <th>Comprovante:</th>
-                                    <th>Email: </th>
                                     <th>ID FIDE:</th>
                                     <th>ID CBX:</th>
                                     <th>Cidade:</th>
@@ -121,6 +164,7 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                     <th>Gênero:</th>
                                     <th>Divisão:</th>
                                     <th>Categoria:</th>
+                                    <th>Email: </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -158,10 +202,6 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                             <a href={comprovantes[el.uuid]} target='_blank'>Ver comprovante</a>
                                         </td>
 
-                                        <td className='email'>
-                                            {el.usuario.email}
-                                        </td>
-
                                         <td style={{backgroundColor: nowInscri[el.uuid].id_fide !== defaultInscri[el.uuid]?.id_fide ? 'var(--ligthgray)' : ''}}>
                                             <input placeholder='Nenhum' type="text" defaultValue={el.id_fide} size={String(el.id_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_fide', e.currentTarget.value, 'number')}/>
                                         </td>
@@ -175,10 +215,10 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                             <input type="text" defaultValue={el.club ? el.club : ''} placeholder={'Nenhum'} size={el.club ? el.club.length : 6} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'club', e.currentTarget.value, 'string')}/>
                                         </td> 
                                         <td style={{backgroundColor: nowInscri[el.uuid].rtg_fide !== defaultInscri[el.uuid]?.rtg_fide ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.rtg_fide} size={String(el.rtg_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_fide', e.currentTarget.value, 'number')}/>
+                                            <input placeholder='Nenhum' type="text" defaultValue={el.rtg_fide} size={String(el.rtg_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_fide', e.currentTarget.value, 'number')}/>
                                         </td>
                                         <td style={{backgroundColor: nowInscri[el.uuid].rtg_cbx !== defaultInscri[el.uuid]?.rtg_cbx ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.rtg_cbx} size={String(el.rtg_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_cbx', e.currentTarget.value, 'number')}/>
+                                            <input placeholder='Nenhum' type="text" defaultValue={el.rtg_cbx} size={String(el.rtg_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_cbx', e.currentTarget.value, 'number')}/>
                                         </td>
                                         
                                         <td className='date' style={{backgroundColor: nowInscri[el.uuid].data_nasc !== defaultInscri[el.uuid]?.data_nasc ? 'var(--ligthgray)' : ''}}>
@@ -209,6 +249,10 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                                     <option key={i2} value={cat.uuid}>{cat.name} ({divisions.find(d => Number(d.id) === Number(cat.default_division))?.name})</option>
                                                 ))}
                                             </select>
+                                        </td>
+
+                                        <td className='email'>
+                                            {el.usuario.email}
                                         </td>
                                     </tr>
                                 )})}

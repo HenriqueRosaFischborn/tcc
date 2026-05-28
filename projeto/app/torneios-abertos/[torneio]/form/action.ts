@@ -216,13 +216,13 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
                 club: resData.team,
                 data_nasc: date,
                 id_division: defaultDivision.id,
-                id_fide: String(resData.idfide).trim() == '' ? undefined : Number(resData.idfide),
-                id_cbx: String(resData.idcbx).trim() == '' ? undefined : Number(resData.idcbx),
+                id_fide: String(resData.idfide).trim() == '' ? null : Number(resData.idfide),
+                id_cbx: String(resData.idcbx).trim() == '' ? null : Number(resData.idcbx),
                 genre: resData.genre == 'masc',
-                name: resData.name,
+                name: hasFide && playerFide? playerFide.name : resData.name,
                 id_torneio: Number(cat.id_torneio),
-                rtg_fide: classTime == 'bullet' ? null : (playerFide.ratings[classTime] == 'Not rated' ? 0 : Number(playerFide.ratings[classTime])),
-                rtg_cbx: classTime == 'bullet' ? null :  (playerCbx.ratings[classTime] == 'Not rated' ? 0 : Number(playerCbx.ratings[classTime]))
+                rtg_fide: classTime == 'bullet' ? null : (playerFide ? playerFide.ratings[classTime] == 'Not rated' ? 0 : Number(playerFide.ratings[classTime]) : null),
+                rtg_cbx: classTime == 'bullet' ? null :  (playerCbx ? playerCbx.ratings[classTime] == 'Not rated' ? 0 : Number(playerCbx.ratings[classTime]): null)
             }
 
 

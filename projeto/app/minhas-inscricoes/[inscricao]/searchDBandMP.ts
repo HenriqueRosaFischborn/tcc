@@ -2,7 +2,6 @@
 
 import db from "@/lib/db"
 import { Info } from "@/lib/types"
-import {Payment, MercadoPagoConfig} from 'mercadopago'
 
 
 export async function searchCatInscri(uuid: string): Promise <Info> {

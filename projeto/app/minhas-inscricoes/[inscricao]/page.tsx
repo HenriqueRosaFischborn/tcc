@@ -27,7 +27,7 @@ export default async function inscription({params}: {params: Promise<{inscricao:
                         textAlign: 'start'
                     }}>Você só poderá realizar o pagamento confirmando sua inscrição até até 28/08 às 18:00</h3>
                     <div className="content" style={{width: '100%'}}>
-                        <QrDiv email={String(session?.user.email)} status={String(info.status)} qr_key={String(info.key_code)} qr_src={String(info.qr_code)} />
+                        {/* <QrDiv email={String(session?.user.email)} status={String(info.status)} qr_key={String(info.key_code)} qr_src={String(info.qr_code)} /> */}
                         <div style={{flexDirection: 'column', gap: '10px', flex: 1, minWidth: 0, width: '100%'}}>
                             <div className="info-div">
                                 <div style={{flexWrap: 'wrap'}}>

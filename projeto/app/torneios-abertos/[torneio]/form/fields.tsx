@@ -105,7 +105,7 @@ export default function Fields({playerCbx, playerFide, hasFide, setindividualPri
                         father.innerText = e.currentTarget.value
                         if (father.innerText == '') father.innerText = 'Henrique'
                     }
-                } :{})} defaultValue={state.values && state.values[0] ? state.values[0].name : ''} onKeyDown={handleEnterBlur}/> 
+                } :{})} defaultValue={state.values && state.values[0] ? state.values[0].name : ''} onKeyDown={handleEnterBlur}/>
                 {hasFide && errorName != '' ? <p className="error">{errorName}</p> : ''}
             </div>
             
