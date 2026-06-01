@@ -24,8 +24,8 @@
 #form-content {
     flex-direction: column;
     width: 85%;
-    padding-top: 80px;
-    padding-bottom: 80px;
+    padding-top: 50px;
+    padding-bottom: 50px;
     align-items: center;
 }
 

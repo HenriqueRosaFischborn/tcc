@@ -5,7 +5,7 @@
 header {
   display: flex;
   flex-direction: column;
-  background-color: var(--mainred);
+  background-color: var(--mainblue);
   align-items: center;
   position: sticky; /* Fica colado e acompanha depois */
   top: 0; /*Necessário pro sticky*/

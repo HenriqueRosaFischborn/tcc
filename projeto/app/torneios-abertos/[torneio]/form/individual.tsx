@@ -38,12 +38,21 @@ export default function FormInscriIndividual() {
     const [button, setUButton] = useState<Boolean>(false)
     const [comprovante, setComprovante] = useState<string>('')
 
-    function uploadFile(file: string) {
-        const fileName = String(file.split('\\').at(-1))
+    function uploadFile(file: File) {
+        const fileName = String(file.name.split('\\').at(-1))
         const extension = fileName.split('.').at(-1)
 
         if (extension == 'jpeg' || extension == 'png' || extension == '.jpg') {
             setComprovante(fileName)
+        }
+
+        const nome = document.getElementById('nome')
+        const input = document.getElementById('input-comprovante')
+
+        if (nome && input) {
+            nome.focus()
+            nome.blur()
+            input.focus()
         }
     }
    
@@ -230,7 +239,13 @@ export default function FormInscriIndividual() {
                                 {comprovante != '' ? (
                                     <p>({comprovante})</p>
                                 ) : ('')}
-                                <input onChange={(e) => {uploadFile(e.currentTarget.value)}} type='file' id='input-comprovante' name='fileComprovante' accept='.jpg,.jpeg,.png' hidden={true}/>     
+                                <input onChange={(e) => {
+                                    const files = e.currentTarget.files?.[0]
+
+                                    if (!files) return
+                                    
+                                    uploadFile(files)
+                                }} type='file' id='input-comprovante' name='fileComprovante' accept='.jpg,.jpeg,.png' hidden={true}/>     
                             </div>
 
 

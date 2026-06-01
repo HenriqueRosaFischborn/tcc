@@ -28,7 +28,19 @@ export default async function searchCat(date: string, genre: string) {
             }
         }, include: {divisoes: {select: {genre: true}}}
     })
-
+    
+    if (cat2.length == 0) {
+        cat2 = await db.categoria.findMany({
+            where: {
+                max_y: {
+                    lt: year
+                }
+            },
+            orderBy: {
+                max_y: 'desc'
+            }, include: {divisoes: {select: {genre: true}}}
+        })
+    }
 
     if (cat2.length == 0) {
         cat2 = await db.categoria.findMany({
@@ -43,18 +55,6 @@ export default async function searchCat(date: string, genre: string) {
         })
     }
 
-    if (cat2.length == 0) {
-        cat2 = await db.categoria.findMany({
-            where: {
-                max_y: {
-                    lt: year
-                }
-            },
-            orderBy: {
-                max_y: 'desc'
-            }, include: {divisoes: {select: {genre: true}}}
-        })
-    }
 
     const categorie = cat2.filter((el) => {
         if (el.divisoes.genre == genre.toLowerCase() || el.divisoes.genre == 'ambos') {
