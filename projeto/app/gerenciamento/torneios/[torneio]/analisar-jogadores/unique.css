@@ -8,11 +8,6 @@ article > .content {
     gap: 30px;
 }
 
-.link {
-    color: blue;
-    text-decoration: underline;
-}
-
 #folder-img {
     width: 150px;
     height: auto;
@@ -125,7 +120,7 @@ td{
     padding: 0px 0px;
     
 }
-
+/* link */
 .email {
     padding: 0px 5px;
 }

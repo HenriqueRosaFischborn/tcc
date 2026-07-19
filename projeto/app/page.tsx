@@ -3,6 +3,8 @@ import './unique.css'
 import './responsive-unique.css'
 import { headers } from 'next/headers'
 import { auth } from "@/auth";
+import db from "@/lib/db";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 
 export default async function Home() {
@@ -11,6 +13,76 @@ export default async function Home() {
   
   const isMobile = /mobile|android|iphone|ipad/i.test(userAgent) // faz uma pesquisa na string de tudo que pode indicar ser mobile
   // usar o isMobile para chamar o número de torneios iniciais necessários, mudar essa diferenciação depois, atualmente se está usando display none pelo css 
+
+  
+
+  const tournments = await db.torneio.findMany(
+    {
+      // where: {id: 1},
+      include: {
+      tempo_torneio_time_digitalTotempo: {
+          select: {
+              time: true,
+              plus: true
+          }
+      },
+      tempo_torneio_time_analogTotempo: {
+          select: {
+              time: true,
+              plus: true
+          }
+      }
+    }}
+  )
+
+  const supabaseAdmin = await getSupabaseAdmin()  
+
+  const folders: {[key: string]: string} = {}
+
+  for (let i = 0 ; i < tournments.length ; i++) {
+    const pathFolder = `folders/${tournments[i].title}`
+    const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
+    folders[String(tournments[i].title.split(' ').join('~'))] = dataFolder.publicUrl
+  }
+
+  function classifyTime(min: number, seg: number) {
+
+      const total = min + seg
+
+      if (total < 3) {
+          return 'bullet'
+      } else if (total < 10) {
+          return 'blitz'
+      } else if (total < 60) {
+          return 'rapid'
+      } else {
+          return 'standard'
+      }
+  }
+
+  const titulados = [
+    {
+      nome: 'Frank Becker',
+      funcao: 'Presidente',
+      titulo: 'Árbitro FIDE',
+    },
+
+    {
+      nome: 'Leandro Ubialli ',
+      funcao: 'Vice-Presidente',
+      titulo: 'Candidato a Mestre Nacional',
+    },
+
+    {
+      nome: 'Alexandre de Matos',
+      titulo: 'Candidato a Mestre Nacional',
+    },
+
+    {
+      nome: 'Eduardo da Silva Cardoso',
+      titulo: 'Candidato a Mestre FIDE',
+    },
+  ]
 
   return (
     <>
@@ -23,107 +95,100 @@ export default async function Home() {
       </div>
       
       
-      <div id="comparation">
-        <h1 >Bem-vindo ao Sombrio Xadrez Clube!!!</h1>
-        <h2 style={{paddingBottom: '10px'}}>Promovendo o xadrez há mais de 20 anos</h2>
-        <div>
-          <img src="/images/comp2.png" alt="comp2" fetchPriority='low' loading='lazy' decoding='async'/>
-          <img src="/images/comp1.png" alt="comp1" fetchPriority='low' loading='lazy' decoding='async'/>
-        </div>
-      </div>
-      
-      <div id="slider">
-        <h1 >Trazendo torneios que criam amizades!</h1>
-        <div className="track">
-          <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
-          </div>
-
-          <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
-          </div>
-        </div>
-      </div>
+     
+      <h1 style={{
+        fontSize: '32pt'
+      }}>Bem-vindo(a) ao <br/>Clube de Xadrez de Araranguá!</h1>
+      <img style={{
+        width: 'auto',
+        height: '100px',
+        objectFit: 'contain'
+      }} src="/icons/second-logo.png" alt="comp2" fetchPriority='low' loading='lazy' decoding='async'/>
       
       <div id="tournaments">
-        <h1>Torneios abertos para inscrição</h1>
+        <h1>Torneios Abertos para Inscrição</h1>
 
 
-        {Array.from({ length: 2 }).map((_, i) => (
+        {tournments.length > 0 ? tournments.map((tournment, i) => {
+          
+              const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
+              const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+              })
+          
+              const dateEvent = tournment.date_event.toLocaleDateString('pt-BR')
+              const timeEvent = tournment.date_event.toLocaleTimeString('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit'
+              })
+          
+              const times = {
+                  digital: {
+                      time: Number(tournment.tempo_torneio_time_digitalTotempo?.time),
+                      plus: Number(tournment.tempo_torneio_time_digitalTotempo?.plus)
+                  },
+                  analog: {
+                      time: Number(tournment.tempo_torneio_time_analogTotempo?.time),
+                      plus: Number(tournment.tempo_torneio_time_analogTotempo?.plus)
+                  }
+              }
+              const diference = times.digital.time + ' + ' + times.digital.plus != times.analog.time + ' + ' + times.analog.plus
+          
+              const classTime = classifyTime(times.digital.time, times.digital.plus)
+              const classTime2 = classifyTime(times.analog.time, times.analog.plus)
+          
+          return(
           // i é o número de repetição do negócio
           <div className="tournament" key={i}>
-            <div className="contentImg">
-              <div className="content">
-                <h3>IV TORNEIO BLITZ SOMBRIO</h3>
+            <div className="content">
+              <h3>{tournment.title}</h3>
+              <div className="informations">
+                <p><span className="r">Data do encerramento das inscrições:</span> {dateInscri}</p>
+                <p><span className="r">Data do evento:</span> {dateEvent}</p>
                 <p>
-                  Tempo: 3 + 5 (digital) / 10 + 0 (analógico) <br />
-                  <br />
-                  Local: CITI, Rua João Goularte, Sombrio. <br />
-                  <br />
-                  Encerramento das inscrições:<br />
-                  Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora:  18:00<br />
-                  <br />
-                  Início:<br />
-                  Data: 28/08/2025&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hora: 18:30<br />
-                  <br />
-                  Valor: R$10,00 - R$25,00
+                  <span>Tempo:</span> {diference ? (<>
+                      Digital: {classTime.charAt(0).toUpperCase() + classTime.slice(1)} ({times.digital.time + ' + ' + times.digital.plus}) /
+                      Analógico: {classTime2.charAt(0).toUpperCase() + classTime2.slice(1)} ({times.analog.time + ' + ' + times.analog.plus})
+                  </>)
+                      : `
+                      ${classTime.charAt(0).toUpperCase() + classTime.slice(1)} (${times.digital.time + ' + ' + times.digital.plus})
+                  `}
+                  
+                  &nbsp;&nbsp;&nbsp;
+                  <span>Local: <a target='_blank' href={tournment.local_link ? tournment.local_link : '#'} className="link">{tournment.local}</a></span>
                 </p>
               </div>
-              <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+              <a href={`/torneios-abertos/${tournment.title.split(' ').join('~')}`} className="button blue">Inscreva-se</a>
             </div>
-            <div className="buttons">
-              <div>
-                <a href="#" className="button red">Inscreva-se</a>
-              </div>
-              <div style={{flexDirection: 'column', width: 'min-content'}}>
-                <a href="#" className="button black">Inscrição em grupo</a>
-                <p className="obs">*Há descontos disponíveis para determinados volumes de inscrições.</p>
-              </div>
-            </div>
-          </div>  
-        ))}
+            <img src={folders[tournment.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+          </div>
+        )}) : (<>
+          <p className="obs">Não há torneios abertos no momento</p>
+        </>)}
 
           <div id="pbuttons">
-            <a href="#" className="button red big">Vertodos os torneios</a>
-            <a href="#" className="button black big">Ver histórico de eventos</a>
+            <a href="/torneios-abertos" className="button black big">Ver todos os torneios</a>
           </div>
       </div>
       
       <div id="founders">
 
-        <h1>Conheça nossos fundadores</h1>
-        <h2>Aqueles que fizeram tudo acontecer</h2>
+        <h1>Membros titulados do CXA</h1>
+        <h2>Os destaques que impulsionam nosso xadrez</h2>
+        
+        
         <div id="img-founders">
-          <div>
-            <img src="/images/f1.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>Athauan Machado</h3>
-          </div>
-          <div>
-            <img src="/images/f2.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>Mateus de Souza</h3>
-          </div>
-          <div>
-            <img src="/images/f3.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>Thiago Godinho</h3>
-          </div>
-          <div>
-            <img src="/images/f4.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>Chesman Emerim</h3>
-          </div>
-          <div>
-            <img src="/images/f5.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>José <br/> Carlos</h3>
-          </div>
-          <div>
-            <img src="/images/f6.png" alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
-            <h3>Lucas de Souza</h3>
-          </div>
+          {titulados.map((el, i) => (
+            <div className="founder">
+              <img key={i} src={`/images/founders/imagem${i + 4}.png`} alt="f" fetchPriority='low' loading='lazy' decoding='async'/>
+              <div key={i} className="content">
+                <h3>{el.nome}</h3>
+                {el.funcao ? ( <p><span>{el.funcao}</span></p> ) : ''}
+                <p>{el.titulo}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>
@@ -137,34 +202,30 @@ export default async function Home() {
           <div>
             <h1 style={{marginBottom: '20px'}}>Nossa história</h1>
             
-            <p>Fundado em 07 de julho de 2003 por Mateus de Souza, Chesman Emerin, Athauan Machado, Thiago Godinho, José Carlos e Lucas de Souza. O Sombrio Xadrez Clube nasceu em Sombrio (SC) com o objetivo de difundir o amor pelo xadrez.</p>
+            <p>Fundado em 2024 por Frank Becker, Leandro Ubialli e Alexandre de Matos, o Clube de Xadrez de Araranguá nasceu com o propósito de incentivar a prática do xadrez, promover o desenvolvimento esportivo e fortalecer a comunidade enxadrística da região.</p>
 
-            <p>Em 2023, o clube celebrou seus 20 anos de história, reunindo jogadores de todas as idades em eventos especiais. Ao longo das décadas, tornou-se referência regional, promovendo torneios e aulas para iniciantes e avançados.</p>
+            <p>Desde sua criação, o clube tem se dedicado à organização de torneios, atividades de ensino e encontros entre enxadristas de diferentes níveis e experiência. Atualmente, o clube possui quatro membros titulados: Frank Becker (Árbitro FIDE), Leandro Ubialli (Candidato a Mestre Nacional), Alexandre de Matos (Candidato a Mestre Nacional) e Eduardo da Silva Cardoso (Candidato a Mestre FIDE).</p>
 
-            <p style={{marginBottom: '40px'}}>Hoje, o Sombrio Xadrez Clube continua sendo um espaço de aprendizado, estratégia e amizade.</p>
-
-            <button className="button red">Ver história completa</button>
+            <p style={{marginBottom: '40px'}}>Hoje, o Clube de Xadrez de Araranguá continua sendo um espaço de aprendizado, estratégia e amizade.</p>
           </div>
         </div>
       </div>
 
       <div id="origins">
-        <h1>Voltando às origens</h1>
-        <h2 style={{marginBottom: '20px'}} >Relembrando antigos momentos de felicidade</h2>
+        <h1>Momentos Marcantes do Clube</h1>
+        <h2 style={{marginBottom: '20px'}} >Registros que contam quem somos</h2>
 
         <div className="track rigth" style={{marginBottom: '20px'}}>
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <img key={i} src={`/images/sliderTop/imagem${i + 5}.png`} alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            ))}
           </div>
 
           <div className="set">
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-            <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
+            {Array.from({ length: 7 }).map((_, i) => (
+              <img key={i} src={`/images/sliderTop/imagem${i + 5}.png`} alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+            ))}
           </div>
         </div>
 
@@ -173,17 +234,15 @@ export default async function Home() {
 
           <div className="track left">
             <div className="set">
-              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <img key={i} src={`/images/sliderBottom/imagem${i + 12}.png`} alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              ))}
             </div>
 
             <div className="set">
-              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img1.png" alt="img1" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img2.png" alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
-              <img src="/images/slider1/img3.png" alt="img3" fetchPriority='low' loading='lazy' decoding='async'/>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <img key={i} src={`/images/sliderBottom/imagem${i + 12}.png`} alt="img2" fetchPriority='low' loading='lazy' decoding='async'/>
+              ))}
             </div>
           </div>
         </div>

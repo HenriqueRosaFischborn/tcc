@@ -124,6 +124,7 @@ h2 {
   margin: 0px;
   padding: 0px;
 }
+/* link */
 
 h2 {
   font-size: 20pt;
@@ -178,7 +179,7 @@ p {
 
 .blue {
   color: white;
-  background-color: #32a3d7;
+  background-color: var(--mainblue);
 }
 
 .black {
@@ -191,6 +192,11 @@ p {
   color: var(--mainblack);
   border: solid 2px var(--mainblack);
   
+}
+
+.link {
+  color: blue;
+  text-decoration: underline;
 }
 
 .obs {

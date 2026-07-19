@@ -41,25 +41,6 @@ z-index: 2;
 }
 
 /* HEROBAR ===============================================================================================================*/
-/* COMPARATION ===========================================================================================================*/
-
-#comparation {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 50px;
-}
-
-#comparation div {
-    gap: 20px;
-}
-
-#comparation div img {
-    width: calc(50% - 10px);
-    height: auto;
-}
-
-/* COMPARATION ===========================================================================================================*/
 /* SLIDER ================================================================================================================*/
 
 #slider {
@@ -78,7 +59,7 @@ z-index: 2;
 
 .track {
     width: max-content;
-    animation: scroll 40s linear infinite;
+    animation: scroll 80s linear infinite;
 }
 
 .track img {
@@ -104,10 +85,11 @@ z-index: 2;
 
 #tournaments {
     align-items: start;
+    flex-direction: column;
     margin-bottom: 50px;
     flex-wrap: wrap;
     width: 90%;
-    gap: 30px;
+    gap: 20px;
 }
 
 #tournaments h1 {
@@ -116,11 +98,14 @@ z-index: 2;
 }
 
 .tournament {
-    flex-direction: column;
-    flex: 1;
+    width: 100%;
     justify-content: space-between;
-    row-gap: 10px;
-    align-items: start;
+    gap: 50px;
+    align-items: stretch;
+    border: solid 1px lightgray;
+    border-radius: 5px;
+    padding: 15px 30px;
+    
 }
 
 .tournament h3{
@@ -130,41 +115,34 @@ z-index: 2;
 
 .tournament p{
     font-size: 13pt;
+    font-weight: 400;
 }
 
 .tournament img{
-    width: 240px;
+    width: 160px;
     height: auto;
     flex-shrink: 0;
     object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
 }
 
-.tournament .contentImg {
-    width: 100%;
-    justify-content: space-between;
-    align-items: start;
-}
-
 .tournament .content {
     flex-direction: column;
-    row-gap: 10px;
-    width: 60%;
-}
-
-.tournament .buttons {
-    width: 100%;
-    margin-top: 20px;
     justify-content: space-between;
-    gap: 30px;
-}
-
-.tournament .buttons div{
+    row-gap: 10px;
     flex: 1;
 }
 
-.tournament .buttons a{
-    width: 100%;
-    height: fit-content;
+.tournament .informations {
+    flex-direction: column;
+
+}
+
+.tournament .informations span {
+    font-weight: 600;
+}
+
+.tournament .informations span.r {
+    color: var(--mainred)
 }
 
 #pbuttons {
@@ -186,35 +164,63 @@ z-index: 2;
 }
 
 #img-founders {
-    gap: 50px;
+    gap: 20px;
     width: 100%;
     justify-content: center;
-    margin-top: 30px;
+    align-items: stretch;
 }
 
-#img-founders div {
-    width: calc((90% - 250px)/ 6);
+.founder {
+    flex-direction: column;
+    width: calc((90% - 150px)/ 4);
+    padding: 20px;
+    align-items: center;
+}
+
+.founder .content {
+    width: 100%;
+    height: 100%;
     flex-direction: column;
     align-items: center;
     row-gap: 10px;
+    border: solid 2px lightgray;
+    border-radius: 10px;
+    padding: 100px 10px 10px 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.548);
 }
 
-#img-founders h3{
-    font-size: 20pt;
+.founder span {
+    font-weight: 600;
+    color: var(--mainred);
+}
+
+.founder p {
+    text-align: center;
+    font-weight: 400;
+    font-size: 14pt;
+}
+
+.founder h3{
+    font-size: 14pt;
     font-weight: 500;
 }
 
-#img-founders img {
-    width: 100%;
-    height: 300px;
+.founder img {
+    width: 150px;
+    height: 150px;
     object-fit: cover;
-    
+    background-color: white;
+    border-radius: 100%;
+    border: solid 2px lightgray;
+    padding: 5px;
+    margin-bottom: -80px;
+    z-index: 2;
 }
 
 /* FOUNDERS ==============================================================================================================*/
 
 /* HISTORY ===============================================================================================================*/
-
+/* 
 #history { 
     width: 100%;
     min-height: 80vh;
@@ -224,7 +230,7 @@ z-index: 2;
 }
 
 #history #img {
-    width: max-content;
+    width: 50%;
     min-height: 100%;
     position: relative;
     object-fit: cover;
@@ -236,7 +242,7 @@ z-index: 2;
   top: 0;
   right: 0;
 
-  width: 120px;           /* largura do "shadow" */
+  width: 120px;          
   height: 100%;
 
   background: linear-gradient(
@@ -250,8 +256,8 @@ z-index: 2;
 }
 
 #p-content {
-    flex: 1;
-    min-width: 50%;
+    
+    width: 50%;
     flex-direction: column;
     background-color: black;
     padding: 50px 30px 55px 30px;
@@ -268,8 +274,69 @@ z-index: 2;
 #history p {
     text-indent: 2em;
     text-align: justify;
+} */
+#history {
+    display: flex;
+    width: 100%;
+    max-height: 80vh;
+    background: black;
+    color: white;
+    margin-bottom: 50px;
 }
 
+#img {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+#img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+#img::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 100%;
+
+    background: linear-gradient(
+        to left,
+        rgb(0,0,0) 0%,
+        rgba(0,0,0,.85) 40%,
+        rgba(0,0,0,0) 100%
+    );
+
+    z-index: 2;
+    pointer-events: none;
+}
+
+#p-content {
+    flex: 1;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px;
+}
+
+#p-content > div {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#history p {
+    text-indent: 1em;
+    text-align: justify;
+    font-size: 12pt;
+}
 
 
 /* HISTORY ===============================================================================================================*/
@@ -296,7 +363,7 @@ z-index: 2;
 }
 
 .left {
-    animation: scrollleft 40s linear infinite;
+    animation: scrollleft 80s linear infinite;
 }
 
 @keyframes scrollleft {
