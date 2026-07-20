@@ -6,7 +6,7 @@
 
 #body {
   flex-direction: column;
-  gap: 50px;
+  gap: 20px;
 }
 
 .tournment {
@@ -14,6 +14,9 @@
   justify-content: space-between;
   column-gap: 20px;
   flex-wrap: wrap;
+  border: solid 2px lightgray;
+  padding: 10px;
+  border-radius: 5px;
 }
 
 .tournment .content {

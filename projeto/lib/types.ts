@@ -99,3 +99,33 @@ export type Differences = {
   rtg_fide: number
   rtg_cbx: number
 }
+
+export type Tempo = {
+  time: number
+  plus: number
+}
+
+export type Tournment = {
+  id: number
+  title: string
+
+  chave_pix: string | null
+
+  date_event: Date
+  date_inscri: Date
+
+  folder_path: string | null
+  qr_path: string | null
+  reg_path: string | null
+
+  local: string | null
+  local_link: string | null
+
+  link_chessresults: string | null
+
+  time_analog: number | null
+  time_digital: number | null
+
+  tempo_torneio_time_analogTotempo: Tempo | null
+  tempo_torneio_time_digitalTotempo: Tempo | null
+}

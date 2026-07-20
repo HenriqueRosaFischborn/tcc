@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 
-export default function InputHour({blur, multiple}: {blur?: Function, multiple?: string}) {
+export default function InputHour({blur, multiple, defaultValue}: {blur?: Function, multiple?: string, defaultValue?: string}) {
     function change(input: HTMLInputElement) {
         let numbers = input.value.replace(/\D/g, '')
 
@@ -57,7 +57,7 @@ export default function InputHour({blur, multiple}: {blur?: Function, multiple?:
                 className='needed' 
                 onBlur={(e) => ownBlur(e.currentTarget)}
                 placeholder="00:00"
-                defaultValue={'18:00'}
+                defaultValue={defaultValue ? defaultValue : '18:00'}
                 maxLength={5}
                 onChange={(e) => change(e.currentTarget)}
             />

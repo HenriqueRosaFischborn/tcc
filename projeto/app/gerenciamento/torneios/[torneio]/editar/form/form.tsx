@@ -5,7 +5,7 @@ import Form from 'next/form'
 import { useActionState, useState } from 'react'
 import addTournmentForm from './action'
 import CategorieArea from './categories/catArea'
-import { NewTournment } from '@/lib/types'
+import { NewTournment, Tournment } from '@/lib/types'
 import { verifyEmail } from '@/app/(auth)/cadastro/form/verify-types'
 import InputHour from '@/components/ui/input-hour'
 
@@ -15,20 +15,32 @@ type Division = {
     genre: string
 }
 
-export default function AddTournmentForm({times}: {times?: {time: number, plus: number}[]}) {
+export default function AddTournmentForm({times, tournment, defaultDivisions, defaultEmails}: {defaultEmails: string[], defaultDivisions: Division[], tournment: Tournment, times?: {time: number, plus: number}[]}) {
+    const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
+    const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+
+    const dateEvent = tournment.date_event.toLocaleDateString('pt-BR')
+    const timeEvent = tournment.date_event.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+    
+    
     const initialValue: NewTournment = {}
     const [state, formAction] = useActionState(addTournmentForm, initialValue)
 
     const [errorCategories, setErrorCategories] = useState<boolean>(false)
 
     function changeErrorCategories(value: boolean) {
-    console.log("setErrorCategories:", value)
-    setErrorCategories(value)
-}
+        setErrorCategories(value)
+    }
 
     const [dateError, setDateError] = useState<boolean>(false)
 
-    const [emails, setEmails] = useState<string[]>([])
+    const [emails, setEmails] = useState<string[]>(defaultEmails)
     const [emailError, setEmailError] = useState<string>('')
 
     function removeEmail(index: number) {
@@ -81,7 +93,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
         }
     }
 
-    const [txtNeed, setTxtNeed] = useState<boolean>(false)
+    const [txtNeed, setTxtNeed] = useState<boolean>(true)
 
     const [errorInputDate1, setErrorInputDate1] = useState<boolean>(false)
     const [errorInputDate2, setErrorInputDate2] = useState<boolean>(false)
@@ -148,7 +160,6 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
         } else {
             setDateError(false)
             setTxtNeed(isComplete)
-            //changeerro
         }
     }
 
@@ -201,7 +212,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
 
 
 
-    const [divisions, setDivisions] = useState<Division[]>([])
+    const [divisions, setDivisions] = useState<Division[]>(defaultDivisions)
     const [divisionError, setDivisionError] = useState<string>('')
 
     async function giveDivision() {
@@ -227,36 +238,39 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                 inputName.value = ''
                 console.log(divisions)
             }
-        }        
-        
+        }
     }
+
+    
 
     function removeDivision(index: number) {
         setDivisions(prev => prev.filter((el, i) => i != index))
     }
 
 
+    console.log(!(divisions.length > 0) , !txtNeed , errorCategories , errorLocal , errorHour)
 
     return (
         <>
             <Form action={formAction}>
                 <div id='content'>
                     <div className='form' style={{width: '100%'}}>
-                    <h1>Adicionar torneio</h1>
-                    <p style={{width: '100%'}} className='error'>Preencha todos os campos obrigatórios (*)</p>
+                    <h1>{tournment.title}</h1>
+                    <p style={{width: '100%'}} className='error'>Para atualizar, todos os campos obrigatórios (*) devem estar preenchidos</p>
                         <div style={{width: 'calc(50% - 15px)'}}>
                             <label htmlFor="title">Título: <p className='ast'>*</p></label>
-                            <input type="text" name='title' className='needed' onBlur={completeBlur}/>
+                            <input type="text" defaultValue={tournment.title} name='title' className='needed' onBlur={completeBlur}/>
                         </div>
                         <div id='times' style={{width: 'calc(50% - 15px)'}}>
                             <div>
                                 <label htmlFor="timeAnalog">Tempo analógico:<p className='ast'>*</p></label>
+                                
                                 {times ? (
-                                    <select  name="timeAnalog" id="timeAnalog" onBlur={completeBlur}>  
+                                    <select defaultValue={tournment.tempo_torneio_time_analogTotempo ? `${tournment.tempo_torneio_time_analogTotempo.time}+${tournment.tempo_torneio_time_analogTotempo.plus}` : undefined} name="timeAnalog" id="timeAnalog" onBlur={completeBlur}>  
                                         <option style={{display: 'none'}} value=""></option>
                                         {times.map((el, i) => {
                                             return (
-                                                <option key={i} value={`${el.time}+${el.plus}`} >{el.time} + {el.plus}</option>
+                                                <option key={i} value={`${el.time}+${el.plus}`}>{el.time} + {el.plus}</option>
                                             )
                                         })}
                                     </select>
@@ -267,7 +281,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                             <div>
                                 <label htmlFor="timeDigital">Tempo digital:<p className='ast'>*</p></label>
                                 {times ? (
-                                    <select name="timeDigital" id="timeDigital" onBlur={completeBlur}>  
+                                    <select name="timeDigital" id="timeDigital" onBlur={completeBlur} defaultValue={tournment.tempo_torneio_time_digitalTotempo ? `${tournment.tempo_torneio_time_digitalTotempo.time}+${tournment.tempo_torneio_time_digitalTotempo.plus}` : undefined}>  
                                         <option style={{display: 'none'}} value=""></option>
                                         {times.map((el, i) => {
                                             return (
@@ -288,18 +302,18 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
 
                         <div style={{width: '100%'}}>
                             <label htmlFor="link-chess-results">Link chess results:</label>
-                            <input type="text" name='link-chess-results' onBlur={completeBlur}/>
+                            <input type="text" name='link-chess-results' onBlur={completeBlur} defaultValue={tournment.link_chessresults ? tournment.link_chessresults : undefined}/>
                         </div>
 
                         <div style={{width: '100%'}} id='local'>
                             <div>
                                 <label htmlFor="local">Local:<p className='ast'>*</p></label>
-                                <input type="text" name='local' onBlur={completeBlur} className='needed'placeholder='Ex.: Shopping Center - Rua tal'/>
+                                <input type="text" name='local' onBlur={completeBlur} className='needed'placeholder='Ex.: Shopping Center - Rua tal' defaultValue={tournment.local ? tournment.local : undefined}/>
                             </div>
                             <div>
                                 <label htmlFor="localLink">Link do local (google maps):</label>
                                 <div style={{flex: 1, flexDirection: 'column', height: 'fit-content'}}>
-                                    <input type="text" name='localLink' onBlur={(e) => {completeBlur(); localBlur(e.currentTarget.value)}} placeholder='https://maps.app.goo.gl/...'/>
+                                    <input type="text" name='localLink' onBlur={(e) => {completeBlur(); localBlur(e.currentTarget.value)}} placeholder='https://maps.app.goo.gl/...' defaultValue={tournment.local_link ? tournment.local_link : undefined}/>
                                     {errorLocal ? ( <p className='error'>*Este não é um link válido</p> ) : ('')}
                                 </div>
                             </div>
@@ -307,22 +321,22 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
 
                         <div style={{width: '40%'}}>
                             <label >Data do evento: <p className='ast'>*</p></label>
-                            <InputDate multiple='sim' blur={completeBlur} now={true}/>
+                            <InputDate defaultValue={dateEvent} multiple='sim' blur={completeBlur} now={true}/>
                             {errorInputDate1 ? ( <p className='error'>*Esta não é uma data válida</p> ) : ('')}
                         </div>
                         <div style={{width: '35%'}}>
                             <label htmlFor="hour">Hora: <p className='ast'>*</p></label>
-                            <InputHour blur={hourBlur}/>
+                            <InputHour defaultValue={timeEvent} blur={hourBlur}/>
                         </div>
                         <div style={{width: '40%'}}>
                             <label >Data de encerramento das inscrições: <p className='ast'>*</p></label>
-                            <InputDate multiple='sim' blur={completeBlur} now={true}/>
+                            <InputDate defaultValue={dateInscri} multiple='sim' blur={completeBlur} now={true}/>
                             {errorInputDate2 ? ( <p className='error'>*Esta não é uma data válida</p> ) : ('')}
                             {!errorInputDate2 && dateError ? ( <p className='error'>*A data de encerramento das inscrições não pode ser maior que a data do evento</p> ) : ('')}
                         </div>
                         <div style={{width: '35%'}}>
                             <label htmlFor="hour">Hora: <p className='ast'>*</p></label>
-                            <InputHour blur={hourBlur}/>
+                            <InputHour defaultValue={timeInscri} blur={hourBlur}/>
                             
                         </div>
                     </div>
@@ -519,12 +533,12 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                 <div className='buttons'>
                     <div id='qr-area' className='upload-file'>
                         
-                        <button onClick={() => document.getElementById('input-qr')?.click()} type='button' className='button red'>Anexar Qr Code <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
+                        <button onClick={() => document.getElementById('input-qr')?.click()} type='button' className='button red'>Atualizar Qr Code <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
                         <input onChange={(e) => uploadFile(e.currentTarget.value, true)} type='file' id='input-qr' name='fileQr' accept='.jpg,.jpeg,.png' hidden={true}/>     
                     
                         <div style={{flex: 1}}>
                             <h3>Chave pix:</h3>
-                            <input type="text" name='chave-pix'/>
+                            <input type="text" name='chave-pix' defaultValue={tournment.chave_pix ? tournment.chave_pix : undefined}/>
                         </div>
                         <div style={{width: '100%'}}>
                             {nameQr != '' ? (
@@ -534,7 +548,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                     </div>
 
                     <div className='upload-file'>
-                        <button onClick={() => document.getElementById('input-folder')?.click()} type='button' className='button red'>Anexar folder <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
+                        <button onClick={() => document.getElementById('input-folder')?.click()} type='button' className='button red'>Atualizar folder <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>
                         {nameFolder != '' ? (
                             <p>({nameFolder})</p>
                         ) : ('')}
@@ -542,7 +556,7 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                     </div>
 
                     <div className='upload-file'>
-                        <button onClick={() => document.getElementById('input-reg')?.click()} type='button' className='button red'>Anexar regulamento <span style={{fontSize: '10pt'}}>(.pdf)</span></button>
+                        <button onClick={() => document.getElementById('input-reg')?.click()} type='button' className='button red'>Atualizar regulamento <span style={{fontSize: '10pt'}}>(.pdf)</span></button>
                         {nameReg != '' ? (
                             <p>({nameReg})</p>
                         ) : ('')}
@@ -555,7 +569,22 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
                         justifyContent: 'end',
                         flexDirection: 'row',
                     }}>
-                        <button type='submit' className={`button red big ${!(divisions.length > 0) || !txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Adicionar torneio</button>
+                        
+                        <input type="text" name='defaultTournment' hidden value={JSON.stringify(tournment)}/>
+                        
+                        
+                        <button type='submit' onClick={(e) => {
+                            const divs = Array.from(document.getElementsByName('divisions'))[0]
+                            if (!(divs instanceof HTMLInputElement)) return
+                            console.log(divs.value != JSON.stringify(defaultDivisions))
+
+                            if (divs.value != JSON.stringify(defaultDivisions)) {
+                                if (!confirm("Você fez alterações nas categorias ou divisões, se você atualizar as informações todos os jogadores inscritos no torneio serão removidos automaticamente e deverão realizar sua inscrição novamente. Deseja continuar mesmo assim?")) {
+                                    e.preventDefault()
+                                }
+                            }
+                            
+                        }} className={`button red big ${!(divisions.length > 0) || !txtNeed || errorCategories || errorLocal || errorHour ? 'disableDiv' : ''}`} >Atualizar informações</button>
                     </div>
                 </div>
             </Form> 

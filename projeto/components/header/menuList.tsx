@@ -21,7 +21,7 @@ export default function Menu ({user, admin}: {user: boolean, admin: boolean}) {
                     <a className={`menu-item ${pathname == '/entrar' ? 'selected' : ''}`} href="/entrar">Entrar</a>
                 )}
                 {user && admin ? (
-                    <a className={`menu-item ${pathname == '/gerenciamento' ? 'selected' : ''}`} href="/gerenciamento">Gerenciamento</a>
+                    <a className={`menu-item ${pathname == '/gerenciamento' ? 'selected' : ''}`} href="/gerenciamento/torneios">Gerenciamento</a>
                 ) : ('')}
 
                 {user ? (
