@@ -214,7 +214,7 @@ export default function FormInscriIndividual() {
 
                         
                         <div className={`form ${(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? 'disableDiv' : ''}`} style={{width: '100%'}}> 
-                            <Fields id={id} playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
+                            <Fields id={id.id} playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
                             
                             <div id="qr-div" >
                                 <div>
