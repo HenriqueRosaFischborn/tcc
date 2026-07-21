@@ -114,10 +114,6 @@ export type Tournment = {
   date_event: Date
   date_inscri: Date
 
-  folder_path: string | null
-  qr_path: string | null
-  reg_path: string | null
-
   local: string | null
   local_link: string | null
 
