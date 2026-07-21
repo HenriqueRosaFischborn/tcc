@@ -1,5 +1,11 @@
-'use client';
+import { createContext } from "react";
+import { Player } from "./types";
 
-import { createContext } from 'react';
+type TournamentContextType = {
+  id: number;
+  inscricao?: Player;
+};
 
-export const TournamentContext = createContext<number>(0);
+export const TournamentContext = createContext<TournamentContextType>({
+  id: 0,
+});

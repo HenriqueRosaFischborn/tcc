@@ -152,7 +152,7 @@ export default async function MyInscriptions() {
                         </div>
                         <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
                         <div className='pbuttons'>
-                            <a href={`#`} className="button blue">Atualizar informações</a>
+                            <a href={`/minhas-inscricoes/${el.uuid}/editar-informacoes`} className="button blue">Editar informações</a>
                             <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
                         </div>
                         </div>
