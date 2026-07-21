@@ -4,15 +4,13 @@ article {
 }
 
 #tournaments {
-    align-items: center;
-    justify-content: center;
+    align-items: start;
+    flex-direction: column;
     margin-bottom: 50px;
     flex-wrap: wrap;
     width: 90%;
-    gap: 30px;
+    gap: 20px;
 }
-
-
 
 #tournaments h1 {
     width: 100%;
@@ -20,14 +18,14 @@ article {
 }
 
 .tournament {
-    flex-direction: column;
-    width: calc(50% - 15px);
+    width: 100%;
     justify-content: space-between;
-    row-gap: 10px;
-    align-items: start;
-    border: solid 2px var(--ligthgray);
+    gap: 50px;
+    align-items: stretch;
+    border: solid 1px lightgray;
     border-radius: 5px;
-    padding: 10px;
+    padding: 15px 30px;
+    
 }
 
 .tournament h3{
@@ -37,41 +35,34 @@ article {
 
 .tournament p{
     font-size: 13pt;
+    font-weight: 400;
 }
 
 .tournament img{
-    width: 240px;
+    width: 160px;
     height: auto;
     flex-shrink: 0;
     object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
 }
 
-.tournament .contentImg {
-    width: 100%;
-    justify-content: space-between;
-    align-items: start;
-}
-
 .tournament .content {
     flex-direction: column;
-    row-gap: 10px;
-    width: 60%;
-}
-
-.tournament .buttons {
-    width: 100%;
-    margin-top: 20px;
     justify-content: space-between;
-    gap: 30px;
-}
-
-.tournament .buttons div{
+    row-gap: 10px;
     flex: 1;
 }
 
-.tournament .buttons a{
-    width: 100%;
-    height: fit-content;
+.tournament .informations {
+    flex-direction: column;
+
+}
+
+.tournament .informations span {
+    font-weight: 600;
+}
+
+.tournament .informations span.r {
+    color: var(--mainred)
 }
 
 #pbuttons {
@@ -80,34 +71,5 @@ article {
     width: 100%;
 }
 
-#div-search-bar {
-    width: 70%;
-    height: 50px;
-    border: solid 2px black;
-}
-
-#div-search-bar input {
-    width: 100%;
-}
-
-#div-search-bar input:focus {
-    outline: none;
-    border: none;
-    background-color: var(--ligthgray);
-}
-
-#icon-search {
-    background-color: black;
-    height: 100%;
-    width: 50px;
-    justify-content: center;
-    align-items: center;
-}
-
-#icon-search img {
-    height: 60%;
-    width: auto;
-    object-fit: contain;
-}
 
 /* genre */

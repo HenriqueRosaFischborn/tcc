@@ -5,10 +5,11 @@ article {
 
 #tournaments {
     align-items: start;
+    flex-direction: column;
     margin-bottom: 50px;
     flex-wrap: wrap;
-    width: 80%;
-    gap: 30px;
+    width: 90%;
+    gap: 20px;
 }
 
 #tournaments h1 {
@@ -17,11 +18,14 @@ article {
 }
 
 .tournament {
-    flex-direction: column;
-    flex: 1;
+    width: 100%;
     justify-content: space-between;
-    row-gap: 10px;
-    align-items: start;
+    gap: 50px;
+    align-items: stretch;
+    border: solid 1px lightgray;
+    border-radius: 5px;
+    padding: 15px 30px;
+    
 }
 
 .tournament h3{
@@ -30,42 +34,39 @@ article {
 
 
 .tournament p{
-    font-size: 10pt;
+    font-size: 13pt;
+    font-weight: 400;
 }
 
 .tournament img{
-    width: 240px;
+    width: 160px;
     height: auto;
     flex-shrink: 0;
     object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
 }
 
-.tournament .contentImg {
-    width: 100%;
-    justify-content: space-between;
-    align-items: start;
-}
-
 .tournament .content {
     flex-direction: column;
-    row-gap: 10px;
-    width: 60%;
-}
-
-.tournament .buttons {
-    width: 100%;
-    
     justify-content: space-between;
-    gap: 30px;
-}
-
-.tournament .buttons div{
+    row-gap: 10px;
     flex: 1;
 }
 
-.tournament .buttons a{
+.tournament .informations {
+    gap: 50px;
+}
+
+
+span.r {
+    color: var(--mainred);
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.pbuttons {
+    gap: 10px;
+    flex-direction: row;
     width: 100%;
-    height: fit-content;
 }
 
 /*margin*/

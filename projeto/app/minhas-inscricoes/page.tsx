@@ -1,80 +1,166 @@
 import './unique.css'
 import './responsive.css'
+import { auth } from '@/auth'
+import db from '@/lib/db'
+import { getSupabaseAdmin } from '@/lib/supabase'
+import ButtonCancelSolicitation from './buttonCancelSolicitation'
+import { Player } from '@/lib/types'
 
 
-export default function MyInscriptions() {
+export default async function MyInscriptions() {
+    const session = await auth()
+
+    const inscri = await db.incricao.findMany({
+        where: {
+            usuario: {
+                email: session?.user.email
+            }
+        },
+        include: {
+            usuario: {
+                select: {
+                    id: true,
+                    email: true
+                }
+            },
+            torneio: {
+                select: {
+                    id: true,
+                    title: true,
+                    date_inscri: true
+                }
+            },
+            categoria: {
+                select: {
+                    name: true,
+                    uuid: true,
+                    id_torneio: true,
+                    value: true
+                }
+            },
+            divisoes: {
+                select: {
+                    id: true,
+                    name: true
+                }
+            }
+        }
+    })
+
+    const supabaseAdmin = await getSupabaseAdmin()  
+    
+    const folders: { [key: string]: string } = {}
+
+    const torneiosUnicos = Array.from(
+        new Map(inscri.map(item => [item.torneio.id, item.torneio])).values()
+    )
+
+    
+    for (const torneio of torneiosUnicos) {
+        const pathFolder = `folders/${torneio.id}`
+
+        const { data } = supabaseAdmin.storage
+            .from('publics')
+            .getPublicUrl(pathFolder)
+
+        folders[torneio.title.split(' ').join('~')] = data.publicUrl
+    }
+    
+    
+    
     return (
         <>
             <div id="tournaments">
-                <h1>Inscrições</h1>
-                {Array.from({ length: 2 }).map((_, i) => (
+                <h1>Minhas Inscrições</h1>
+                {inscri.length > 0 ? inscri.map((el, i) => {
+                    
+                    const dateInscri = el.torneio.date_inscri.toLocaleDateString('pt-BR')
+                    const timeInscri = el.torneio.date_inscri.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+
+                    if (!el.divisoes) return
+
+                    const inscricaoDetails: Player = {
+                        city: el.city,
+                        club: el.club ? el.club : '',
+                        genre: el.genre,
+                        data_nasc: el.data_nasc,
+                        uuid_cat: el.uuid_cat,
+                        status: el.status,
+                        id_usuario: el.id_usuario,
+                        id_fide: Number(el.id_fide),
+                        id_cbx: Number(el.id_cbx),
+                        uuid: el.uuid,
+                        name: el.name,
+                        id_division: Number(el.id_division),
+                        id_torneio: Number(el.id_torneio),
+                        rtg_fide: Number(el.rtg_fide),
+                        rtg_cbx: Number(el.rtg_cbx),
+                        categoria: {
+                            name: el.categoria.name,
+                            uuid: el.categoria.uuid,
+                            id_torneio: Number(el.categoria.id_torneio),
+                        },
+                        divisoes: {
+                            id: Number(el.divisoes.id),
+                            name: String(el.divisoes.name),
+                        },
+                        usuario: {
+                            id: el.usuario.id,
+                            email: el.usuario.email,
+                        }
+                    }
+                    
+                    return(
                     // i é o número de repetição do negócio
                     <div className="tournament" key={i}>
-                        <div className="contentImg">
-                            <div className="content">
-                                <h3>IV TORNEIO BLITZ SOMBRIO</h3>
-                                <p>
-                                    Nome: Henrique Fischborn <br />
-                                    <br />
-                                    Data de nascimento: 23 / 05 / 2009 <br />
-                                    <br />
-                                    Email: henrique@gmail.com <br />
-                                    <br />
-                                    Rating FIDE: 123456 <br />
-                                    Rating CBX: -- <br />
-                                    <br />
-                                    Categoria: sub 16 (valendo FIDE) <br />
-                                    <br />
-                                    Valor: R$15,00 <br />
-                                    <br />
-                                    <strong>Você só poderá realizar sua inscrição até 28/08 às 18:00</strong>
-                                </p>
-                            </div>
-                            <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                        <div className="content">
+                        <h3>{el.torneio.title}</h3>
+                        {el.status == 'Confirmada' ? (
+                            <p><strong>Status: <span style={{color: 'green'}}>Confirmada</span> </strong></p>
+                        ) : el.status == 'Pendente' ? (
+                            <p><strong>Status: <span style={{color: '#838383'}}> Pendente</span>  </strong></p>
+                        ) : (
+                            <p><strong>Status: <span style={{color: 'red'}}>Cancelada</span> </strong></p>
+                        )}
+                        <div className="informations">
+                            <p>
+                                <strong>Nome:</strong> {el.name}<br />
+                                <br />
+
+                                <strong>Data de nascimento:</strong> {el.data_nasc.toLocaleDateString('pt-BR')} <br />
+                                <br />
+                            </p>
+
+                            <p>
+                                <strong>Email:</strong> {el.usuario.email}<br />
+                                <br />
+                            </p>
+
+                            <p>
+                                <strong>Categoria:</strong> {el.categoria.name} <br />
+                                <br />
+
+                                <strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', {
+                                    style: 'currency',
+                                    currency: 'BRL'
+                                }).format(Number(el.categoria.value))} <br />
+                                <br />
+                            </p>
                         </div>
-                        <div className="buttons">
-                            <div>
-                                <a href="#" className="button yellow">Efetuar Pagamento</a>
-                            </div>
+                        <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
+                        <div className='pbuttons'>
+                            <a href={`#`} className="button blue">Atualizar informações</a>
+                            <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
                         </div>
-                    </div>  
-                ))}
-                <h1>Inscrições em grupo</h1>
-                {Array.from({ length: 2 }).map((_, i) => (
-                    // i é o número de repetição do negócio
-                    <div className="tournament" key={i}>
-                        <div className="contentImg">
-                            <div className="content">
-                                <h3>IV TORNEIO BLITZ SOMBRIO</h3>
-                                <p>
-                                    Nome: Henrique Fischborn <br />
-                                    <br />
-                                    Data de nascimento: 23 / 05 / 2009 <br />
-                                    <br />
-                                    Email: henrique@gmail.com <br />
-                                    <br />
-                                    Rating FIDE: 123456 <br />
-                                    Rating CBX: -- <br />
-                                    <br />
-                                    Categoria: sub 16 (valendo FIDE) <br />
-                                    <br />
-                                    Valor: R$15,00 <br />
-                                    <br />
-                                    <strong>Você só poderá realizar sua inscrição até 28/08 às 18:00</strong>
-                                </p>
-                            </div>
-                            <img src="/folderteste.jpeg" alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
                         </div>
-                        <div className="buttons">
-                            <div>
-                                <a href="#" className="button black">Cancelar inscrição</a>
-                            </div>
-                            <div>
-                                <a href="#" className="button blue">Editar informações</a>
-                            </div>
-                        </div>
-                    </div>  
-                ))}
+                        <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                    </div>
+                    )}) : (<>
+                    <p className="obs">Não há inscrições cadastradas no momento</p>
+                </>)}
             </div>
         </>
     )
