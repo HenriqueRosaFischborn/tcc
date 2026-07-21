@@ -2,16 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 export const config = {
-  matcher: [
-    '/gerenciamento/:path*',
-    '/api/:path*',
-    '/entrar/:path*',
-    '/cadastro/:path*',
-    '/esqueci-minha-senha/:path*',
-    '/redefinir-senha/:path*',
-    '/minhas-inscricoes/:path*',
-    '/torneios-abertos/:path*',
-  ],
+  // matcher: [
+  //   '/gerenciamento/:path*',
+  //   '/api/:path*',
+  //   '/entrar/:path*',
+  //   '/cadastro/:path*',
+  //   '/esqueci-minha-senha/:path*',
+  //   '/redefinir-senha/:path*',
+  //   '/minhas-inscricoes/:path*',
+  //   '/torneios-abertos/:path*',
+  // ],
 }
 
 export default async function proxy(req: NextRequest) {
