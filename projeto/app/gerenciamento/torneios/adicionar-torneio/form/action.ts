@@ -5,41 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase"
 import { NewTournment } from "@/lib/types"
 
 export default async function addTournmentForm(prev: NewTournment, formdata: FormData): Promise<NewTournment> {
-    const fileFolder = formdata.get('fileFolder') as File
-    const fileFolderPath = fileFolder.size != 0 ? `folders/${formdata.get('title')}` : ''
-    if (fileFolder.size != 0) {
-        
-        const supabaseAdmin = await getSupabaseAdmin()
-        const {error} = await supabaseAdmin.storage.from('publics').upload(fileFolderPath, fileFolder, {
-            upsert: true,
-            contentType: fileFolder.type
-        })
-    }
-
-    const fileReg = formdata.get('fileReg') as File
-    const fileRegPath = fileReg.size != 0 ? `regulamentos/${formdata.get('title')}` : ''
-    if (fileReg.size != 0) {
-        
-        const supabaseAdmin = await getSupabaseAdmin()
-        const {error} = await supabaseAdmin.storage.from('publics').upload(fileRegPath, fileReg, {
-            upsert: true,
-            contentType: fileFolder.type
-        })
-    }
-
-    const fileQr = formdata.get('fileQr') as File
-    const fileQrPath = fileQr.size != 0 ? `qrCodes/${formdata.get('title')}` : ''
-    if (fileQr.size != 0) {
-        const supabaseAdmin = await getSupabaseAdmin()
-        const {error} = await supabaseAdmin.storage.from('publics').upload(fileQrPath, fileQr, {
-            upsert: true,
-            contentType: fileFolder.type
-        })
-    }
     
-    
-    
-    console.log(formdata)
   
     const dataTimeAnalog = String(formdata.get('timeAnalog')).split('+').map(Number)
     const dataTimeDigital = String(formdata.get('timeDigital')).split('+').map(Number)
@@ -88,12 +54,41 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
             date_event: date_e,
             date_inscri: date_i,
             chave_pix: formdata.get('chave-pix') as string,
-            folder_path: fileFolderPath,
-            reg_path: fileRegPath,
-            qr_path: fileQrPath,
             link_chessresults: formdata.get('link-chess-results') as string
         }
     })
+
+    const fileFolder = formdata.get('fileFolder') as File
+    const fileFolderPath = fileFolder.size != 0 ? `folders/${tournment.id}` : ''
+    if (fileFolder.size != 0) {
+        
+        const supabaseAdmin = await getSupabaseAdmin()
+        const {error} = await supabaseAdmin.storage.from('publics').upload(fileFolderPath, fileFolder, {
+            upsert: true,
+            contentType: fileFolder.type
+        })
+    }
+
+    const fileReg = formdata.get('fileReg') as File
+    const fileRegPath = fileReg.size != 0 ? `regulamentos/${tournment.id}` : ''
+    if (fileReg.size != 0) {
+        
+        const supabaseAdmin = await getSupabaseAdmin()
+        const {error} = await supabaseAdmin.storage.from('publics').upload(fileRegPath, fileReg, {
+            upsert: true,
+            contentType: fileFolder.type
+        })
+    }
+
+    const fileQr = formdata.get('fileQr') as File
+    const fileQrPath = fileQr.size != 0 ? `qrCodes/${tournment.id}` : ''
+    if (fileQr.size != 0) {
+        const supabaseAdmin = await getSupabaseAdmin()
+        const {error} = await supabaseAdmin.storage.from('publics').upload(fileQrPath, fileQr, {
+            upsert: true,
+            contentType: fileFolder.type
+        })
+    }
 
     const emails = JSON.parse(String(formdata.get('emails'))) as string[]
 

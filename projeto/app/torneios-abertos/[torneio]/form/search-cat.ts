@@ -5,8 +5,8 @@ import db from "@/lib/db"
 
 
 
-export default async function searchCat(date: string, genre: string) {
-    
+export default async function searchCat(id: number, date: string, genre: string) {
+    console.log('id: ', id)
 
     const year = Number(date.split('/')[2])
 
@@ -20,6 +20,7 @@ export default async function searchCat(date: string, genre: string) {
 
     let cat2 = await db.categoria.findMany({
         where: {
+            id_torneio: id,
             min_y: {
                 lte: year
             },
@@ -32,6 +33,7 @@ export default async function searchCat(date: string, genre: string) {
     if (cat2.length == 0) {
         cat2 = await db.categoria.findMany({
             where: {
+                id_torneio: id,
                 max_y: {
                     lt: year
                 }
@@ -45,6 +47,7 @@ export default async function searchCat(date: string, genre: string) {
     if (cat2.length == 0) {
         cat2 = await db.categoria.findMany({
             where: {
+                id_torneio: id,
                 min_y: {
                     gt: year
                 }

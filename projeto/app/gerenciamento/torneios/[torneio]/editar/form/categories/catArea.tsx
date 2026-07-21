@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import verifyCategorieDates from "./verifydates"
 import { isAbsolute } from "path"
+import { Tournment } from "@/lib/types"
 
 type Categorie = {
     name: string,
@@ -20,10 +21,12 @@ type Division = {
     categories?: Categorie[]
 }
 
-export default function CategorieArea({divisionsBasic, setErrorCategories}: {divisionsBasic: Division[], setErrorCategories?: Function}) {
+export default function CategorieArea({defaultDivisions, divisionsBasic, setErrorCategories}: {defaultDivisions: Division[], divisionsBasic: Division[], setErrorCategories?: Function}) {
 
     const [divisions, setDivisions] = useState<Division[]>([...divisionsBasic])
-    const [categories, setCategories] = useState<Categorie[]>([])
+    const [categories, setCategories] = useState<Categorie[]>(
+        divisionsBasic.flatMap(div => div.categories ?? [])
+    )
 
     const [dateError, setDateError] = useState<string>('')
 
@@ -89,8 +92,10 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
                         
                         const newCategories = [...categories, categorie]
                         
-                        const thisDivision = divisionsBasic.filter(el => el.name == categorie.divisionFor)[0]
-                        
+                        const thisDivision = divisions.find(
+                            el => el.name == categorie.divisionFor
+                        )
+                        if (!thisDivision) return
                         const genreThisDivision = thisDivision.genre
 
                         const divisionsSameGenreNames = divisionsBasic.filter(el => el.genre == genreThisDivision || el.genre == 'Masculino/Feminino').map(el => el.name)
@@ -104,31 +109,36 @@ export default function CategorieArea({divisionsBasic, setErrorCategories}: {div
                         } else {
                             setMessageError('')
                             
-                            const x = [
-    ...newCategories.filter(el => el.divisionFor != categorie.divisionFor),
-    ...res2.organized
-]
+                                const x = [
+                                ...newCategories.filter(el => el.divisionFor != categorie.divisionFor),
+                                ...res2.organized
+                            ]
 
-setCategories(x)
+                            setCategories(x)
 
-const updatedDivision = {
-    ...thisDivision,
-    categories: res2.organized
-}
+                            const updatedDivision = {
+                                ...thisDivision,
+                                categories: [
+                                    ...(thisDivision?.categories ?? []).filter(
+                                        cat => !res2.organized.some(
+                                            newCat => newCat.name === cat.name
+                                        )
+                                    ),
+                                    ...res2.organized
+                                ]
+                            }
 
-const y = [
-    ...divisions.filter(el => el.name != categorie.divisionFor),
-    updatedDivision
-]
+                            const y = [
+                                ...divisions.filter(el => el.name != categorie.divisionFor),
+                                updatedDivision
+                            ]
 
-setDivisions(y)
+                            setDivisions(y)
 
                             nameInput.value = ''
                             valueInput.value = ''
                             toInput.value = ''
                             fromInput.value = ''
-                            fideInput.checked = false
-                            cbxInput.checked = false
                            
                             console.log('divisions', divisions)
                         }
@@ -160,11 +170,12 @@ setDivisions(y)
     )
 }
 
-    useEffect(() => {
-        setDivisions([...divisionsBasic])
-    }, [divisionsBasic])
+    // useEffect(() => {
+    //     setDivisions(divisionsBasic)
+    //     setCategories(divisionsBasic.flatMap(div => div.categories ?? []))
+    // }, [])
 
-
+//thisDivision
     useEffect(() => {
     console.log("divisionsBasic", divisionsBasic)
     console.log("divisions", divisions)
@@ -284,6 +295,8 @@ setDivisions(y)
                 </div>
                 {/* <input name="categories" type="text" hidden value={JSON.stringify(categories)} /> */}
                 <input name='divisions' type="text" hidden value={JSON.stringify(divisions)} />
+                <input name='difference' type="text" hidden value={`${JSON.stringify(divisions) != JSON.stringify(defaultDivisions)}`} />
+                
             </div>
         </>
     )

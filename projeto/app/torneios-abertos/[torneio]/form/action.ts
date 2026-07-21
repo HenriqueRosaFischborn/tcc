@@ -224,13 +224,11 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
                 rtg_fide: classTime == 'bullet' ? null : (playerFide ? playerFide.ratings[classTime] == 'Not rated' ? 0 : Number(playerFide.ratings[classTime]) : null),
                 rtg_cbx: classTime == 'bullet' ? null :  (playerCbx ? playerCbx.ratings[classTime] == 'Not rated' ? 0 : Number(playerCbx.ratings[classTime]): null)
             }
-
-
         })
 //erro aqui
         
         const fileComprovante = formdata.get('fileComprovante') as File
-        const fileComprovantePath = fileComprovante.size != 0 ? `comprovantes/${cat.torneio.title}/${user.id}/${res.uuid}` : ''
+        const fileComprovantePath = fileComprovante.size != 0 ? `comprovantes/${cat.id_torneio}/${user.id}/${res.uuid}` : ''
         if (fileComprovante.size != 0) {
             
             const supabaseAdmin = await getSupabaseAdmin()
@@ -242,7 +240,7 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
 
 
         return {
-            message: ['Sucesso', `/minhas-inscricoes/${res.uuid}`],
+            message: ['Sucesso', `/minhas-inscricoes/`],
             values: [resData]
         }
     } catch (e){
@@ -254,3 +252,5 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
     
     
 }
+
+//comprovant

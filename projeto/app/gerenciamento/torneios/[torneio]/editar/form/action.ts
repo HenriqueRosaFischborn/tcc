@@ -111,9 +111,7 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
             date_event: date_e,
             date_inscri: date_i,
             chave_pix: formdata.get('chave-pix') as string,
-            folder_path: fileFolderPath,
-            reg_path: fileRegPath,
-            qr_path: fileQrPath,
+            
             link_chessresults: formdata.get('link-chess-results') as string
         }
     })
@@ -137,74 +135,73 @@ export default async function addTournmentForm(prev: NewTournment, formdata: For
     
     console.dir(divisions, { depth: null })
 
+    const difference = formdata.get('difference') === "true"
 
-    // Deleta categorias antigas
-await db.categoria.deleteMany({
-    where: {
-        id_torneio: tournment.id
-    }
-})
-
-// Deleta divisões antigas
-await db.divisoes.deleteMany({
-    where: {
-        id_torneio: tournment.id
-    }
-})
-
-// Cria divisões
-await db.divisoes.createMany({
-    data: divisions.map((div: Division )=> ({
-        name: div.name,
-        id_torneio: tournment.id,
-        isAbsolute: div.isAbsolute,
-        genre: div.genre === 'Masculino/Feminino'
-            ? 'ambos'
-            : div.genre.toLowerCase()
-    }))
-})
-
-// Busca divisões criadas
-const createdDivisions = await db.divisoes.findMany({
-    where: {
-        id_torneio: tournment.id
-    }
-})
-
-// Cria categorias relacionando pelo nome da divisão
-const categoriesData = divisions.flatMap((div: Division) => {
-    const createdDiv = createdDivisions.find(
-        d => d.name === div.name
-    )
-
-    if (!div.categories) return
-
-    return div.categories.map((category: Categorie) => ({
-        name: category.name as string,
-        id_torneio: tournment.id,
-        value: Number(
-            category.value
-                .replace('R$', '')
-                .replace(/\./g, '')
-                .replace(',', '.')
-                .trim()
-        ),
-        vale_fide: category.fide as boolean,
-        min_y: category.from as number,
-        max_y: category.to as number,
-        default_division: createdDiv!.id
-    }))
-})
-
-// Cria categorias
-await db.categoria.createMany({
-    data: categoriesData
-})
+    if (difference) {
+        // Deleta categorias antigas
+        await db.categoria.deleteMany({
+            where: {
+                id_torneio: tournment.id
+            }
+        })
     
+        // Deleta divisões antigas
+        await db.divisoes.deleteMany({
+            where: {
+                id_torneio: tournment.id
+            }
+        })
     
-
-
+        
+        // Cria divisões
+        await db.divisoes.createMany({
+            data: divisions.map((div: Division )=> ({
+                name: div.name,
+                id_torneio: tournment.id,
+                isAbsolute: div.isAbsolute,
+                genre: div.genre === 'Masculino/Feminino'
+                    ? 'ambos'
+                    : div.genre.toLowerCase()
+            }))
+        })
     
+        // Busca divisões criadas
+        const createdDivisions = await db.divisoes.findMany({
+            where: {
+                id_torneio: tournment.id
+            }
+        })
+    
+        // Cria categorias relacionando pelo nome da divisão
+        const categoriesData = divisions.flatMap((div: Division) => {
+            const createdDiv = createdDivisions.find(
+                d => d.name === div.name
+            )
+    
+            if (!div.categories) return
+    
+            return div.categories.map((category: Categorie) => ({
+                name: category.name as string,
+                id_torneio: tournment.id,
+                value: Number(
+                    category.value
+                        .replace('R$', '')
+                        .replace(/\./g, '')
+                        .replace(',', '.')
+                        .trim()
+                ),
+                vale_fide: category.fide as boolean,
+                min_y: category.from as number,
+                max_y: category.to as number,
+                default_division: createdDiv!.id
+            }))
+        })
+    
+        // Cria categorias
+        await db.categoria.createMany({
+            data: categoriesData
+        })
+    }
 
     return {message: 'Sucesso'}
 }

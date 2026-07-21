@@ -2,6 +2,9 @@ import './unique.css'
 import './responsive.css'
 import { getSupabaseAdmin } from '@/lib/supabase'
 import db from '@/lib/db'
+import Form from 'next/form'
+import { deleteTournment } from './[torneio]/deletar-jogadores/action'
+import DeleteButton from './[torneio]/deletar-jogadores/button'
 
 type Tournment = {
     title: string,
@@ -43,7 +46,7 @@ export default async function Tournments() {
     const folders: {[key: string]: string} = {}
 
     for (let i = 0 ; i < tournments.length ; i++) {
-        const pathFolder = `folders/${tournments[i].title}`
+        const pathFolder = `folders/${tournments[i].id}`
         const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
         folders[String(tournments[i].title.split(' ').join('~'))] = dataFolder.publicUrl
     }
@@ -129,7 +132,9 @@ export default async function Tournments() {
                             <img src={folders[tournment.title.split(' ').join('~')]} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
                             <div className='buttons'>
                                 <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/editar`} className='button red'>Editar informações</a>
-                                <button className='button black'>Deletar torneio</button>
+                                
+                                <DeleteButton id={Number(tournment.id) }/>
+                                
                                 <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/analisar-jogadores`} className='button gray'>Analisar jogadores inscritos</a>
                             </div>
                         </div>

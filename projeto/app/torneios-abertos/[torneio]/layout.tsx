@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 
 import { getSupabaseAdmin } from '@/lib/supabase'
 import classifyTime from '@/lib/classifyTime'
+import TournamentProvider from '@/components/TournmentProvider';
 
 export default async function layoutTorneio({children, params}: {children: React.ReactNode, params: Promise<{ torneio: string }>}) {
     const {torneio} = await params
@@ -31,9 +32,13 @@ export default async function layoutTorneio({children, params}: {children: React
    
     const supabaseAdmin = await getSupabaseAdmin()  
     
-    const path = `folders/${torneio.split('~').join(' ')}`
+    const path = `folders/${tournment.id}`
     const { data } = supabaseAdmin.storage.from('publics').getPublicUrl(path)
     const folder = data.publicUrl
+
+    const pathQr = `qrCodes/${tournment.id}`
+    const dataQr = supabaseAdmin.storage.from('publics').getPublicUrl(pathQr)
+    const folderQr = dataQr.data.publicUrl
     
     
     const times = {
@@ -51,9 +56,11 @@ export default async function layoutTorneio({children, params}: {children: React
     const classTime = await classifyTime(times.digital.time, times.digital.plus)
     const classTime2 = await classifyTime(times.analog.time, times.analog.plus)
     
-    const path2 = `regulamentos/${torneio.split('~').join(' ')}`
+    const path2 = `regulamentos/${tournment.id}`
     const data2 = supabaseAdmin.storage.from('publics').getPublicUrl(path2).data
     const reg = data2.publicUrl
+
+    
     
 
     return (
@@ -62,6 +69,9 @@ export default async function layoutTorneio({children, params}: {children: React
                 <div id='form-content'>
                     <h1 style={{width: '100%', textAlign: 'start'}} id='torneio-title'>{torneio.split('~').join(' ')}</h1>
                     <h1 id='qr-key' hidden>{tournment.chave_pix}</h1>
+                    <h1 id='qr-src' hidden>{folderQr}</h1>
+                    <h1 id='id' hidden>{tournment.id}</h1>
+                    
                     <div id='informations'>
                         <div id='l1' style={{marginBottom: '20px', gap: '30px'}}>
                             <div style={{flexDirection: 'column', gap: '30px'}}>
@@ -102,8 +112,9 @@ export default async function layoutTorneio({children, params}: {children: React
                             <h2>Realizar nova inscrição:</h2>
                             <p className="error">Preencha todos os campos obrigatórios (*)</p>
                 
-
-                            {children}
+                            <TournamentProvider id={Number(tournment.id)}>
+                                {children}
+                            </TournamentProvider>
                         </div>
                     </div>
                 </div>

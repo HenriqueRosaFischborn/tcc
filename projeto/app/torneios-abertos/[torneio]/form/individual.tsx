@@ -1,13 +1,14 @@
 'use client'
 
 
-import {useActionState, useEffect, useState } from "react";
+import {useActionState, useContext, useEffect, useState } from "react";
 import Fields from "./fields";
 import actionInscriIndividual from "./action";
 import Form from "next/form";
 import { FormState } from "@/lib/types";
 import { searchCbx, searchFide } from "./searchID";
 import { supabase } from "@/lib/supabaseClient";
+import { TournamentContext } from "@/lib/context";
 
 type DataPlayer = {
     name: string,
@@ -81,14 +82,13 @@ export default function FormInscriIndividual() {
     const [qrKey, setQrKey] = useState<string>('')
     useEffect(() => {
         async function loadQr() {
-            const torneio = String(document.getElementById('torneio-title')?.innerText) 
-            const pathQr = `qrCodes/${torneio.split('~').join(' ')}`
-            const {data}= supabase.storage.from('publics').getPublicUrl(pathQr)
+            
 
             const chave = String(document.getElementById('qr-key')?.innerText)
+            const src = String(document.getElementById('qr-src')?.innerText)
             
             setQrKey(chave)
-            setQr(data.publicUrl)
+            setQr(src)
         } 
         loadQr()
     }, [])
@@ -172,9 +172,10 @@ export default function FormInscriIndividual() {
         }
     }
 
+    const id = useContext(TournamentContext);
+
     return (
         <>
-            
                 <div className="form">
                     
                     <Form action={formAction}>
@@ -213,7 +214,7 @@ export default function FormInscriIndividual() {
 
                         
                         <div className={`form ${(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? 'disableDiv' : ''}`} style={{width: '100%'}}> 
-                            <Fields playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
+                            <Fields id={id} playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
                             
                             <div id="qr-div" >
                                 <div>

@@ -29,7 +29,7 @@ type DataPlayer = {
     }
 }
 
-export default function Fields({playerCbx, playerFide, hasFide, setindividualPrice, state, setButton, setIdError, player}: {playerCbx?: DataPlayer, playerFide?: DataPlayer, hasFide: boolean, setIdError?: Function, setindividualPrice?: Function, setButton?: Function, player?: any, state: FormState}) {
+export default function Fields({playerCbx, playerFide, hasFide, setindividualPrice, state, setButton, setIdError, player, id}: {id: number, playerCbx?: DataPlayer, playerFide?: DataPlayer, hasFide: boolean, setIdError?: Function, setindividualPrice?: Function, setButton?: Function, player?: any, state: FormState}) {
     function handleEnterBlur(e: React.KeyboardEvent<HTMLInputElement>) {
         if (e.key === 'Enter') {
             e.preventDefault()
@@ -123,7 +123,7 @@ export default function Fields({playerCbx, playerFide, hasFide, setindividualPri
                 </>
             )}
 
-            <SelectCategorie hasFide={hasFide} errorInfo={errorInfo} setindividualPrice={setindividualPrice} state={state} setDivisions={division} blur={completeBlur}/>     
+            <SelectCategorie id={id} hasFide={hasFide} errorInfo={errorInfo} setindividualPrice={setindividualPrice} state={state} setDivisions={division} blur={completeBlur}/>     
         </>
     )//console
 }

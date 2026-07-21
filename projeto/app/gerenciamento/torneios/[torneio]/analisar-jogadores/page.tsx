@@ -18,11 +18,11 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
 
     const supabaseAdmin = await getSupabaseAdmin()  
 
-    const pathReg = `regulamentos/${torneio.split('~').join(' ')}`
+    const pathReg = `regulamentos/${tournment.id}`
     const dataReg = supabaseAdmin.storage.from('publics').getPublicUrl(pathReg).data
     const reg = dataReg.publicUrl
 
-    const pathFolder = `folders/${torneio.split('~').join(' ')}`
+    const pathFolder = `folders/${tournment.id}`
     const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
     const folder = dataFolder.publicUrl
 
@@ -57,7 +57,7 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
 
     const comprovantes: { [key: string]: string } = {}
     inscricoes.map((el)=> {
-        const pathComprovante = `comprovantes/${torneio.split('~').join(' ')}/${el.usuario.id}/${el.uuid}`
+        const pathComprovante = `comprovantes/${tournment.id}/${el.usuario.id}/${el.uuid}`
         const dataComprovante = supabaseAdmin.storage.from('publics').getPublicUrl(pathComprovante).data
         const comprovante = dataComprovante.publicUrl
         comprovantes[el.uuid] = comprovante

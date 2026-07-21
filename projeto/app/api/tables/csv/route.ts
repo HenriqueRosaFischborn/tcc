@@ -16,6 +16,8 @@ export async function POST(req: Request) {
   
   const players = (await req.json()) as Inscricoes
 
+  
+
   // Cabeçalhos do Swiss Manager
   const rows = [
     [
@@ -32,17 +34,21 @@ export async function POST(req: Request) {
   ]
 
   for (const player of Object.values(players)) {
-    rows.push([
-      String(player.id_cbx ? player.id_cbx : 0),
-      player.name,
-      player.genre ? '' : 'f',
-      'BRA',
-      player.club ? player.club : player.city,
-      formatDate(new Date(player.data_nasc)),
-      String(player.rtg_cbx ? player.rtg_cbx : 0),
-      String(player.id_fide ? player.id_fide : 0),
-      String(player.rtg_fide ? player.rtg_fide : 0),
-    ])
+    if (player.status == 'Confirmada') {
+      rows.push([
+        String(player.id_cbx ? player.id_cbx : 0),
+        player.name,
+        player.genre ? '' : 'f',
+        'BRA',
+        player.club ? player.club : player.city,
+        formatDate(new Date(player.data_nasc)),
+        String(player.rtg_cbx ? player.rtg_cbx : 0),
+        String(player.id_fide ? player.id_fide : 0),
+        String(player.rtg_fide ? player.rtg_fide : 0),
+      ])
+    }
+    
+    
   }
 
   // Cria worksheet

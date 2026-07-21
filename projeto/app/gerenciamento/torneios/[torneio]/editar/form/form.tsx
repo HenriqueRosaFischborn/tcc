@@ -442,7 +442,7 @@ export default function AddTournmentForm({times, tournment, defaultDivisions, de
 
 
                 
-                <CategorieArea divisionsBasic={divisions} setErrorCategories={changeErrorCategories}/>
+                <CategorieArea defaultDivisions={defaultDivisions} divisionsBasic={divisions} setErrorCategories={changeErrorCategories}/>
 
 
                 {/* <div id='discount' className='content' hidden>
@@ -576,7 +576,6 @@ export default function AddTournmentForm({times, tournment, defaultDivisions, de
                         <button type='submit' onClick={(e) => {
                             const divs = Array.from(document.getElementsByName('divisions'))[0]
                             if (!(divs instanceof HTMLInputElement)) return
-                            console.log(divs.value != JSON.stringify(defaultDivisions))
 
                             if (divs.value != JSON.stringify(defaultDivisions)) {
                                 if (!confirm("Você fez alterações nas categorias ou divisões, se você atualizar as informações todos os jogadores inscritos no torneio serão removidos automaticamente e deverão realizar sua inscrição novamente. Deseja continuar mesmo assim?")) {

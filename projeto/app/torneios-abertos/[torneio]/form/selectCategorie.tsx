@@ -17,7 +17,7 @@ enum ErrorCat {
 
 
 
-export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, state, setDivisions}: {hasFide: boolean, errorInfo?: string, setindividualPrice?: Function, blur?: Function, setDivisions?: Function, state: FormState}) {
+export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, state, setDivisions, id}: {id: number, hasFide: boolean, errorInfo?: string, setindividualPrice?: Function, blur?: Function, setDivisions?: Function, state: FormState}) {
     const [fieldsCat, setFields] = useState<FieldsCat>(['genre'])
     const [updateCat, setUpdate] = useState<Boolean>(false) // essa const só serve pra quando atualizar, chamar o useEffect de novo, atualizando a cat, ela muda sempre no complete
     const [errorCat, setErrorCat] = useState<ErrorCat>(ErrorCat.NONE)
@@ -46,7 +46,7 @@ export function SelectCategorie({hasFide, errorInfo, setindividualPrice, blur, s
                         }
                     })[0].parentElement?.querySelector('h3')?.innerText
 
-                    const res = await searchCat(date, String(genre))
+                    const res = await searchCat(id, date, String(genre))
 
                     if (res.error) {
                         setErrorCat(ErrorCat.TRUE)

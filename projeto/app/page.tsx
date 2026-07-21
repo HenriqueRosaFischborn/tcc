@@ -40,7 +40,7 @@ export default async function Home() {
   const folders: {[key: string]: string} = {}
 
   for (let i = 0 ; i < tournments.length ; i++) {
-    const pathFolder = `folders/${tournments[i].title}`
+    const pathFolder = `folders/${tournments[i].id}`
     const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
     folders[String(tournments[i].title.split(' ').join('~'))] = dataFolder.publicUrl
   }
