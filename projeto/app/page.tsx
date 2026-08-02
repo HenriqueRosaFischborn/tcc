@@ -96,9 +96,7 @@ export default async function Home() {
       
       
      
-      <h1 style={{
-        fontSize: '32pt'
-      }}>Bem-vindo(a) ao <br/>Clube de Xadrez de Araranguá!</h1>
+      <h1>Bem-vindo(a) ao <br/>Clube de Xadrez de Araranguá!</h1>
       <img style={{
         width: 'auto',
         height: '100px',
@@ -200,13 +198,13 @@ export default async function Home() {
         
         <div id="p-content">
           <div>
-            <h1 style={{marginBottom: '20px'}}>Nossa história</h1>
+            <h1>Nossa história</h1>
             
             <p>Fundado em 2024 por Frank Becker, Leandro Ubialli e Alexandre de Matos, o Clube de Xadrez de Araranguá nasceu com o propósito de incentivar a prática do xadrez, promover o desenvolvimento esportivo e fortalecer a comunidade enxadrística da região.</p>
 
             <p>Desde sua criação, o clube tem se dedicado à organização de torneios, atividades de ensino e encontros entre enxadristas de diferentes níveis e experiência. Atualmente, o clube possui quatro membros titulados: Frank Becker (Árbitro FIDE), Leandro Ubialli (Candidato a Mestre Nacional), Alexandre de Matos (Candidato a Mestre Nacional) e Eduardo da Silva Cardoso (Candidato a Mestre FIDE).</p>
 
-            <p style={{marginBottom: '40px'}}>Hoje, o Clube de Xadrez de Araranguá continua sendo um espaço de aprendizado, estratégia e amizade.</p>
+            <p>Hoje, o Clube de Xadrez de Araranguá continua sendo um espaço de aprendizado, estratégia e amizade.</p>
           </div>
         </div>
       </div>

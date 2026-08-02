@@ -21,21 +21,10 @@
     #herobar {
         justify-content: center;
         align-items: center;
-        padding: 30px 0px 30px 0px;
+        padding: 30px 0px 30px 30px;
     }
 
     /* HEROBAR ===============================================================================================================*/
-    /* COMPARATION ===========================================================================================================*/
-    
-    #comparation div {
-        gap: 5px;
-    }
-
-    #comparation div img {
-        width: calc(50% - 2.5px);
-    }
-
-    /* COMPARATION ===========================================================================================================*/
 
     /* SLIDER ================================================================================================================*/
 
@@ -51,8 +40,17 @@
         flex-direction: column;
     }
     
+    .tournaments {
+        width: 100%;
+    }
+
+    .tournament {
+        padding: 15px;
+        gap: 10px;
+    }
+
     .tournament img{
-        width: 180px;
+        width: 110px;
     }
 
     .tournament p{
@@ -69,30 +67,67 @@
 
     /* HISTORY ===============================================================================================================*/
 
-    #history {
+     #history{
         flex-direction: column-reverse;
-    }
-
-    #p-content div {
-        width: 98%;
-        align-items: center;
-    }
-
-    #history #img {
-        width: 100%;
+        max-height: none;
         height: auto;
-        object-fit: cover;
     }
 
-    #history #img::before{
+    #p-content{
+        padding: 35px 20px;
+    }
+
+    #p-content > div{
         width: 100%;
-        height: 50px;
+        align-items: center;
+        padding-bottom: 0px;
+    }
+
+    #p-content h1{
+        margin: 0px;
+    }
+
+    #history p {
+        font-size: 10pt;
+    }
+
+    #history #img{
+        flex: none;
+        width: 100%;
+        height: 320px;
+        overflow: hidden;
+    }
+
+    #history #img img{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Remove o degradê lateral do desktop */
+    #history #img::after{
+        display: none;
+    }
+
+    /* Cria um degradê em cima da imagem */
+    #history #img::before{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 70px;
+
         background: linear-gradient(
             to bottom,
-            rgb(0, 0, 0) 0%,
-        rgba(0, 0, 0, 0.85) 40%,
-        rgba(138, 43, 226, 0) 75%   
+            rgb(0,0,0) 0%,
+            rgba(0,0,0,.8) 40%,
+            rgba(0,0,0,0) 100%
         );
+
+        z-index: 2;
+        pointer-events: none;
     }
 
     /* HISTORY ===============================================================================================================*/
@@ -100,20 +135,36 @@
     /* FOUNDERS ==============================================================================================================*/
 
     #img-founders {
-        gap: 10px;
+        gap: 0px;
+        width: 100%;
+        justify-content: center;
+        align-items: stretch;
         flex-wrap: wrap;
     }
 
-    #img-founders div {
-        width: calc((100% - 20px) / 3);
+    .founder {
+        flex-direction: column;
+        width: calc((100% - 10px)/ 2);
+        padding: 20px;
+        margin-bottom: -20px;
+        align-items: center;
     }
 
-    #img-founders h3 {
-        font-size: 15pt;
+    .founder img {
+        width: 130px;
+        height: 130px;
     }
-    
-    #founders img {
-        height: 200px;
+
+    .founder .content {
+        row-gap: 5px;
+    }
+
+    .founder p {
+        font-size: 10pt;
+    }
+
+    .founder h3{
+        font-size: 12t;
     }
 
     /* FOUNDERS ==============================================================================================================*/
