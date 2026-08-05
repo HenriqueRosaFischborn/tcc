@@ -39,10 +39,21 @@ export default async function Home() {
 
   const folders: {[key: string]: string} = {}
 
-  for (let i = 0 ; i < tournments.length ; i++) {
-    const pathFolder = `folders/${tournments[i].id}`
-    const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
-    folders[String(tournments[i].title.split(' ').join('~'))] = dataFolder.publicUrl
+  for (let i = 0; i < tournments.length; i++) {
+    const pathFolder = `folders/${tournments[i].id}`;
+
+    const { data, error } = await supabaseAdmin.storage
+      .from("publics")
+      .list("folders");
+
+    if (!error && data.some(file => file.name === String(tournments[i].id))) {
+      const publicUrl = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(pathFolder)
+        .data.publicUrl;
+
+      folders[tournments[i].title.split(" ").join("~")] = publicUrl;
+    }
   }
 
   function classifyTime(min: number, seg: number) {
@@ -83,6 +94,8 @@ export default async function Home() {
       titulo: 'Candidato a Mestre FIDE',
     },
   ]
+
+  console.log(folders)
 
   return (
     <>
@@ -159,7 +172,9 @@ export default async function Home() {
               </div>
               <a href={`/torneios-abertos/${tournment.title.split(' ').join('~')}`} className="button blue">Inscreva-se</a>
             </div>
-            <img src={folders[tournment.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+            {folders[tournment.title.split(' ').join('~')] ? (
+              <img src={folders[tournment.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+            ) : ('')}
           </div>
         )}) : (<>
           <p className="obs">Não há torneios abertos no momento</p>

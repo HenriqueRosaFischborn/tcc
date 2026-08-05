@@ -216,24 +216,27 @@ export default function FormInscriIndividual() {
                         <div className={`form ${(hasFide && (!playerFide || !playerCbx)) || (errorIdFide != '' || errorIdCbx != '') ? 'disableDiv' : ''}`} style={{width: '100%'}}> 
                             <Fields id={id.id} playerCbx={playerCbx} playerFide={playerFide} hasFide={hasFide} setindividualPrice={setVPrice} state={state} setButton={setButton} />
                             
-                            <div id="qr-div" >
-                                <div>
-                                    <h2>Efetuar pagamento e confirmar inscrição:</h2>
-                                    <p>Escaneie o QRcode com sua conta bancária ou use a chave PIX e confirme sua inscrição</p>    
-                                    <div id="qr-key">
-                                        <p><strong>Ou copie o código:</strong></p>
-                                        <div className="input">
-                                            <p>{qrKey}</p>
-                                            <img src="/icons/copy.png" alt="copy" onClick={() => {
-                                                navigator.clipboard.writeText(String(qrKey))
-                                                alert('Copiado para área de transferência...')
-                                            }}/>
+                            {qr ? (
+
+                                <div id="qr-div" >
+                                    <div>
+                                        <h2>Efetuar pagamento e confirmar inscrição:</h2>
+                                        <p>Escaneie o QRcode com sua conta bancária ou use a chave PIX e confirme sua inscrição</p>    
+                                        <div id="qr-key">
+                                            <p><strong>Ou copie o código:</strong></p>
+                                            <div className="input">
+                                                <p>{qrKey}</p>
+                                                <img src="/icons/copy.png" alt="copy" onClick={() => {
+                                                    navigator.clipboard.writeText(String(qrKey))
+                                                    alert('Copiado para área de transferência...')
+                                                }}/>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <img src={qr} alt="qrcode" />
-                            </div>
+                                    <img src={qr} alt="qrcode" />
+                                </div>
+                            ) : ''}
                             
                             <div className='upload-file' style={{width: '100%'}}>
                                 <button onClick={() => document.getElementById('input-comprovante')?.click()} type='button' className='button red'><img src="/icons/upload.png" alt="" id="uploadIcon" fetchPriority='low' loading='lazy' decoding='async'/> Anexar comprovante <span style={{fontSize: '10pt'}}>(.jpg / .jpeg / .png)</span></button>

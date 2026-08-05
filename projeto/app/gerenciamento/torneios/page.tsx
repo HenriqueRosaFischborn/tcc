@@ -45,11 +45,22 @@ export default async function Tournments() {
 
     const folders: {[key: string]: string} = {}
 
-    for (let i = 0 ; i < tournments.length ; i++) {
-        const pathFolder = `folders/${tournments[i].id}`
-        const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
-        folders[String(tournments[i].title.split(' ').join('~'))] = dataFolder.publicUrl
+     for (let i = 0; i < tournments.length; i++) {
+    const pathFolder = `folders/${tournments[i].id}`;
+
+    const { data, error } = await supabaseAdmin.storage
+      .from("publics")
+      .list("folders");
+
+    if (!error && data.some(file => file.name === String(tournments[i].id))) {
+      const publicUrl = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(pathFolder)
+        .data.publicUrl;
+
+      folders[tournments[i].title.split(" ").join("~")] = publicUrl;
     }
+  }
 
     // function changeState(e: React.MouseEvent, el: Tournment) {
     //     const newState = el
@@ -129,7 +140,10 @@ export default async function Tournments() {
                                     </div>
                                 </div>
                             </div>
-                            <img src={folders[tournment.title.split(' ').join('~')]} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
+                            {folders[tournment.title.split(' ').join('~')] ? (
+                                <img src={folders[tournment.title.split(' ').join('~')]} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
+                            ) : ''}
+                            
                             <div className='buttons'>
                                 <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/editar`} className='button red'>Editar informações</a>
                                 

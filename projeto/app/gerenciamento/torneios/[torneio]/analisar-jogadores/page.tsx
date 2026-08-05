@@ -16,15 +16,43 @@ export default async function Players({params}: {params: Promise<{ torneio: stri
         redirect('/torneios-abertos')
     }
 
-    const supabaseAdmin = await getSupabaseAdmin()  
+    const supabaseAdmin = await getSupabaseAdmin();
 
-    const pathReg = `regulamentos/${tournment.id}`
-    const dataReg = supabaseAdmin.storage.from('publics').getPublicUrl(pathReg).data
-    const reg = dataReg.publicUrl
+    let folder: string | null = null;
+    let folderQr: string | null = null;
+    let reg: string | null = null;
 
-    const pathFolder = `folders/${tournment.id}`
-    const dataFolder = supabaseAdmin.storage.from('publics').getPublicUrl(pathFolder).data
-    const folder = dataFolder.publicUrl
+    // =======================
+    // Folder
+    // =======================
+    const path = `folders/${tournment.id}`;
+
+    const { data: folderFiles, error: folderError } =
+    await supabaseAdmin.storage
+        .from("publics")
+        .list("folders");
+
+    if (!folderError && folderFiles.some(file => file.name === String(tournment.id))) {
+    folder = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(path).data.publicUrl;
+    }
+
+    // =======================
+    // Regulamento
+    // =======================
+    const pathReg = `regulamentos/${tournment.id}`;
+
+    const { data: regFiles, error: regError } =
+    await supabaseAdmin.storage
+        .from("publics")
+        .list("regulamentos");
+
+    if (!regError && regFiles.some(file => file.name === String(tournment.id))) {
+    reg = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(pathReg).data.publicUrl;
+    }
 
     const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
     const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {

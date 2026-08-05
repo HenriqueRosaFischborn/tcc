@@ -30,16 +30,59 @@ export default async function layoutTorneio({children, params}: {children: React
 
 
    
-    const supabaseAdmin = await getSupabaseAdmin()  
-    
-    const path = `folders/${tournment.id}`
-    const { data } = supabaseAdmin.storage.from('publics').getPublicUrl(path)
-    const folder = data.publicUrl
+    const supabaseAdmin = await getSupabaseAdmin();
 
-    const pathQr = `qrCodes/${tournment.id}`
-    const dataQr = supabaseAdmin.storage.from('publics').getPublicUrl(pathQr)
-    const folderQr = dataQr.data.publicUrl
-    
+    let folder: string | null = null;
+    let folderQr: string | null = null;
+    let reg: string | null = null;
+
+    // =======================
+    // Folder
+    // =======================
+    const path = `folders/${tournment.id}`;
+
+    const { data: folderFiles, error: folderError } =
+    await supabaseAdmin.storage
+        .from("publics")
+        .list("folders");
+
+    if (!folderError && folderFiles.some(file => file.name === String(tournment.id))) {
+    folder = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(path).data.publicUrl;
+    }
+
+    // =======================
+    // QR Code
+    // =======================
+    const pathQr = `qrCodes/${tournment.id}`;
+
+    const { data: qrFiles, error: qrError } =
+    await supabaseAdmin.storage
+        .from("publics")
+        .list("qrCodes");
+
+    if (!qrError && qrFiles.some(file => file.name === String(tournment.id))) {
+    folderQr = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(pathQr).data.publicUrl;
+    }
+
+    // =======================
+    // Regulamento
+    // =======================
+    const pathReg = `regulamentos/${tournment.id}`;
+
+    const { data: regFiles, error: regError } =
+    await supabaseAdmin.storage
+        .from("publics")
+        .list("regulamentos");
+
+    if (!regError && regFiles.some(file => file.name === String(tournment.id))) {
+    reg = supabaseAdmin.storage
+        .from("publics")
+        .getPublicUrl(pathReg).data.publicUrl;
+    }
     
     const times = {
         digital: {
@@ -56,10 +99,6 @@ export default async function layoutTorneio({children, params}: {children: React
     const classTime = await classifyTime(times.digital.time, times.digital.plus)
     const classTime2 = await classifyTime(times.analog.time, times.analog.plus)
     
-    const path2 = `regulamentos/${tournment.id}`
-    const data2 = supabaseAdmin.storage.from('publics').getPublicUrl(path2).data
-    const reg = data2.publicUrl
-
     
     
 

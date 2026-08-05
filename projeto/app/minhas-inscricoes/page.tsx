@@ -57,13 +57,20 @@ export default async function MyInscriptions() {
 
     
     for (const torneio of torneiosUnicos) {
-        const pathFolder = `folders/${torneio.id}`
+        const pathFolder = `folders/${torneio.id}`;
 
-        const { data } = supabaseAdmin.storage
-            .from('publics')
+        const { data, error } = await supabaseAdmin.storage
+        .from("publics")
+        .list("folders");
+
+        if (!error && data.some(file => file.name === String(torneio.id))) {
+        const publicUrl = supabaseAdmin.storage
+            .from("publics")
             .getPublicUrl(pathFolder)
+            .data.publicUrl;
 
-        folders[torneio.title.split(' ').join('~')] = data.publicUrl
+        folders[torneio.title.split(" ").join("~")] = publicUrl;
+        }
     }
     
     
@@ -156,7 +163,9 @@ export default async function MyInscriptions() {
                             <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
                         </div>
                         </div>
-                        <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                        {folders[el.torneio.title.split(' ').join('~')] ? (
+                            <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                        ) : ''}
                     </div>
                     )}) : (<>
                     <p className="obs">Não há inscrições cadastradas no momento</p>
