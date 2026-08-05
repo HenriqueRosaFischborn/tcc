@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
+import { auth } from './auth'
 
 export const config = {
   matcher: [
@@ -17,10 +18,11 @@ export const config = {
 export default async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET,
-  })
+  console.log('cookies: ', req.cookies.getAll())
+
+  const token = await auth()
+
+  console.log('token: ', token)
 
   const authRoutes = [
     '/entrar',
@@ -46,7 +48,7 @@ export default async function proxy(req: NextRequest) {
   // }
 
   if (pathname.startsWith('/gerenciamento')) {
-    if (!token || !token.admin) {
+    if (!token || !token.user.admin) {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }
