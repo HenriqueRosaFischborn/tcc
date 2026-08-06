@@ -7,57 +7,30 @@ import { Cat, Div, Player } from '@/lib/types'
 import Form from 'next/form'
 import { useActionState, useEffect, useState } from 'react'
 import updateDataBase from './updateDataBase'
+import { generateTXT } from './generateTXT'
 
 type Inscricoes = {
     [key: string]: Player
 }
 
-async function routeGenerateXLS(players: Inscricoes) {
-    const response = await fetch('/api/tables/xls',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(players),
-      }
-    )
+async function routeGenerateTXT(players: Inscricoes) {
+    const conteudo = generateTXT(players)
 
-    const blob = await response.blob()
+    const blob = new Blob([conteudo], {
+        type: "text/plain;charset=utf-8",
+    });
 
-    const url =
-      window.URL.createObjectURL(blob)
+    const url = URL.createObjectURL(blob);
 
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'NationalRatings.xlsx'
-    a.click()
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Exp.TXT";
 
-    window.URL.revokeObjectURL(url)
-}
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
-async function routeGenerateCSV(players: Inscricoes) {
-    const response = await fetch('/api/tables/csv',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(players),
-      }
-    )
-
-    const blob = await response.blob()
-
-    const url =
-      window.URL.createObjectURL(blob)
-
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'NationalRatings.csv'
-    a.click()
-
-    window.URL.revokeObjectURL(url)
+    URL.revokeObjectURL(url);
 }
 
 export default function BodyClient({nameTournment, players, comprovantes, categories, divisions}: {nameTournment: string, categories: Cat[], divisions: Div[], players: Player[], comprovantes: {[key: string]: string}}) {
@@ -133,8 +106,9 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                     <h2>Baixar lista de jogadores:</h2>
                     <div className='buttons'>
                         {/* <button className='button gray' ><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> PDF</button> */}
-                        <button className='button gray' onClick={() => routeGenerateXLS(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xlsx)</button>
-                        <button className='button gray' onClick={() => routeGenerateCSV(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button>
+                        {/* <button className='button gray' onClick={() => routeGenerateXLS(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.xlsx)</button>
+                        <button className='button gray' onClick={() => routeGenerateCSV(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.csv)</button> */}
+                        <button className='button gray' onClick={() => routeGenerateTXT(defaultInscri)}><img src="/icons/download.png" alt="" fetchPriority='low' loading='lazy' decoding='async'/> Swiss Manager (.txt)</button>
                     </div>
                 </div>
 
@@ -152,7 +126,7 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                 <tr>
                                     {/* <th ></th> */}
                                     <th>Status:</th>
-                                    <th>Nome:</th>
+                                    <th className='fixa'>Nome:</th>
                                     <th>Comprovante:</th>
                                     <th>ID FIDE:</th>
                                     <th>ID CBX:</th>
@@ -188,14 +162,14 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                                 <input type='checkbox' />
                                             </div>
                                         </td>   */}
-                                        <td className='select' style={{backgroundColor: nowInscri[el.uuid]?.status !== defaultInscri[el.uuid]?.status ? 'var(--ligthgray)' : '', color: nowInscri[el.uuid]?.status == 'Confirmada' ? '#0F7B0F' : nowInscri[el.uuid]?.status == 'Recusada' ? 'red' : 'var(--mainblack)'}}>
+                                        <td className='select' style={{backgroundColor: nowInscri[el.uuid]?.status !== defaultInscri[el.uuid]?.status ? 'var(--ligthgray)' : '', borderRight: 'solid 2px black', color: nowInscri[el.uuid]?.status == 'Confirmada' ? '#0F7B0F' : nowInscri[el.uuid]?.status == 'Recusada' ? 'red' : 'var(--mainblack)'}}>
                                             <select name="" id="" defaultValue={el.status} onChange={(e) => updateObjNowSelect(el.uuid, 'status', e.currentTarget.value, 'string')}>
                                                 <option style={{color: 'green'}} value="Confirmada">Confirmada</option>
                                                 <option style={{color: 'var(--mainblack)'}} value="Pendente">Pendente</option>
                                                 <option style={{color: 'red'}} value="Recusada">Recusada</option>
                                             </select>
                                         </td>
-                                        <td style={{backgroundColor: nowInscri[el.uuid].name !== defaultInscri[el.uuid]?.name ? 'var(--ligthgray)' : ''}}>
+                                        <td className='fixa' style={{backgroundColor: nowInscri[el.uuid].name !== defaultInscri[el.uuid]?.name ? 'var(--ligthgray)' : ''}}>
                                             <input type="text" defaultValue={el.name} size={el.name.length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'name', e.currentTarget.value, 'string')}/>
                                         </td>  
                                         <td className='comprovante' style={{paddingLeft: '5px'}}>
@@ -228,7 +202,7 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                         <td className='select' style={{backgroundColor: nowInscri[el.uuid]?.genre !== defaultInscri[el.uuid]?.genre ? 'var(--ligthgray)' : ''}}>
                                             <select name="" id="" defaultValue={el.genre ? 'true' : 'false'} onChange={(e) => {updateObjNowSelect(el.uuid, 'genre', e.currentTarget.value, 'boolean')}}>
                                                 <option value={'true'}>Masculino</option>
-                                                <option value={''}>Feminino</option>
+                                                <option value={'false'}>Feminino</option>
                                             </select>
                                         </td>
                                         

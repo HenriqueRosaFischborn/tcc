@@ -18,11 +18,8 @@ export const config = {
 export default async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
-  console.log('cookies: ', req.cookies.getAll())
-
   const token = await auth()
 
-  console.log('token: ', token)
 
   const authRoutes = [
     '/entrar',
