@@ -130,10 +130,12 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                     <th>Comprovante:</th>
                                     <th>ID FIDE:</th>
                                     <th>ID CBX:</th>
-                                    <th>Cidade:</th>
-                                    <th>Clube:</th>
                                     <th>Rating FIDE:</th>
                                     <th>Rating CBX:</th>
+                                    <th>Titulação</th>
+                                    <th>Cidade:</th>
+                                    <th>Clube:</th>
+                                    <th>Federação:</th>
                                     <th>Data de nascimento:</th>
                                     <th>Gênero:</th>
                                     <th>Divisão:</th>
@@ -182,18 +184,27 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                         <td style={{backgroundColor: nowInscri[el.uuid].id_cbx !== defaultInscri[el.uuid]?.id_cbx ? 'var(--ligthgray)' : ''}}>
                                             <input placeholder='Nenhum' type="text" defaultValue={el.id_cbx} size={String(el.id_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'id_cbx', e.currentTarget.value, 'number')}/>
                                         </td>
-                                        <td style={{backgroundColor: nowInscri[el.uuid].city !== defaultInscri[el.uuid]?.city ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.city} size={el.city.length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'city', e.currentTarget.value, 'string')}/>
-                                        </td> 
-                                        <td style={{backgroundColor: nowInscri[el.uuid].club !== defaultInscri[el.uuid]?.club ? 'var(--ligthgray)' : ''}}>
-                                            <input type="text" defaultValue={el.club ? el.club : ''} placeholder={'Nenhum'} size={el.club ? el.club.length : 6} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'club', e.currentTarget.value, 'string')}/>
-                                        </td> 
                                         <td style={{backgroundColor: nowInscri[el.uuid].rtg_fide !== defaultInscri[el.uuid]?.rtg_fide ? 'var(--ligthgray)' : ''}}>
                                             <input placeholder='Nenhum' type="text" defaultValue={el.rtg_fide} size={String(el.rtg_fide).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_fide', e.currentTarget.value, 'number')}/>
                                         </td>
                                         <td style={{backgroundColor: nowInscri[el.uuid].rtg_cbx !== defaultInscri[el.uuid]?.rtg_cbx ? 'var(--ligthgray)' : ''}}>
                                             <input placeholder='Nenhum' type="text" defaultValue={el.rtg_cbx} size={String(el.rtg_cbx).length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'rtg_cbx', e.currentTarget.value, 'number')}/>
                                         </td>
+
+                                        <td style={{backgroundColor: nowInscri[el.uuid].titulo !== defaultInscri[el.uuid]?.titulo ? 'var(--ligthgray)' : ''}}>
+                                            <input type="text" defaultValue={el.titulo ? el.titulo : ''} placeholder={'Nenhum'} size={el.titulo ? el.titulo.length : 6} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'titulo', e.currentTarget.value, 'string')}/>
+                                        </td> 
+
+                                        <td style={{backgroundColor: nowInscri[el.uuid].city !== defaultInscri[el.uuid]?.city ? 'var(--ligthgray)' : ''}}>
+                                            <input type="text" defaultValue={el.city} size={el.city.length} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'city', e.currentTarget.value, 'string')}/>
+                                        </td> 
+                                        <td style={{backgroundColor: nowInscri[el.uuid].club !== defaultInscri[el.uuid]?.club ? 'var(--ligthgray)' : ''}}>
+                                            <input type="text" defaultValue={el.club ? el.club : ''} placeholder={'Nenhum'} size={el.club ? el.club.length : 6} onInput={(e) => reguleSize(e.currentTarget)} onChange={(e) => updateObjNowSelect(el.uuid, 'club', e.currentTarget.value, 'string')}/>
+                                        </td> 
+
+                                        <td style={{backgroundColor: nowInscri[el.uuid].federation !== defaultInscri[el.uuid]?.federation ? 'var(--ligthgray)' : ''}}>
+                                            <input type="text" defaultValue={el.federation} size={el.federation ? el.federation.length : 6} onInput={(e) => {e.currentTarget.value = e.currentTarget.value.toUpperCase(); reguleSize(e.currentTarget)}} onChange={(e) => updateObjNowSelect(el.uuid, 'federation', e.currentTarget.value, 'string')}/>
+                                        </td> 
                                         
                                         <td className='date' style={{backgroundColor: nowInscri[el.uuid].data_nasc !== defaultInscri[el.uuid]?.data_nasc ? 'var(--ligthgray)' : ''}}>
                                             <InputDate uuid={el.uuid} updateObjNowSelect={updateObjNowSelect} reguleSize={reguleSize} size={el.data_nasc.toLocaleDateString('pt-BR', {timeZone: 'UTC'}).length} defaultValue={el.data_nasc.toLocaleDateString('pt-BR', {timeZone: 'UTC'})}/>

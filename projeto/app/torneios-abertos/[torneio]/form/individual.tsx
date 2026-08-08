@@ -15,6 +15,7 @@ type DataPlayer = {
     bornYear: string,
     genre: string,
     title: string,
+    sigla: string,
     idFide: string,
     ratings: {
         standard: string,
@@ -124,6 +125,8 @@ export default function FormInscriIndividual() {
 
             
                 const dataPlayerFide = await searchFide(id) as DataPlayer
+
+                console.log('dataPlayerFide ', dataPlayerFide)
 
                 if (
                     !dataPlayerFide ||

@@ -12,6 +12,7 @@ type DataPlayer = {
     bornYear: string,
     genre: string,
     title: string,
+    sigla: string,
     idFide: string,
     ratings: {
         standard: string,
@@ -221,6 +222,8 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
                 genre: resData.genre == 'masc',
                 name: hasFide && playerFide? playerFide.name : resData.name,
                 id_torneio: Number(cat.id_torneio),
+                federation: playerFide ? playerFide.sigla : undefined,
+                titulo: playerFide && playerFide.title != 'None' ? playerFide.title : undefined,
                 rtg_fide: classTime == 'bullet' ? null : (playerFide ? playerFide.ratings[classTime] == 'Not rated' ? 0 : Number(playerFide.ratings[classTime]) : null),
                 rtg_cbx: classTime == 'bullet' ? null :  (playerCbx ? playerCbx.ratings[classTime] == 'Not rated' ? 0 : Number(playerCbx.ratings[classTime]): null)
             }

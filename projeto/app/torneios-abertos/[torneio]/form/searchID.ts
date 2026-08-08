@@ -1,6 +1,8 @@
 'use server'
 
 import * as cheerio from 'cheerio'
+import countries from 'i18n-iso-countries'
+import en from 'i18n-iso-countries/langs/en.json'
 
 export async function searchFide(id: string) {
     console.log('Começou')
@@ -12,6 +14,8 @@ export async function searchFide(id: string) {
             'User-Agent': 'Mozilla/5.0'
         }
     })
+    
+    console.log(res.url)
 
     const html = await res.text()
 
@@ -19,17 +23,35 @@ export async function searchFide(id: string) {
     
     const notFound = $('.row.no-gutters').text().trim()
 
-    if (notFound) {
+    const name = $('.player-title').text().trim()
+    
+    if (notFound && name == '') {
         return {
             name: 'Usuário FIDE não encontrado'
         }
     }
-
-    const name = $('.player-title').text().trim()
+    
     const bornYear = $('.profile-info-byear').text().trim()
     const genre = $('.profile-info-sex').text().trim()
     const ratings = $('.profile-games').text().trim().match(/Not rated|\d+/g)
     const title = $('.profile-info-row').text().trim().match(/FIDE title\s*([A-Za-z]+)/i)?.[1]
+
+
+    countries.registerLocale(en)
+
+    const flagSrc = $('.profile-info-country img').attr('src')
+
+    const country2 = flagSrc
+        ?.split('/')
+        .pop()
+        ?.replace('.svg', '')
+        ?.toUpperCase()
+
+    const sigla = country2
+        ? countries.alpha2ToAlpha3(country2)
+        : undefined
+
+    
     
     return {
         name: name,
@@ -37,6 +59,7 @@ export async function searchFide(id: string) {
         genre: genre == 'Male' ? 'm' : 'f',
         title: title,
         idFide: id,
+        sigla: sigla,
         ratings: {
             standard: ratings? ratings[0] == 'Not rated' ? '0' : ratings[0] : '0',
             rapid: ratings? ratings[1] == 'Not rated' ? '0' : ratings[1] : '0',

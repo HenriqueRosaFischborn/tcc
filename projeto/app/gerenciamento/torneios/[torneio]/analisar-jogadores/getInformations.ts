@@ -103,7 +103,8 @@ export async function getplayers(id: number) {
                 select: {
                     name: true,
                     uuid: true,
-                    id_torneio: true
+                    id_torneio: true,
+                    min_y: true
                 }
             },
             divisoes: {

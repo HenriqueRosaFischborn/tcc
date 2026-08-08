@@ -53,10 +53,13 @@ export type Player = {
   id_torneio: number
   rtg_fide: number
   rtg_cbx: number
+  federation?: string
+  titulo?: string
   categoria: {
     name: string
     uuid: string
     id_torneio: number
+    min_y?: number
   }
   divisoes: {
     name: string,
