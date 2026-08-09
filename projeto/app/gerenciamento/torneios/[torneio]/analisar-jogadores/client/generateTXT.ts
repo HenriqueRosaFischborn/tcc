@@ -39,7 +39,7 @@ export function generateTXT(players: Inscricoes) {
             cont += `${players[i].rtg_cbx ? players[i].rtg_fide : 0};` //FIDE
             cont += `${formatDate(players[i].data_nasc)};` //Dnasc
             cont += `${players[i].federation ? players[i].federation : 'BRA'};` //Fed
-            cont += `${players[i].genre ? 0 : 1};` //Sexo
+            cont += `${players[i].genre ? '' : 'W'};` //Sexo
             cont += `;` // Cat aparentemente não precisa preencher
             cont += `${players[i].city};` // Gr
             cont += `0;` //NoClube
@@ -56,7 +56,7 @@ export function generateTXT(players: Inscricoes) {
             cont += `;` // Clas
             cont += `${String(players[i].name.split(',')[1]).trim()};` // Sobrenome
             cont += `${String(players[i].name.split(',')[0]).trim()};` // Nome
-            cont += `;`; // Atítulo
+            cont += ``; // Atítulo
 
             cont += `\n`
         }
