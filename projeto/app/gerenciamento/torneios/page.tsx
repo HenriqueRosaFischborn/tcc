@@ -5,6 +5,8 @@ import db from '@/lib/db'
 import Form from 'next/form'
 import { deleteTournment } from './[torneio]/deletar-jogadores/action'
 import DeleteButton from './[torneio]/deletar-jogadores/button'
+import { closeInscri, openInscri } from './editOpenInscri'
+import { ButtonClose, ButtonOpen } from './buttonsOpenClose'
 
 type Tournment = {
     title: string,
@@ -17,7 +19,8 @@ type Tournment = {
     dateInscri: Date,
     priceMin: number,
     priceMax: number,
-    srcFolder: string
+    srcFolder: string,
+    inscri_closed_by_arbiter: string
 }
 
 
@@ -67,6 +70,9 @@ export default async function Tournments() {
     //     newState.state = !newState.state
     //     setTournments((prev) => prev.map((elPrev: Tournment) => elPrev == el ? newState : elPrev))
     // }
+
+    const dateNow = new Date()
+
     
     return (
         <>
@@ -81,7 +87,8 @@ export default async function Tournments() {
                 </div>
 
                 <div id='body'>
-                    {tournments.map((tournment, i) => {
+                    <h1 style={{fontSize: '24pt'}}>Torneios abertos para inscrição:</h1>
+                    {tournments.filter(el => !(el.inscri_closed_by_arbiter || el.date_inscri < dateNow)).length > 0 ? tournments.filter(el => !(el.inscri_closed_by_arbiter || el.date_inscri < dateNow)).map((tournment, i) => {
                         const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
                         const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {
                             hour: '2-digit',
@@ -109,10 +116,12 @@ export default async function Tournments() {
                         return (
                         <div key={i} className='tournment'>
                             <div className='content'>
+                                <div style={{flexDirection: 'column'}}>
                                 <div className='title'>
                                     <h2>{tournment.title}</h2>
                                 </div>
-
+                            
+                                    
                                 {/* <div className='state'>
                                     <p>Estado: </p>
                                     <Switch colorOn='#229614' colorOff='var(--darkgray)' el={el} onClick={changeState} defaultChecked={el.state}/>
@@ -122,27 +131,32 @@ export default async function Tournments() {
                                         <p style={{color: '#6b6b6bff'}}>Inativo </p>
                                     )}
                                 </div> */}
-                                <div className='body-informations'>
-                                    <div className='informations'>
-                                        <p>Tempos: {times.digital.time + ' + ' + times.digital.plus} (digital) / {times.analog.time + ' + ' + times.analog.plus} (analógico)</p>
-                                        <a href={tournment.local_link ? tournment.local_link : '#'}>Local: {tournment.local}</a>
-                                        {/* <p>Valor: {tournment.priceMin} - {tournment.priceMax}</p> */}
-                                    </div>
-                                    <div className='informations'>
-                                        <p>Encerramento das inscrições:</p>
-                                        <p>Data: {dateInscri}</p>
-                                        <p>Hora: {timeInscri}</p>
-                                    </div>
-                                    <div className='informations'>
-                                        <p>Início:</p>
-                                        <p>Data: {dateEvent}</p>
-                                        <p>Hora: {timeEvent}</p>
+                                
+
+                                    <div className='body-informations'>
+                                        <div className='informations'>
+                                            <p>Tempos: {times.digital.time + ' + ' + times.digital.plus} (digital) / {times.analog.time + ' + ' + times.analog.plus} (analógico)</p>
+                                            <a href={tournment.local_link ? tournment.local_link : '#'}>Local: {tournment.local}</a>
+                                            {/* <p>Valor: {tournment.priceMin} - {tournment.priceMax}</p> */}
+                                        </div>
+                                        <div className='informations'>
+                                            <p>Encerramento das inscrições:</p>
+                                            <p>Data: {dateInscri}</p>
+                                            <p>Hora: {timeInscri}</p>
+                                        </div>
+                                        <div className='informations'>
+                                            <p>Início:</p>
+                                            <p>Data: {dateEvent}</p>
+                                            <p>Hora: {timeEvent}</p>
+                                        </div>
                                     </div>
                                 </div>
+                                <ButtonClose id={Number(tournment.id)} />
                             </div>
                             {folders[tournment.title.split(' ').join('~')] ? (
                                 <img src={folders[tournment.title.split(' ').join('~')]} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
                             ) : ''}
+                            
                             
                             <div className='buttons'>
                                 <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/editar`} className='button red'>Editar informações</a>
@@ -152,9 +166,95 @@ export default async function Tournments() {
                                 <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/analisar-jogadores`} className='button gray'>Analisar jogadores inscritos</a>
                             </div>
                         </div>
-                    )})}
+                    )}) : (
+                        <p className='obs'>Não há torneios abertos para inscrição</p>
+                    )}
+                    <h1 style={{fontSize: '24pt', marginTop: '30px'}}>Torneios fechados para inscrição:</h1>
+                    {tournments.filter(el => el.inscri_closed_by_arbiter || el.date_inscri < dateNow).length > 0 ? tournments.filter(el => el.inscri_closed_by_arbiter || el.date_inscri < dateNow).map((tournment, i) => {
+                        const dateInscri = tournment.date_inscri.toLocaleDateString('pt-BR')
+                        const timeInscri = tournment.date_inscri.toLocaleTimeString('pt-BR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })
+                    
+                        const dateEvent = tournment.date_event.toLocaleDateString('pt-BR')
+                        const timeEvent = tournment.date_event.toLocaleTimeString('pt-BR', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })
+
+                        const times = {
+                            digital: {
+                                time: Number(tournment.tempo_torneio_time_digitalTotempo?.time),
+                                plus: Number(tournment.tempo_torneio_time_digitalTotempo?.plus)
+                            },
+                            analog: {
+                                time: Number(tournment.tempo_torneio_time_analogTotempo?.time),
+                                plus: Number(tournment.tempo_torneio_time_analogTotempo?.plus)
+                            }
+                        }
+
+
+                        return (
+                        <div key={i} className='tournment'>
+                            <div className='content'>
+                                <div style={{flexDirection: 'column'}}>
+                                <div className='title'>
+                                    <h2>{tournment.title}</h2>
+                                </div>
+                            
+                                    
+                                {/* <div className='state'>
+                                    <p>Estado: </p>
+                                    <Switch colorOn='#229614' colorOff='var(--darkgray)' el={el} onClick={changeState} defaultChecked={el.state}/>
+                                    {el.state ? (
+                                        <p style={{color: '#229614'}}>Ativo </p>
+                                    ) : (
+                                        <p style={{color: '#6b6b6bff'}}>Inativo </p>
+                                    )}
+                                </div> */}
+                                
+
+                                    <div className='body-informations'>
+                                        <div className='informations'>
+                                            <p>Tempos: {times.digital.time + ' + ' + times.digital.plus} (digital) / {times.analog.time + ' + ' + times.analog.plus} (analógico)</p>
+                                            <a href={tournment.local_link ? tournment.local_link : '#'}>Local: {tournment.local}</a>
+                                            {/* <p>Valor: {tournment.priceMin} - {tournment.priceMax}</p> */}
+                                        </div>
+                                        <div className='informations'>
+                                            <p>Encerramento das inscrições:</p>
+                                            <p>Data: {dateInscri}</p>
+                                            <p>Hora: {timeInscri}</p>
+                                        </div>
+                                        <div className='informations'>
+                                            <p>Início:</p>
+                                            <p>Data: {dateEvent}</p>
+                                            <p>Hora: {timeEvent}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ButtonOpen dateNow={dateNow} date_inscri={tournment.date_inscri} id={Number(tournment.id)}/>
+                            </div>
+                            {folders[tournment.title.split(' ').join('~')] ? (
+                                <img src={folders[tournment.title.split(' ').join('~')]} alt="img" className='tournment-img' fetchPriority='low' loading='lazy' decoding='async'/>
+                            ) : ''}
+                            
+                            
+                            <div className='buttons'>
+                                <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/editar`} className='button red'>Editar informações</a>
+                                
+                                <DeleteButton id={Number(tournment.id) }/>
+                                
+                                <a href={`/gerenciamento/torneios/${tournment.title.split(' ').join('~')}/analisar-jogadores`} className='button gray'>Analisar jogadores inscritos</a>
+                            </div>
+                        </div>
+                    )}) : (
+                        <p className='obs'>Não há torneios fechados para inscrição</p>
+                    )}
                 </div>
             </div>
         </>
     )
 }
+
+//alert

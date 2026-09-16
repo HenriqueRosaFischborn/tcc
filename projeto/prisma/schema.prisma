@@ -80,6 +80,7 @@ model torneio {
   date_inscri                       DateTime    @db.Timestamptz(6)
   chave_pix                         String?
   link_chessresults                 String?
+  inscri_closed_by_arbiter          Boolean     @default(false)
   categoria                         categoria[]
   divisoes                          divisoes[]
   emails                            emails[]

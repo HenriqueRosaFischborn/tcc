@@ -181,7 +181,11 @@ export default function FormInscriIndividual() {
         <>
                 <div className="form">
                     
-                    <Form action={formAction}>
+                    <Form action={formAction} onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                        e.preventDefault()
+                        }
+                    }}>
                         {/* <p className="error">*Para checar sua informação, <a className='fide-link' href="https://ratings.fide.com/" target='_blank' >Clique aqui</a> </p> */}
                         <div style={{width: '100%'}} className="select-radios">
                             <div>

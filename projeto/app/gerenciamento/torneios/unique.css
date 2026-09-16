@@ -12,18 +12,19 @@
 .tournment {
   align-items: start;
   justify-content: space-between;
-  column-gap: 20px;
+  gap: 5px 20px;
   flex-wrap: wrap;
   border: solid 2px lightgray;
   padding: 10px;
   border-radius: 5px;
+  align-items: stretch;
 }
 
 .tournment .content {
     flex-direction: column;
     gap: 10px;
     flex: 1;
-    
+    justify-content: space-between;
 }
 
 .tournment-img {

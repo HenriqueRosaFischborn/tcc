@@ -252,7 +252,11 @@ export default function AddTournmentForm({times, tournment, defaultDivisions, de
 
     return (
         <>
-            <Form action={formAction}>
+            <Form action={formAction} onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                e.preventDefault()
+                }
+            }}>
                 <div id='content'>
                     <div className='form' style={{width: '100%'}}>
                     <h1>{tournment.title}</h1>

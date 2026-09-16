@@ -14,25 +14,34 @@ export default async function Home() {
   const isMobile = /mobile|android|iphone|ipad/i.test(userAgent) // faz uma pesquisa na string de tudo que pode indicar ser mobile
   // usar o isMobile para chamar o número de torneios iniciais necessários, mudar essa diferenciação depois, atualmente se está usando display none pelo css 
 
-  
+  const dateNow = new Date()
 
-  const tournments = await db.torneio.findMany(
-    {
-      // where: {id: 1},
-      include: {
-      tempo_torneio_time_digitalTotempo: {
-          select: {
-              time: true,
-              plus: true
-          }
+  const tournments = await db.torneio.findMany({
+        // where: {id: 1},
+        include: {
+        tempo_torneio_time_digitalTotempo: {
+            select: {
+                time: true,
+                plus: true
+            }
+        },
+        tempo_torneio_time_analogTotempo: {
+            select: {
+                time: true,
+                plus: true
+            }
+        }
       },
-      tempo_torneio_time_analogTotempo: {
-          select: {
-              time: true,
-              plus: true
-          }
+      where: {
+        inscri_closed_by_arbiter: {
+          not: true
+        },
+        date_inscri: {
+          gt: dateNow
+        }
       }
-    }}
+    
+    }
   )
 
   const supabaseAdmin = await getSupabaseAdmin()  

@@ -239,7 +239,11 @@ export default function AddTournmentForm({times}: {times?: {time: number, plus: 
 
     return (
         <>
-            <Form action={formAction}>
+            <Form action={formAction} onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                e.preventDefault()
+                }
+            }}>
                 <div id='content'>
                     <div className='form' style={{width: '100%'}}>
                     <h1>Adicionar torneio</h1>

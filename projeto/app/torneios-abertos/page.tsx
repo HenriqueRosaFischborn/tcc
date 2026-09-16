@@ -6,6 +6,8 @@ import classifyTime from '@/lib/classifyTime'
 
 
 export default async function OpenTournments() {
+    const dateNow = new Date()
+    
     const tournments = await db.torneio.findMany(
         {
         // where: {id: 1},
@@ -22,7 +24,16 @@ export default async function OpenTournments() {
                 plus: true
             }
         }
-        }}
+        },
+        where: {
+        inscri_closed_by_arbiter: {
+          not: true
+        },
+        date_inscri: {
+          gt: dateNow
+        }
+      }
+    }
     )
 
     const supabaseAdmin = await getSupabaseAdmin()  
