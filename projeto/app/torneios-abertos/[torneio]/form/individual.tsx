@@ -227,7 +227,7 @@ export default function FormInscriIndividual() {
 
                                 <div id="qr-div" >
                                     <div>
-                                        <h2>Efetuar pagamento e confirmar inscrição:</h2>
+                                        <h2>Efetuar pagamento:</h2>
                                         <p>Escaneie o QRcode com sua conta bancária ou use a chave PIX e confirme sua inscrição</p>    
                                         <div id="qr-key">
                                             <p><strong>Ou copie o código:</strong></p>

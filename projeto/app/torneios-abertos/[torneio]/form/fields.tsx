@@ -109,19 +109,6 @@ export default function Fields({playerCbx, playerFide, hasFide, setindividualPri
                 {hasFide && errorName != '' ? <p className="error">{errorName}</p> : ''}
             </div>
             
-            {pathname.includes('em-grupo') ? ('') : (
-                <>
-                    <div style={{width: 'calc(50% - 15px)'}}>
-                        <label htmlFor="city">Cidade que representa: <p className="ast">*</p></label>
-                        <input className="needed" type="text" name="city" onBlur={completeBlur} defaultValue={state.values && state.values[0] ? state.values[0].city : ''} onKeyDown={handleEnterBlur}/>
-                    </div>
-                    
-                    <div style={{width: 'calc(50% - 15px)'}}>
-                        <label htmlFor="team">Clube que representa (se houver):</label>
-                        <input type="text" name="team" defaultValue={state.values && state.values[0] ? state.values[0].club : ''} onKeyDown={handleEnterBlur}/>
-                    </div>
-                </>
-            )}
 
             <SelectCategorie id={id} hasFide={hasFide} errorInfo={errorInfo} setindividualPrice={setindividualPrice} state={state} setDivisions={division} blur={completeBlur}/>     
         </>

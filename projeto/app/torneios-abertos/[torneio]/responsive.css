@@ -1,3 +1,5 @@
+
+
 #bars-content {
     justify-content: space-between;
 }
@@ -5,6 +7,8 @@
 #l1 {
     width: 30%;
     flex-direction: column;
+    margin-bottom: 20px;
+    gap: 30px;
 }
 
 #l2 {
@@ -16,12 +20,29 @@
 }
 
 @media (max-width: 768px) {
+    h1 {
+        padding: 0px;
+    }
+
+    #form-content h2 {
+        font-size: 20pt;
+        padding: 0px;
+    }
+
+    article {
+        padding: 5px;
+    }
+    
     .informations {
         font-size: 10pt;
     }
 
     #form-content h1{
         margin-bottom: 30px;
+    }
+
+    .error {
+        font-size: 11pt;
     }
     
     #info {
@@ -33,6 +54,7 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: start;
+        gap: 5px
     }
 
     #l2 .genre {
@@ -103,11 +125,29 @@
         zoom: 1.2;
     }
 
+    #qr-div {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+        justify-content: start;
+    }
+
+    #qr-div h2 {
+        font-size: 12pt;
+    }
+
     #qr-div p {
         font-size: 10pt;
     }
 
-    #qr-div img {
-        width: 40%;
+    #qr-div > img{
+        width: auto;
+        height: 100px;
+        object-fit: contain;
+    }
+
+    .upload-file button {
+        gap: 10px;
+        padding: 15px 10px;
     }
 }

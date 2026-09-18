@@ -9,10 +9,10 @@ export default function Login() {
     return (
         <>
             <div id='img'>
-                <img src="/images/login.png" alt="login" fetchPriority='low' loading='lazy' decoding='async'/>
+                <img src="/images/login-copia.png" alt="login" fetchPriority='low' loading='lazy' decoding='async'/>
             </div>
             <div id='login-content'>
-                <Logo width='200' />
+                <Logo width='180' />
                 <h1>Entrar</h1>
                 <LoginForm />
             </div>

@@ -11,18 +11,27 @@
     }
 
     .tournament {
+        flex-direction: column;
         align-items: start;
         padding: 15px;
-        gap: 0px;
+        gap: 10px;
+    }
+
+    .tournament .content {
+        flex-direction: row;
     }
 
     .tournament .informations {
         flex-direction: column;
-        gap: 0px;
+        gap: 10px;
     }
 
     .tournament img{
         width: 110px;
+    }
+
+    .tournament h3 {
+        font-size: 12pt;
     }
 
     .tournament p{

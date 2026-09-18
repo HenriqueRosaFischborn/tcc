@@ -112,7 +112,7 @@ export default async function layoutTorneio({children, params}: {children: React
                     <h1 id='id' hidden>{tournment.id}</h1>
                     
                     <div id='informations'>
-                        <div id='l1' style={{marginBottom: '20px', gap: '30px'}}>
+                        <div id='l1'>
                             <div style={{flexDirection: 'column', gap: '30px'}}>
                                 <h2 id='info' style={{textAlign: 'start', fontSize: '22pt'}}>Informações do torneio:</h2>
                                 {reg ? 
