@@ -41,7 +41,7 @@ article {
     width: 160px;
     height: auto;
     flex-shrink: 0;
-    object-fit: contain; /* Faz a imagem manter a proporção, sempre tentar usar se você precisa garantir que a imagem fique exata sempre */
+    object-fit: contain;
 }
 
 .tournament .content {

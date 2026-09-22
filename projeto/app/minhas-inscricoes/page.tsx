@@ -123,7 +123,8 @@ export default async function MyInscriptions() {
                         }
                     }
 
-                    if (isMobile || true) {
+                    if (isMobile) {
+                        console.log('status: ', el.status)
                         return(
                         // i é o número de repetição do negócio
                         <div className="tournament" key={i}>
@@ -168,11 +169,22 @@ export default async function MyInscriptions() {
                                 <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
                             ) : ''}
                             </div>
-                            <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
-                            <div className='pbuttons'>
-                                <a href={`/minhas-inscricoes/${el.uuid}/editar-informacoes`} className="button blue">Editar informações</a>
-                                <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
-                            </div>
+                            
+                            {el.status == 'Recusada' ? (
+                                <>
+                                    <span className='r'>Esta ionscrição foi cancelada, caso tenha ocorrido algum erro contate o árbitro</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
+                                    <div className='pbuttons'>
+                                        <a href={`/minhas-inscricoes/${el.uuid}/editar-informacoes`} className="button blue">Editar informações</a>
+                                        <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
+                                    </div>
+                                </>
+                            )}
+
+
                         </div>
                         )
                     } else {
@@ -213,11 +225,19 @@ export default async function MyInscriptions() {
                                     <br />
                                 </p>
                             </div>
-                            <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
-                            <div className='pbuttons'>
-                                <a href={`/minhas-inscricoes/${el.uuid}/editar-informacoes`} className="button blue">Editar informações</a>
-                                <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
-                            </div>
+                            {el.status == 'Recusada' ? (
+                                <>
+                                    <span className='r'>Esta ionscrição foi cancelada, caso tenha ocorrido algum erro contate o árbitro</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className='r'>Você só poderá atualizar sua inscrição até {dateInscri} às {timeInscri}</span>
+                                    <div className='pbuttons'>
+                                        <a href={`/minhas-inscricoes/${el.uuid}/editar-informacoes`} className="button blue">Editar informações</a>
+                                        <ButtonCancelSolicitation torneioID={Number(el.torneio.id)} inscricao={inscricaoDetails} torneio={el.torneio.title}/>
+                                    </div>
+                                </>
+                            )}
                             </div>
                             {folders[el.torneio.title.split(' ').join('~')] ? (
                                 <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
@@ -275,50 +295,87 @@ export default async function MyInscriptions() {
 
                     
                     
-                    return(
-                    // i é o número de repetição do negócio
-                    <div className="tournament disableDiv" key={i}>
-                        <div className="content">
-                        <h3>{el.torneio.title}</h3>
-                        {el.status == 'Confirmada' ? (
-                            <p><strong>Status: <span style={{color: 'green'}}>Confirmada</span> </strong></p>
-                        ) : el.status == 'Pendente' ? (
-                            <p><strong>Status: <span style={{color: '#838383'}}> Pendente</span>  </strong></p>
-                        ) : (
-                            <p><strong>Status: <span style={{color: 'red'}}>Cancelada</span> </strong></p>
-                        )}
-                        <div className="informations">
-                            <p>
-                                <strong>Nome:</strong> {el.name}<br />
-                                <br />
+                    if (isMobile) {
+                        return(
+                        // i é o número de repetição do negócio
+                        <div className="tournament disableDiv" key={i}>
+                            <div className="content">
+                            {/* <div className='text-content'>
 
-                                <strong>Data de nascimento:</strong> {el.data_nasc.toLocaleDateString('pt-BR')} <br />
-                                <br />
-                            </p>
-
-                            <p>
-                                <strong>Email:</strong> {el.usuario.email}<br />
-                                <br />
-                            </p>
-
-                            <p>
-                                <strong>Categoria:</strong> {el.categoria.name} <br />
-                                <br />
-
-                                <strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', {
-                                    style: 'currency',
-                                    currency: 'BRL'
-                                }).format(Number(el.categoria.value))} <br />
-                                <br />
-                            </p>
+                            </div> */}
+                            <div className="informations">
+                            <h3>{el.torneio.title}</h3>
+                            
+                                <p>
+                                    <strong>Nome:</strong> {el.name}<br />
+                                    <br />
+    
+                                    <strong>Data de nascimento:</strong> {el.data_nasc.toLocaleDateString('pt-BR')} <br />
+                                    <br />
+                                </p>
+    
+                                <p>
+                                    <strong>Email:</strong> {el.usuario.email}<br />
+                                    <br />
+                                </p>
+    
+                                <p>
+                                    <strong>Categoria:</strong> {el.categoria.name} <br />
+                                    <br />
+    
+                                    <strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL'
+                                    }).format(Number(el.categoria.value))} <br />
+                                    <br />
+                                </p>
+                            </div>
+                            {folders[el.torneio.title.split(' ').join('~')] ? (
+                                <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                            ) : ''}
+                            </div>
                         </div>
-
+                        )
+                    } else {
+                        return(
+                        // i é o número de repetição do negócio
+                        <div className="tournament disableDiv" key={i}>
+                            <div className="content">
+                            <h3>{el.torneio.title}</h3>
+                            
+                            <div className="informations">
+                                <p>
+                                    <strong>Nome:</strong> {el.name}<br />
+                                    <br />
+    
+                                    <strong>Data de nascimento:</strong> {el.data_nasc.toLocaleDateString('pt-BR')} <br />
+                                    <br />
+                                </p>
+    
+                                <p>
+                                    <strong>Email:</strong> {el.usuario.email}<br />
+                                    <br />
+                                </p>
+    
+                                <p>
+                                    <strong>Categoria:</strong> {el.categoria.name} <br />
+                                    <br />
+    
+                                    <strong>Valor:</strong> {new Intl.NumberFormat('pt-BR', {
+                                        style: 'currency',
+                                        currency: 'BRL'
+                                    }).format(Number(el.categoria.value))} <br />
+                                    <br />
+                                </p>
+                            </div>
+                            </div>
+                            {folders[el.torneio.title.split(' ').join('~')] ? (
+                                <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
+                            ) : ''}
                         </div>
-                        {folders[el.torneio.title.split(' ').join('~')] ? (
-                            <img src={folders[el.torneio.title.split(' ').join('~')]} alt="torneio" fetchPriority='low' loading='lazy' decoding='async'/>
-                        ) : ''}
-                    </div>
-                    )
+                        )
+
+                    }
                     }) : (<>
                     <p className="obs">Não há inscrições anteriores cadastradas no momento</p>
                 </>)}

@@ -3,6 +3,8 @@
 import db from '@/lib/db';
 import { Player } from '@/lib/types';
 import { Resend } from 'resend';
+import CancelSolicitationEmail from '../../email-elements/cancel-solicitation';
+import { render } from '@react-email/components';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -20,31 +22,14 @@ export async function sendCancelSolicitation(inscricao: Player, torneioTitle: st
 
     const emails = emailsData.map(el => el.email)
     
+    const html = await render(CancelSolicitationEmail({ inscricao, torneioTitle }))
+    
     try {
     const { data, error } = await resend.emails.send({
-      from: `Henrique <confirmedmessage@testetcc.com.br>`,
+      from: `CXA - Clube de Xadrez de Araranguá <cancelsolicitation@testetcc.com.br>`,
       to: emails,
       subject: 'Solicitação de cancelamento de inscrição',
-      html: `
-        <p>
-          A seguinte inscrição realizou a solicitação de cancelamento<br/>
-          <br/>
-          Torneio: ${torneioTitle}<br/>
-          Categoria: ${inscricao.categoria.name}<br/>
-          <br/>
-          Dados da inscrição:<br/>
-          <br/>
-          Nome: ${inscricao.name} <br/>
-          Data de nascimento: ${new Date(inscricao.data_nasc).toLocaleDateString('pt-BR', {timeZone: 'UTC'})} <br/>
-          Gênero: ${inscricao.genre ? 'Masculino' : 'Feminino'} <br/>
-          Cidade que representa: ${inscricao.city} <br/>
-          Clube que representa: ${inscricao.club} <br/>
-          ID FIDE: ${inscricao.id_fide} <br/>
-          ID CBX: ${inscricao.id_cbx} <br/>
-          Rating FIDE: ${inscricao.rtg_fide} <br/>
-          Rating CBX: ${inscricao.rtg_cbx} <br/>
-        </p>       
-      `
+      html: html
     });
 
     console.log('resultado resend')

@@ -1,52 +1,36 @@
 export const runtime = 'nodejs'
 
-
-import { EmailTemplate } from '@/email-template/reset-password';
 import { Player } from '@/lib/types';
 import { Resend } from 'resend';
+import ConfirmedMessageEmail from '../../email-elements/confirmed-message';
+import { render } from '@react-email/components';
+
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendConfirmedMessageEmail(inscricao: Player, torneio: string) {
-    console.log('enviando email...')
-    
-    try {
+  console.log('enviando email...')
+
+  try {
+    const html = await render(ConfirmedMessageEmail({ inscricao, torneio }))
+
     const { data, error } = await resend.emails.send({
-      from: `Henrique <confirmedmessage@testetcc.com.br>`,
+      from: 'CXA Clube de Xadrez de Araranguá <confirmedmessage@testetcc.com.br>',
       to: [inscricao.usuario.email],
       subject: 'Inscrição confirmada',
-      html: `
-        <p>
-          Olá, sua inscrição foi confirmada<br/>
-          <br/>
-          Torneio: ${torneio}<br/>
-          Categoria: ${inscricao.categoria.name}<br/>
-          <br/>
-          Dados da inscrição:<br/>
-          <br/>
-          Nome: ${inscricao.name} <br/>
-          Data de nascimento: ${new Date(inscricao.data_nasc).toLocaleDateString('pt-BR', {timeZone: 'UTC'})} <br/>
-          Gênero: ${inscricao.genre ? 'Masculino' : 'Feminino'} <br/>
-          Cidade que representa: ${inscricao.city} <br/>
-          Clube que representa: ${inscricao.club} <br/>
-          ID FIDE: ${inscricao.id_fide} <br/>
-          ID CBX: ${inscricao.id_cbx} <br/>
-          Rating FIDE: ${inscricao.rtg_fide} <br/>
-          Rating CBX: ${inscricao.rtg_cbx} <br/>
-        </p>       
-      `
+      html: html
     });
 
-    console.log('resultado resend')
-    console.log({ data, error })
+    console.log('resultado resend', { data, error })
 
     if (error) {
-        console.log('Erro no email', error)
-        return { success: false, error }
+      console.error('Erro retornado pelo Resend:', error)
+      return { success: false, error }
     }
 
     return { success: true, data }
   } catch (error) {
+    console.error('Erro ao montar/enviar email:', error)
     return { success: false, error }
   }
 }

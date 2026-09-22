@@ -1,30 +1,23 @@
 export const runtime = 'nodejs'
 
-
-import { EmailTemplate } from '@/email-template/reset-password';
 import { Resend } from 'resend';
+import ResetMessageEmail from '../../email-elements/reset-password';
+import { render } from '@react-email/components';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendEmail(email: string, token: string) {
   console.log(email)
+  
+  
   try {
+    const html = await render(ResetMessageEmail({ email, token }))
+    
     const { data, error } = await resend.emails.send({
-      from: `Henrique <resetpassword@testetcc.com.br>`,
+      from: `CXA Clube de Xadrez de Araranguá <resetpassword@testetcc.com.br>`,
       to: [email],
       subject: 'Redefinir senha',
-      html: `
-          
-        <p>
-          Olá, <br/>
-          <br/>
-          Recebemos sua solicitação para redefinição de senha<br/>
-          <br/>
-          Link para redefinir senha: <br/>
-          Para redefinir sua senha: <a href="http://localhost:3000/redefinir-senha?token=${token}&email=${email}">Clique aqui</a>
-        </p>
-            
-      `
+      html: html
     });
 
     if (error) {

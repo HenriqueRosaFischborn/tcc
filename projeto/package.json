@@ -7,12 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "email": "react-email dev --dir app/api/email-elements"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.3.0",
-    "@react-email/components": "^1.0.6",
+    "@react-email/components": "^1.0.12",
     "@supabase/supabase-js": "^2.95.3",
     "argon2": "^0.44.0",
     "cheerio": "^1.2.0",

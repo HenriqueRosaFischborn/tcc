@@ -26,6 +26,7 @@ export default function Footer({user, admin}: {user: boolean, admin: boolean}) {
                     <div id="social-medias">
                         <a href="https://www.instagram.com/cxararangua/" target="_blank"><div style={{gap: '10px'}}><img src="/icons/instagram.png" alt=""/><h3>@cxararangua</h3></div></a>
                         {/* <a href="https://www.threads.com/@sombrioxadrezclube/" target="_blank"><div style={{gap: '10px'}}><img src="/icons/threads.png" alt=""/><h3>@sombrioxadrezclube</h3></div></a> */}
+                        <a href="mailto:frankbeckerassessoria@gmail.com" target="_blank"><div style={{gap: '10px'}}><img src="/icons/email.svg" alt=""/><h3 className="email">frankbeckerassessoria@gmail.com</h3></div></a>
                     </div>
                 </div>
                 

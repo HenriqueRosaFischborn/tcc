@@ -57,6 +57,10 @@ footer nav a:hover::after{
     text-align: start;
 }
 
+#social-medias div {
+    align-items: start;
+}
+
 footer #logout{
     font-size: 12pt;
     font-weight: 300;

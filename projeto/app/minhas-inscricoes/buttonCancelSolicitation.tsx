@@ -7,7 +7,7 @@ export default async function ButtonCancelSolicitation({inscricao, torneio, torn
     return (
         <>
             <button onClick={ async (e) => {
-                if (confirm('Tem certeza que deseja solicitar cancelamento dessa inscrição?')) {
+                if (confirm('Tem certeza que deseja solicitar cancelamento dessa inscrição? Um email será enviado ao árbitro deste torneio para que haja o seu cancelamento, depois de clicar em "ok" não é necessário solicitar novamente')) {
                     await sendCancelSolicitation(inscricao, torneio, torneioID)
                     alert('Solicitação enviada')
                 }
