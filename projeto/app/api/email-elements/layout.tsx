@@ -34,6 +34,7 @@ export const LINKS = {
   instagram: 'https://instagram.com/cxararangua',
   threads: 'https://www.threads.net/@cxararangua',
   facebook: 'https://facebook.com/cxararangua',
+  email: 'mailto:frankbeckerassessoria@gmail.com'
 };
 
 export const cores = {
@@ -134,11 +135,8 @@ export function EmailLayout({ preview, titulo, children }: EmailLayoutProps) {
                 <Link href={LINKS.instagram} style={linkRodape}>
                   Instagram @cxararangua
                 </Link>
-                <Link href={LINKS.threads} style={linkRodape}>
-                  Threads @cxararangua
-                </Link>
-                <Link href={LINKS.facebook} style={linkRodape}>
-                  facebook.com/cxararangua
+                <Link href={LINKS.email} style={linkRodape}>
+                  Email frankbeckerassessoria@gmail.com
                 </Link>
               </Column>
             </Row>

@@ -293,8 +293,19 @@ export default function FormEditInscriIndividual() {
                                 }).format(Number(price))}</h1>
 
                                 <input type="text" hidden name="uuid" value={inscricao.uuid}/>
-                                <button type="submit" className="button red big" style={{textAlign: 'start'}}>Atualizar insformações</button>
                                 
+                                <button
+                                    type="submit"
+                                    className="button red big"
+                                    style={{ textAlign: 'start' }}
+                                    onClick={(e) => {
+                                        if (!confirm("Tem certeza que deseja atualizar as informações? Sua inscrição voltará a ser pendente caso já tenha sido confirmada e o arbitro revisará novamente suas informações")) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                >
+                                    Atualizar informações
+                                </button>                                
                                 
                                 {/* {state.message && state.values && state.message.includes('error-info-id') ? 
                                     <p className="error pErr">As informações preenchidas não correspondem às oficialmente cadastradas na FIDE <br />

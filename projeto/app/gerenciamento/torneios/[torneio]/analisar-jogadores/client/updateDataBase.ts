@@ -3,6 +3,7 @@
 import { Player } from "@/lib/types"
 import db from "@/lib/db"
 import { sendConfirmedMessageEmail } from "@/app/api/email/confirmed-inscription/send"
+import { sendCancelledMessageEmail } from "@/app/api/email/canceled-inscription/send"
 
 type Inscricoes = {
     [key: string]: Player
@@ -59,6 +60,8 @@ export default async function updateDataBase(prev: {message: string}, formdata: 
             if (isDifferent) {
                 if (key == 'status' && nowIncri[uuid][key] == 'Confirmada') {
                     await sendConfirmedMessageEmail(nowIncri[uuid], nameTournment)
+                } else if (key == 'status' && nowIncri[uuid][key] == 'Recusada') {
+                    await sendCancelledMessageEmail(nowIncri[uuid], nameTournment)
                 }
 
                 setDiff(diff, key, newValue)

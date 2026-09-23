@@ -1,5 +1,7 @@
 'use server'
 
+import { sendRequestedMessageEmail } from "@/app/api/email/inscription-solicited/send"
+import { sendNewInscription } from "@/app/api/email/new-inscription/send"
 import { auth } from "@/auth"
 import classifyTime from "@/lib/classifyTime"
 import db from "@/lib/db"
@@ -240,6 +242,44 @@ export default async function actionInscriIndividual(prev: FormState, formdata: 
                 contentType: fileComprovante.type
             })
         }
+
+
+        const obj = {
+            uuid: res.uuid,
+            city: res.city,
+            club: res.club ? res.club : '',
+            genre: res.genre,
+            data_nasc: res.data_nasc,
+            id_fide: res.id_fide ? Number(res.id_fide) : 0,
+            id_cbx: res.id_cbx ? Number(res.id_cbx) : 0,
+            uuid_cat: res.uuid_cat,
+            status: res.status,
+            id_usuario: res.id_usuario,
+            name: res.name,
+            id_division: res.id_division ? Number(res.id_division) : 0,
+            id_torneio: res.id_torneio ? Number(res.id_torneio) : 0,
+            rtg_fide: res.rtg_fide ? Number(res.rtg_fide) : 0,
+            rtg_cbx: res.rtg_cbx ? Number(res.rtg_cbx) : 0,
+            federation: res.federation ?? undefined,
+            titulo: res.titulo ?? undefined,
+            categoria: {
+                name: cat.name,
+                uuid: cat.uuid,
+                id_torneio: Number(cat.id_torneio),
+                min_y: cat.min_y,
+            },
+            divisoes: {
+                name: defaultDivision.name,
+                id: Number(defaultDivision.id),
+            },
+            usuario: {
+                id: user.id,
+                email: user.email,
+            },
+            }
+        
+        await sendNewInscription(obj, cat.torneio.title, Number(cat.id_torneio))
+        await sendRequestedMessageEmail(obj, cat.torneio.title)
 
 
         return {
