@@ -359,7 +359,7 @@ export default function InscriptionForm() {
               onChange={() => setHasIds(false)}
             />
             <label htmlFor="nao-possui-ids">Não possuo ID FIDE e ID CBX</label>
-            <p className="obs obs-fide">*Se não possuir cadastro FIDE, selecione esta opção</p>
+            {/* <p className="obs obs-fide">*Se não possuir cadastro FIDE, selecione esta opção</p> */}
           </div>
         </div>
 

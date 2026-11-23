@@ -7,6 +7,7 @@ import { Cat, Div, Player } from '@/lib/types'
 import Form from 'next/form'
 import { useActionState, useEffect, useState } from 'react'
 import updateDataBase from './updateDataBase'
+import deleteInscricao from './deleteInscricao'
 import { converterValor, valorDoGenero } from './converter-valor'
 import { generateTXT } from './generateTXT'
 
@@ -71,6 +72,55 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
 
         setAvisoComprovante('')
         window.open(url, '_blank', 'noopener,noreferrer')
+    }
+
+    // Exclusão de uma inscrição. O aviso só aparece em caso de erro: quando dá
+    // certo, a própria linha sumindo da tabela já é o retorno visual.
+    const [avisoDelete, setAvisoDelete] = useState('')
+    // Uuid em processamento, para desabilitar o botão daquela linha enquanto o
+    // servidor responde (evita dois cliques virarem duas exclusões).
+    const [deletando, setDeletando] = useState('')
+    // Já apagados: mantém o aviso de "nenhum inscrito" correto quando a última
+    // linha da tabela é removida.
+    const [deletados, setDeletados] = useState<string[]>([])
+
+    async function handleDelete(uuid: string, nome: string) {
+        if (!window.confirm(`Tem certeza que deseja deletar a inscrição de ${nome}? A inscrição e o comprovante anexado serão removidos permanentemente.`)) {
+            return
+        }
+
+        setDeletando(uuid)
+        setAvisoDelete('')
+
+        let resultado: { ok: boolean, message: string }
+
+        try {
+            resultado = await deleteInscricao(uuid)
+        } catch {
+            // `requireAdmin` lança quando a sessão expirou ou o usuário deixou de
+            // ser administrador. Nada foi apagado.
+            resultado = { ok: false, message: 'Não foi possível deletar a inscrição. Entre novamente e tente de novo.' }
+        }
+
+        setDeletando('')
+
+        if (!resultado.ok) {
+            setAvisoDelete(resultado.message)
+            return
+        }
+
+        // A linha já saiu do banco: sai também das duas cópias do estado, senão
+        // o "Salvar alterações" tentaria gravar uma inscrição que não existe mais.
+        const semInscricao = (inscricoes: Inscricoes): Inscricoes => {
+            const restantes = { ...inscricoes }
+            delete restantes[uuid]
+            return restantes
+        }
+
+        setDefaultInscri(semInscricao)
+        setNowInscri(semInscricao)
+        setInvalidDates((anteriores) => anteriores.filter((item) => item !== uuid))
+        setDeletados((anteriores) => [...anteriores, uuid])
     }
 
     function updateObjNowSelect(uuid: string, collumn: string, value: string, type: string) {
@@ -147,7 +197,10 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                     {avisoComprovante !== '' ? (
                         <p className='error' style={{width: '100%'}}>{avisoComprovante}</p>
                     ) : ('')}
-                    {players.length > 0 ? (<>
+                    {avisoDelete !== '' ? (
+                        <p className='error' style={{width: '100%'}}>{avisoDelete}</p>
+                    ) : ('')}
+                    {players.some((el) => !deletados.includes(el.uuid)) ? (<>
                     <div id='table'>
                         <table>
                             <thead>
@@ -169,6 +222,7 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
                                     <th>Divisão:</th>
                                     <th>Categoria:</th>
                                     <th>E-mail:</th>
+                                    <th>Deletar inscrição:</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -267,6 +321,12 @@ export default function BodyClient({nameTournment, players, comprovantes, catego
 
                                         <td className='email'>
                                             {el.usuario.email}
+                                        </td>
+
+                                        <td className='deletar-inscricao'>
+                                            <button type='button' className='delete-inscricao' disabled={deletando === el.uuid} onClick={() => handleDelete(el.uuid, el.name)}>
+                                                {deletando === el.uuid ? 'Deletando...' : 'Deletar inscrição'}
+                                            </button>
                                         </td>
                                     </tr>
                                 )})}

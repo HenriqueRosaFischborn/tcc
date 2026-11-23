@@ -147,6 +147,28 @@ td{
     
 }
 /* link */
+
+/* Última coluna: exclui a inscrição daquela linha. Mesmo desenho do link do
+   comprovante, em vermelho para não se confundir com uma ação de leitura. */
+td button.delete-inscricao {
+    color: red;
+    font-size: 12pt;
+    font-style: italic;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    padding: 0px 5px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+td button.delete-inscricao:disabled {
+    color: var(--darkgray);
+    text-decoration: none;
+    cursor: default;
+}
+
 .email {
     padding: 0px 5px;
 }
