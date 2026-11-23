@@ -18,7 +18,11 @@ export const NOME_CLUBE = 'Clube de Xadrez Araranguá';
 
 // URL pública do site, sem barra no final (ex.: https://cxararangua.com.br).
 // Precisa ser uma URL acessível na internet para a logo e os links funcionarem no email.
-export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '');
+// O fallback cobre a variável ausente ou vazia: sem ele os links do e-mail saem
+// relativos ("/torneios-abertos") e não funcionam em nenhum cliente de e-mail.
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_APP_URL || 'https://cxararangua.com.br'
+).replace(/\/$/, '');
 
 // Coloque o arquivo da logo em /public/logo.png
 export const LOGO_URL = `${SITE_URL}/logo.png`;
