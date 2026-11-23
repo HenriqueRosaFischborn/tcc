@@ -3,10 +3,12 @@ import type { OfficialPlayer } from './types'
 /**
  * Conferência do ID FIDE pelo cadastro da CBX.
  *
- * A FIDE recusa ou demora requisições vindas de IP de datacenter (é o caso da
- * Vercel) e, sem essa alternativa, o jogador fica sem conseguir se inscrever
- * enquanto o site oficial não responder. O perfil da CBX informa o ID FIDE do
- * jogador, então ele serve de confirmação oficial do número digitado.
+ * O formulário consulta a FIDE primeiro; esta é a segunda opinião, usada quando
+ * aquela consulta não responde. A FIDE recusa ou demora requisições vindas de
+ * IP de datacenter (é o caso da Vercel) e, sem essa alternativa, o jogador fica
+ * sem conseguir se inscrever enquanto o site oficial não responder. O perfil da
+ * CBX informa o ID FIDE do jogador, então ele serve de confirmação oficial do
+ * número digitado.
  */
 export type ConfirmacaoCbx =
   | { ok: true; player: OfficialPlayer }

@@ -199,7 +199,13 @@ const primeiroTexto = ($: cheerio.CheerioAPI, seletores: string): string => {
  */
 type ConsultaOpcoes = { prazoMs?: number }
 
-/** Extrai os dados do perfil em ratings.fide.com. */
+/**
+ * Extrai os dados do perfil em ratings.fide.com.
+ *
+ * Nunca lança: uma página que o `cheerio` não consegue montar (HTML truncado,
+ * resposta de bloqueio com marcação quebrada) também é uma consulta que falhou,
+ * não um erro que possa derrubar a inscrição de quem chamou.
+ */
 export async function verifyFideId(
   id: string,
   opcoes: ConsultaOpcoes = {}
@@ -209,7 +215,19 @@ export async function verifyFideId(
 
   if (!busca.ok) return { status: 'unavailable', motivo: busca.motivo }
 
-  const $ = cheerio.load(busca.html)
+  try {
+    return extrairPerfilFide(busca.html, id)
+  } catch (error) {
+    const motivo = descreverErro(error)
+
+    console.error(`[consulta-oficial] falha ao ler o perfil ${id} da FIDE: ${motivo}`)
+
+    return { status: 'unavailable', motivo }
+  }
+}
+
+function extrairPerfilFide(html: string, id: string): LookupResult {
+  const $ = cheerio.load(html)
 
   // O layout já mudou uma vez; os seletores alternativos evitam que uma troca de
   // classe derrube a consulta inteira.
@@ -270,7 +288,7 @@ export async function verifyFideId(
   }
 }
 
-/** Extrai os dados do perfil em cbx.org.br. */
+/** Extrai os dados do perfil em cbx.org.br. Também nunca lança. */
 export async function verifyCbxId(
   id: string,
   opcoes: ConsultaOpcoes = {}
@@ -282,7 +300,19 @@ export async function verifyCbxId(
 
   if (!busca.ok) return { status: 'unavailable', motivo: busca.motivo }
 
-  const $ = cheerio.load(busca.html)
+  try {
+    return extrairPerfilCbx(busca.html)
+  } catch (error) {
+    const motivo = descreverErro(error)
+
+    console.error(`[consulta-oficial] falha ao ler o perfil ${id} da CBX: ${motivo}`)
+
+    return { status: 'unavailable', motivo }
+  }
+}
+
+function extrairPerfilCbx(html: string): LookupResult {
+  const $ = cheerio.load(html)
   const profileRow = $('#dados-jogador-row1').text().trim()
   const name = profileRow.match(/^([\s\S]+?)\s*Data Nasc\./)?.[1]?.trim() ?? ''
 

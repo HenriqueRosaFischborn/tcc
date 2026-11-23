@@ -221,6 +221,78 @@ describe('T16 — o JSON do navegador não define os dados oficiais', () => {
         expect(dados.titulo).toBeUndefined()
     })
 
+    it('grava o rating da FIDE e o da CBX, cada um vindo do seu site', async () => {
+        verifyFideMock.mockResolvedValue({
+            status: 'found',
+            player: {
+                name: 'Nome FIDE',
+                bornYear: '2012',
+                genre: 'm',
+                title: 'MF',
+                federation: 'BRA',
+                idFide: '123',
+                ratings: { standard: 1900, rapid: 1850, blitz: 1800 }
+            }
+        })
+        verifyCbxMock.mockResolvedValue({
+            status: 'found',
+            player: {
+                name: 'Nome CBX',
+                bornYear: '04/05/2012',
+                genre: null,
+                title: null,
+                federation: null,
+                idFide: '123',
+                ratings: { standard: 1786, rapid: 1790, blitz: 1751 }
+            }
+        })
+
+        await submitInscription(estadoInicial, formulario({ hasFide: true }))
+
+        const dados = incricaoCreateMock.mock.calls[0][0].data
+
+        // T16: os dois sites são consultados sempre, e cada coluna recebe o
+        // número do site de origem — o rating FIDE não pode ficar em branco
+        // só porque a CBX respondeu.
+        expect(verifyFideMock).toHaveBeenCalledTimes(1)
+        expect(verifyCbxMock).toHaveBeenCalledTimes(1)
+        expect(dados.rtg_fide).toBe(1900)
+        expect(dados.rtg_cbx).toBe(1786)
+    })
+
+    it('consulta oficial que lança não derruba a inscrição', async () => {
+        // A FIDE deixa a conexão pendurada de IP de datacenter; o que não pode
+        // acontecer é a exceção subir e o jogador perder o formulário.
+        const silencio = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        try {
+            verifyFideMock.mockRejectedValue(new Error('ratings.fide.com fora do ar'))
+            verifyCbxMock.mockResolvedValue({
+                status: 'found',
+                player: {
+                    name: 'Nome CBX',
+                    bornYear: '04/05/2012',
+                    genre: null,
+                    title: null,
+                    federation: null,
+                    idFide: '123',
+                    ratings: { standard: 1786, rapid: 1790, blitz: 1751 }
+                }
+            })
+
+            const resultado = await submitInscription(estadoInicial, formulario({ hasFide: true }))
+
+            expect(resultado).toEqual({ status: 'success' })
+
+            const dados = incricaoCreateMock.mock.calls[0][0].data
+            expect(dados.rtg_fide).toBe(null)
+            // A falha de um site não impede o outro de gravar o que trouxe.
+            expect(dados.rtg_cbx).toBe(1786)
+        } finally {
+            silencio.mockRestore()
+        }
+    })
+
     it('jogador sem FIDE nem CBX não consulta nada e usa o nome digitado', async () => {
         const resultado = await submitInscription(estadoInicial, formulario({ hasFide: false }))
 

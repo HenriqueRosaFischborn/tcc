@@ -41,6 +41,11 @@ function toText(value: FormDataEntryValue | null): string {
  *
  * Devolve `null` tanto para "não existe" quanto para "site fora do ar" — nos
  * dois casos a inscrição segue com o nome digitado, em vez de ser bloqueada.
+ *
+ * O `try` cobre o que o `verify-player` não cobrir: uma consulta oficial que
+ * lance não pode derrubar a inscrição inteira. Sem ele, a rejeição subiria pelo
+ * `Promise.all` abaixo, a action terminaria em erro e o jogador perderia o
+ * formulário por causa de um site que não é dele.
  */
 async function buscarJogadorOficial(
   verificar: (id: string) => Promise<LookupResult>,
@@ -48,9 +53,15 @@ async function buscarJogadorOficial(
 ): Promise<OfficialPlayer | null> {
   if (id === null) return null
 
-  const resultado = await verificar(String(id))
+  try {
+    const resultado = await verificar(String(id))
 
-  return resultado.status === 'found' ? resultado.player : null
+    return resultado.status === 'found' ? resultado.player : null
+  } catch (error) {
+    console.error('[inscricao] consulta ao site oficial falhou:', error)
+
+    return null
+  }
 }
 
 /**
@@ -61,6 +72,10 @@ async function buscarJogadorOficial(
  * Sem o `FIDE_PROXY` a FIDE não responde de IP de nuvem: o prazo é o tempo
  * inteiro que o jogador fica olhando "Enviando inscrição...". Com proxy ela
  * responde em um ou dois segundos, então 3 s não custa dado nenhum.
+ *
+ * O prazo é curto, mas a consulta sempre é feita: é ela que traz o rating FIDE
+ * (`rtg_fide`) e o CBX (`rtg_cbx`). Desistir da consulta é o único motivo para
+ * a inscrição seguir sem esses números.
  */
 const PRAZO_CONSULTA_NO_ENVIO_MS = 3000
 
@@ -157,11 +172,14 @@ export async function submitInscription(
 
   // T16: os dados oficiais NÃO vêm do JSON que o navegador envia
   // (`playerFide`/`playerCbx`). Nome, federação, título e ratings são buscados
-  // aqui, direto na FIDE e na CBX, a partir dos IDs informados.
+  // aqui, direto na FIDE e na CBX, a partir dos IDs informados — é esta consulta
+  // que grava `rtg_fide` e `rtg_cbx`.
   //
-  // Se o site oficial estiver fora do ar, a inscrição NÃO é bloqueada: o nome
-  // digitado é usado e os dados oficiais ficam vazios — o árbitro pode
-  // completá-los depois na tela de análise.
+  // Os dois sites são consultados SEMPRE, em paralelo: um cair não impede o
+  // outro de trazer o seu número. Se um deles estiver fora do ar ou demorar
+  // demais, a inscrição NÃO é bloqueada: o nome digitado é usado e o rating
+  // daquele site fica vazio — o árbitro pode completá-lo depois na tela de
+  // análise.
   //
   // As consultas externas são o que domina a espera no envio (a FIDE chega a
   // estourar o prazo inteiro), então elas começam junto com as leituras do

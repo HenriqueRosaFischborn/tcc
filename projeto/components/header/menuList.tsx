@@ -2,10 +2,24 @@
 
 import logout from "@/app/(auth)/(logout)/action";
 import { usePathname } from "next/navigation";
+import { useTransition } from "react";
 
 
 export default function Menu ({user, admin}: {user: boolean, admin: boolean}) {
     const pathname = usePathname()
+    const [isPending, startTransition] = useTransition()
+
+    function handleLogout() {
+        startTransition(async () => {
+            await logout()
+
+            // Navegação completa: recarrega o documento inteiro, então a home
+            // vem com todo o CSS. Um redirecionamento suave a partir do Server
+            // Action deixaria a página sem os estilos dela. `replace` evita que
+            // o "voltar" caia na página que exigia login.
+            window.location.replace('/')
+        })
+    }
 
     return (
         <>
@@ -25,7 +39,7 @@ export default function Menu ({user, admin}: {user: boolean, admin: boolean}) {
                 ) : ('')}
 
                 {user ? (
-                    <button id="logout" onClick={() => logout()} className="">Sair</button>
+                    <button id="logout" onClick={handleLogout} disabled={isPending} className="">Sair</button>
                 ) : ('')}
             </nav>
         </>

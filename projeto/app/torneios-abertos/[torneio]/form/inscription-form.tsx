@@ -16,7 +16,7 @@ import type {
 } from './types'
 import { formatCurrency, consultarComPrazo, handleEnterBlur, motivoDaFalha } from './utils'
 import { confirmarIdFidePelaCbx } from './confirmacao-cbx'
-import { verifyCbxId } from './verify-player'
+import { verifyCbxId, verifyFideId } from './verify-player'
 
 type IdKind = 'fide' | 'cbx'
 
@@ -25,7 +25,13 @@ type IdState = {
   /** ID já conferido. */
   verifiedId: string
   player: OfficialPlayer | null
+  /** Erro do jogador (ID inexistente, número divergente). Impede o envio. */
   error: string
+  /**
+   * Site oficial indisponível ou lento. Aparece na tela, mas NÃO impede o
+   * envio: o formulário não pode travar por causa de um site de terceiro.
+   */
+  aviso: string
   /** Consulta em andamento. */
   loading: boolean
 }
@@ -35,14 +41,33 @@ const emptyIdState: IdState = {
   verifiedId: '',
   player: null,
   error: '',
+  aviso: '',
   loading: false,
 }
 
+const avisoIndisponivel = (site: string, motivo?: string) =>
+  `A ${site} não respondeu agora${motivo ? ` (${motivo})` : ''}. ` +
+  'A inscrição segue normalmente e os dados serão conferidos na análise.'
+
 /**
- * O ID FIDE é conferido pelo cadastro da CBX, que informa o número — a FIDE não
- * responde requisição vinda de IP de datacenter (é o caso da Vercel), então
- * consultá-la só fazia o jogador esperar por uma resposta que nunca chega.
+ * Roda uma consulta oficial sem deixar nenhuma falha escapar.
+ *
+ * `verifyFideId`/`verifyCbxId` já devolvem `unavailable` em vez de lançar, mas
+ * entre elas e a tela há a chamada de rede da server action: função na Vercel
+ * interrompida, sem rede, aba de um deploy anterior... Nada disso pode deixar o
+ * formulário carregando para sempre nem travar o envio.
  */
+async function consultarSemTravar(
+  id: string,
+  consultar: (id: string) => Promise<LookupResult>
+): Promise<LookupResult> {
+  try {
+    return await consultarComPrazo(id, consultar)
+  } catch (error) {
+    return { status: 'unavailable', motivo: motivoDaFalha(error) }
+  }
+}
+
 // O ID FIDE tem 7 ou 8 dígitos. O ID CBX não tem regra de tamanho: o cadastro
 // da CBX tem IDs de 1 a 6 dígitos.
 const fideIdValido = (id: string) => id.length === 7 || id.length === 8
@@ -62,8 +87,6 @@ export default function InscriptionForm() {
   const [hasIds, setHasIds] = useState(true)
   const [fide, setFide] = useState<IdState>(emptyIdState)
   const [cbx, setCbx] = useState<IdState>(emptyIdState)
-  // Cada consulta recebe um número; respostas de consultas antigas são descartadas.
-  const consultaAtual = useRef(0)
 
   // ---- Dados do jogador ----
   const [name, setName] = useState('')
@@ -92,46 +115,88 @@ export default function InscriptionForm() {
 
   /**
    * Confere o ID FIDE digitado com o cadastro da CBX, que informa o número.
-   * É a única verificação do campo FIDE: a consulta direta à FIDE não passa de
-   * IP de datacenter (é o caso da Vercel), então tentá-la só fazia o jogador
-   * esperar por uma resposta que nunca chega.
+   *
+   * É a segunda opinião: entra quando a consulta direta à FIDE não respondeu.
+   * Quando a FIDE confirmou o ID, o perfil dela é mais completo — nome, gênero,
+   * federação, título e ratings — e nada do que a CBX diga o substitui.
    */
-  function conferirFidePelaCbx(
-    estado: IdState,
-    id: string,
-    jogadorCbx: OfficialPlayer | null
-  ): IdState {
-    // Sem o cadastro da CBX não há com o que comparar: o número é conferido de
-    // novo assim que a consulta da CBX terminar.
-    if (!jogadorCbx) return { ...estado, verifiedId: id, player: null, error: '', loading: false }
+  function conferirFidePelaCbx(estado: IdState, jogadorCbx: OfficialPlayer | null): IdState {
+    // Sem o cadastro da CBX não há com o que comparar.
+    if (!jogadorCbx) return estado
 
+    // A FIDE já confirmou este ID: o perfil dela é a fonte mais completa.
+    if (estado.player) return estado
+
+    const id = estado.value.trim()
     const confirmacao = confirmarIdFidePelaCbx(id, jogadorCbx)
 
     // O cadastro da CBX aponta outro número: é erro de digitação.
     if (!confirmacao.ok && confirmacao.divergente) {
-      return { ...estado, verifiedId: '', player: null, error: `*${confirmacao.motivo}`, loading: false }
+      return { ...estado, verifiedId: '', player: null, error: `*${confirmacao.motivo}`, aviso: '', loading: false }
     }
 
+    // Cadastro da CBX sem ID FIDE é limitação do dado, não erro do jogador:
+    // o campo continua valendo e o envio não é travado.
     return {
       ...estado,
       verifiedId: id,
       player: confirmacao.ok ? confirmacao.player : null,
       error: '',
-      loading: false,
     }
   }
 
-  function checkFideId() {
+  /**
+   * Consulta o ID FIDE no site da FIDE.
+   *
+   * A FIDE não atende requisição vinda de IP de datacenter (é o caso da Vercel)
+   * e deixa a conexão pendurada em vez de recusá-la — por isso a consulta tem
+   * prazo. Quando ele estoura (ou o site retorna erro) o campo apenas avisa: o
+   * jogador segue em frente, com o cadastro da CBX como conferência do número.
+   */
+  async function checkFideId() {
     const id = fide.value.trim()
 
-    if (id === '' || fide.verifiedId === id) return
+    if (id === '' || fide.loading || fide.verifiedId === id) return
 
     if (!fideIdValido(id)) {
-      setFide({ ...fide, verifiedId: '', player: null, error: '*Insira um ID válido', loading: false })
+      setFide({ ...emptyIdState, value: id, error: '*Insira um ID válido' })
       return
     }
 
-    setFide(conferirFidePelaCbx(fide, id, cbx.player))
+    setFide((atual) => ({ ...atual, verifiedId: '', player: null, error: '', aviso: '', loading: true }))
+
+    const resultado = await consultarSemTravar(id, verifyFideId)
+
+    setFide((atual) => {
+      // O jogador já mudou o campo enquanto a consulta acontecia.
+      if (atual.value.trim() !== id) return atual
+
+      if (resultado.status === 'found') {
+        return { ...atual, verifiedId: id, player: resultado.player, error: '', aviso: '', loading: false }
+      }
+
+      // A FIDE respondeu e o número não existe: é erro do jogador.
+      if (resultado.status === 'not-found') {
+        return {
+          ...atual,
+          verifiedId: '',
+          player: null,
+          error: '*ID FIDE não encontrado',
+          aviso: '',
+          loading: false,
+        }
+      }
+
+      // Site fora do ar ou demorou demais: avisa e segue.
+      return {
+        ...atual,
+        verifiedId: '',
+        player: null,
+        error: '',
+        aviso: avisoIndisponivel('FIDE', resultado.motivo),
+        loading: false,
+      }
+    })
   }
 
   async function checkCbxId() {
@@ -139,41 +204,16 @@ export default function InscriptionForm() {
 
     if (id === '' || cbx.loading || cbx.verifiedId === id) return
 
-    const ticket = ++consultaAtual.current
+    setCbx((atual) => ({ ...atual, verifiedId: '', player: null, error: '', aviso: '', loading: true }))
 
-    setCbx({ ...cbx, verifiedId: '', player: null, error: '', loading: true })
+    const resultado = await consultarSemTravar(id, verifyCbxId)
+    const jogadorCbx = resultado.status === 'found' ? resultado.player : null
 
-    let result: LookupResult
-
-    try {
-      result = await consultarComPrazo(id, verifyCbxId)
-    } catch (error) {
-      // Falha de transporte (função na Vercel interrompida, sem rede, aba de um
-      // deploy anterior...) não pode deixar o formulário travado: vira um aviso
-      // e o jogador pode tentar de novo.
-      result = { status: 'unavailable', motivo: motivoDaFalha(error) }
-    }
-
-    if (ticket !== consultaAtual.current) return
-
-    const jogadorCbx = result.status === 'found' ? result.player : null
-
-    let erro = ''
-
-    if (result.status === 'not-found') {
-      erro = '*Usuário CBX não encontrado'
-    } else if (result.status === 'unavailable') {
-      erro = `*Não foi possível consultar a CBX agora${
-        result.motivo ? ` (${result.motivo})` : ''
-      }. Tente novamente.`
-    }
-
-    // Com o cadastro da CBX em mãos dá para conferir o ID FIDE digitado antes.
+    // Com o cadastro da CBX em mãos dá para conferir o ID FIDE digitado antes —
+    // é a conferência que vale quando a FIDE não responde.
     if (jogadorCbx) {
       setFide((latest) =>
-        latest.value.trim() === ''
-          ? latest
-          : conferirFidePelaCbx(latest, latest.value.trim(), jogadorCbx)
+        latest.value.trim() === '' ? latest : conferirFidePelaCbx(latest, jogadorCbx)
       )
     }
 
@@ -181,11 +221,28 @@ export default function InscriptionForm() {
       // O jogador já mudou o campo enquanto a consulta acontecia.
       if (latest.value.trim() !== id) return latest
 
+      if (resultado.status === 'found') {
+        return { ...latest, verifiedId: id, player: resultado.player, error: '', aviso: '', loading: false }
+      }
+
+      if (resultado.status === 'not-found') {
+        return {
+          ...latest,
+          verifiedId: '',
+          player: null,
+          error: '*Usuário CBX não encontrado',
+          aviso: '',
+          loading: false,
+        }
+      }
+
+      // Site fora do ar ou demorou demais: avisa e segue.
       return {
         ...latest,
-        verifiedId: jogadorCbx ? id : '',
-        player: jogadorCbx,
-        error: erro,
+        verifiedId: '',
+        player: null,
+        error: '',
+        aviso: avisoIndisponivel('CBX', resultado.motivo),
         loading: false,
       }
     })
@@ -322,6 +379,7 @@ export default function InscriptionForm() {
                 onKeyDown={handleEnterBlur}
               />
               {fide.error !== '' ? <p className="error">{fide.error}</p> : ''}
+              {fide.aviso !== '' ? <p className="obs">{fide.aviso}</p> : ''}
             </div>
             <input
               type="text"
@@ -345,6 +403,7 @@ export default function InscriptionForm() {
                 onKeyDown={handleEnterBlur}
               />
               {cbx.error !== '' ? <p className="error">{cbx.error}</p> : ''}
+              {cbx.aviso !== '' ? <p className="obs">{cbx.aviso}</p> : ''}
             </div>
             <input
               type="text"
