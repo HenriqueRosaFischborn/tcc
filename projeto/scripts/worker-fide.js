@@ -16,8 +16,8 @@
  * 4. Clique em "Edit code", apague o conteúdo e cole ESTE arquivo inteiro.
  * 5. Troque a senha em TOKEN abaixo por uma sua. Clique em "Deploy" de novo.
  * 6. Copie a URL do topo: https://proxy-fide.SEU-USUARIO.workers.dev
- * 7. Teste no navegador (deve aparecer o HTML do perfil):
- *    https://proxy-fide.SEU-USUARIO.workers.dev/?token=SUA_SENHA&url=https://ratings.fide.com/profile/44731736
+ * 7. Teste no navegador (deve aparecer a linha do jogador):
+ *    https://proxy-fide.SEU-USUARIO.workers.dev/?token=SUA_SENHA&url=https://ratings.fide.com/incl_search_l.php?search=2107660%26simple=1
  * 8. Na Vercel, em Settings → Environment Variables, crie:
  *    FIDE_PROXY = https://proxy-fide.SEU-USUARIO.workers.dev/?token=SUA_SENHA&url={url}
  *    e faça um novo deploy.
@@ -31,12 +31,15 @@ const TOKEN = 'troque-esta-senha'
 const ALVO_PERMITIDO = 'ratings.fide.com'
 
 // Os mesmos cabeçalhos de navegador que verify-player.ts usa.
+// `X-Requested-With` é obrigatório: a busca da FIDE responde 200 com corpo
+// VAZIO sem ele.
 const HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
   Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'pt-BR,pt;q=0.9,en;q=0.8',
   Referer: 'https://ratings.fide.com/',
+  'X-Requested-With': 'XMLHttpRequest',
 }
 
 export default {

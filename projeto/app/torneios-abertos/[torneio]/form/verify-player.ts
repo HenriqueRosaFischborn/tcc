@@ -31,6 +31,8 @@ const TEMPO_MINIMO_TENTATIVA_MS = 1200
 
 const MOTIVO_TEMPO_ESGOTADO = 'tempo esgotado'
 
+const MOTIVO_RESPOSTA_VAZIA = 'resposta vazia'
+
 // Os sites oficiais recusam requisições com cara de robô (ex.: "Mozilla/5.0" sozinho).
 const BROWSER_HEADERS = {
   'User-Agent':
@@ -40,6 +42,20 @@ const BROWSER_HEADERS = {
   // Sem o Referer a FIDE às vezes responde com a página de bloqueio.
   Referer: 'https://ratings.fide.com/',
 }
+
+/**
+ * Cabeçalhos da busca da FIDE.
+ *
+ * `X-Requested-With` não é enfeite: é o que a própria página manda no AJAX que
+ * preenche a tabela. Sem ele o servidor responde **200 com corpo vazio** — e um
+ * corpo vazio é indistinguível de bloqueio, então a consulta falharia sem
+ * explicação.
+ */
+const cabecalhosDaBuscaFide = (id: string) => ({
+  ...BROWSER_HEADERS,
+  Referer: `https://ratings.fide.com/index.phtml?search=${encodeURIComponent(id)}`,
+  'X-Requested-With': 'XMLHttpRequest',
+})
 
 /**
  * A FIDE recusa (ou deixa pendurada) a conexão de IP de nuvem — é o caso da
@@ -95,17 +111,27 @@ const descreverErro = (error: unknown): string => {
   return error.message === '' ? error.name : error.message
 }
 
-async function tentarFetch(url: string, prazoMs: number): Promise<FetchResult> {
+async function tentarFetch(
+  url: string,
+  prazoMs: number,
+  headers: Record<string, string> = BROWSER_HEADERS
+): Promise<FetchResult> {
   try {
     const response = await fetch(url, {
-      headers: BROWSER_HEADERS,
+      headers,
       cache: 'no-store',
       signal: AbortSignal.timeout(prazoMs),
     })
 
     if (!response.ok) return { ok: false, motivo: `HTTP ${response.status}` }
 
-    return { ok: true, html: await response.text() }
+    const html = await response.text()
+
+    // Corpo vazio com status 200 não é resposta: é o que os sites oficiais
+    // devolvem quando recusam a requisição sem dizer que recusaram.
+    if (html.trim() === '') return { ok: false, motivo: MOTIVO_RESPOSTA_VAZIA }
+
+    return { ok: true, html }
   } catch (error) {
     return { ok: false, motivo: descreverErro(error) }
   }
@@ -124,7 +150,11 @@ const valeRepetir = (motivo: string) => motivo !== MOTIVO_TEMPO_ESGOTADO
  * porque é lá que a falha acontece quando o sistema está hospedado — sem ele,
  * uma recusa da FIDE é indistinguível de um problema de rede.
  */
-async function fetchHtml(url: string, prazoTotalMs: number): Promise<FetchResult> {
+async function fetchHtml(
+  url: string,
+  prazoTotalMs: number,
+  headers: Record<string, string> = BROWSER_HEADERS
+): Promise<FetchResult> {
   const limite = Date.now() + prazoTotalMs
   let ultimo: FetchResult = { ok: false, motivo: MOTIVO_TEMPO_ESGOTADO }
 
@@ -133,7 +163,7 @@ async function fetchHtml(url: string, prazoTotalMs: number): Promise<FetchResult
 
     if (restante < TEMPO_MINIMO_TENTATIVA_MS) break
 
-    ultimo = await tentarFetch(url, Math.min(PRAZO_POR_TENTATIVA_MS, restante))
+    ultimo = await tentarFetch(url, Math.min(PRAZO_POR_TENTATIVA_MS, restante), headers)
 
     if (ultimo.ok) return ultimo
 
@@ -155,41 +185,64 @@ const toRating = (value: string | undefined): number | null => {
 }
 
 /**
- * A FIDE escreve o título por extenso ("Woman FIDE Master") e o sistema guarda
- * a abreviação oficial. Antes a consulta pegava só a primeira palavra e gravava
- * "Woman" em vez de "WFM".
+ * A FIDE escreve o título por extenso no perfil ("Woman FIDE Master") e
+ * abreviado na busca ("WFM", "GM WGM"). O sistema guarda a abreviação oficial,
+ * então as duas formas são traduzidas aqui.
  */
-const TITULOS: Record<string, string> = {
-  grandmaster: 'GM',
-  'international master': 'IM',
-  'fide master': 'FM',
-  'candidate master': 'CM',
-  'woman grandmaster': 'WGM',
-  'woman international master': 'WIM',
-  'woman fide master': 'WFM',
-  'woman candidate master': 'WCM',
+const TITULOS_POR_EXTENSO: Record<string, string> = {
+  grandmaster: 'gm',
+  'international master': 'im',
+  'fide master': 'fm',
+  'candidate master': 'cm',
+  'woman grandmaster': 'wgm',
+  'woman international master': 'wim',
+  'woman fide master': 'wfm',
+  'woman candidate master': 'wcm',
 }
+
+const ABREVIACOES = new Set(['gm', 'im', 'fm', 'cm', 'wgm', 'wim', 'wfm', 'wcm'])
+
+/** Títulos que só existem no feminino — a única pista de gênero que a busca dá. */
+const ABREVIACOES_FEMININAS = new Set(['wgm', 'wim', 'wfm', 'wcm'])
 
 /**
- * Devolve a abreviação, ou o texto como veio se a FIDE usar um título novo.
- * Tudo em minúsculas ("gm", "wfm"), que é como a titulação aparece no sistema.
+ * Títulos da coluna "Title", que costuma trazer dois para quem tem o aberto e o
+ * feminino ("GM WGM"): o primeiro é o título principal.
+ *
+ * Devolve a abreviação em minúsculas (como a titulação aparece no sistema) e se
+ * algum dos títulos é feminino. Título desconhecido vira `null`, não exceção.
  */
-const abreviarTitulo = (texto: string): string | null => {
+function lerTitulo(texto: string): { titulo: string | null; feminino: boolean } {
   const nome = texto.replace(/\s+/g, ' ').trim()
 
-  if (nome === '' || nome.toLowerCase() === 'none') return null
+  if (nome === '' || nome.toLowerCase() === 'none') return { titulo: null, feminino: false }
 
-  return (TITULOS[nome.toLowerCase()] ?? nome).toLowerCase()
-}
+  const abreviacoes = nome
+    .split(' ')
+    .map((pedaco) => pedaco.toLowerCase())
+    .filter((pedaco) => ABREVIACOES.has(pedaco))
 
-/** Texto do primeiro elemento que casar com algum dos seletores. */
-const primeiroTexto = ($: cheerio.CheerioAPI, seletores: string): string => {
-  for (const seletor of seletores.split(',')) {
-    const texto = $(seletor.trim()).first().text().trim()
-    if (texto !== '') return texto
+  if (abreviacoes.length > 0) {
+    return {
+      titulo: abreviacoes[0],
+      feminino: abreviacoes.some((abreviacao) => ABREVIACOES_FEMININAS.has(abreviacao)),
+    }
   }
 
-  return ''
+  const porExtenso = TITULOS_POR_EXTENSO[nome.toLowerCase()]
+
+  return porExtenso
+    ? { titulo: porExtenso, feminino: ABREVIACOES_FEMININAS.has(porExtenso) }
+    : { titulo: null, feminino: false }
+}
+
+/** "BRA" (o que a busca mostra) ou "BR" (o que o perfil mostrava) → "BRA". */
+const normalizarFederacao = (valor: string): string | null => {
+  const sigla = valor.trim().toUpperCase()
+
+  if (sigla.length === 3) return countries.alpha3ToAlpha2(sigla) ? sigla : null
+
+  return sigla.length === 2 ? (countries.alpha2ToAlpha3(sigla) ?? null) : null
 }
 
 /**
@@ -200,7 +253,19 @@ const primeiroTexto = ($: cheerio.CheerioAPI, seletores: string): string => {
 type ConsultaOpcoes = { prazoMs?: number }
 
 /**
- * Extrai os dados do perfil em ratings.fide.com.
+ * Endereço da busca da FIDE.
+ *
+ * `index.phtml?search=<id>` é a página que o jogador vê, mas ela NÃO traz os
+ * dados no HTML: é uma casca que preenche a tabela por AJAX. O endereço abaixo
+ * é o que ela chama, e devolve a mesma tabela de resultados — nome, título,
+ * federação, os três ratings e o ano de nascimento — em ~1,7 KB, contra os
+ * 136 KB do antigo `/profile/<id>`.
+ */
+const urlDaBuscaFide = (id: string) =>
+  `https://ratings.fide.com/incl_search_l.php?search=${encodeURIComponent(id)}&simple=1`
+
+/**
+ * Extrai os dados do jogador da busca da FIDE.
  *
  * Nunca lança: uma página que o `cheerio` não consegue montar (HTML truncado,
  * resposta de bloqueio com marcação quebrada) também é uma consulta que falhou,
@@ -210,79 +275,170 @@ export async function verifyFideId(
   id: string,
   opcoes: ConsultaOpcoes = {}
 ): Promise<LookupResult> {
-  const url = aplicarProxyFide(`https://ratings.fide.com/profile/${encodeURIComponent(id)}`)
-  const busca = await fetchHtml(url, opcoes.prazoMs ?? PRAZO_TOTAL_MS)
+  const url = aplicarProxyFide(urlDaBuscaFide(id))
+  const busca = await fetchHtml(
+    url,
+    opcoes.prazoMs ?? PRAZO_TOTAL_MS,
+    cabecalhosDaBuscaFide(id)
+  )
 
   if (!busca.ok) return { status: 'unavailable', motivo: busca.motivo }
 
   try {
-    return extrairPerfilFide(busca.html, id)
+    return extrairBuscaFide(busca.html, id)
   } catch (error) {
     const motivo = descreverErro(error)
 
-    console.error(`[consulta-oficial] falha ao ler o perfil ${id} da FIDE: ${motivo}`)
+    console.error(`[consulta-oficial] falha ao ler a busca ${id} da FIDE: ${motivo}`)
 
     return { status: 'unavailable', motivo }
   }
 }
 
-function extrairPerfilFide(html: string, id: string): LookupResult {
+/**
+ * A busca respondeu que não achou ninguém. O `(?<!\d)` protege o caso de
+ * "10 record(s) found", que senão casaria com "0 record(s) found".
+ */
+const SEM_RESULTADO = /no results found|no record found|(?<!\d)0 record\(s\) found/i
+
+/** Chaves das colunas que interessam da tabela de resultados. */
+type Colunas = {
+  id?: number
+  nome?: number
+  titulo?: number
+  federacao?: number
+  standard?: number
+  rapid?: number
+  blitz?: number
+  nascimento?: number
+}
+
+/**
+ * Nomes das colunas como a FIDE escreve → chave. O cabeçalho é lido antes das
+ * células para que uma coluna nova no meio da tabela não troque os ratings.
+ */
+const COLUNAS: Record<string, keyof Colunas> = {
+  fideid: 'id',
+  name: 'nome',
+  title: 'titulo',
+  fed: 'federacao',
+  std: 'standard',
+  rpd: 'rapid',
+  blz: 'blitz',
+  byear: 'nascimento',
+}
+
+/**
+ * Posições da tabela de hoje (FIDE ID | Name | Title | Tr.T. | Fed | Std. |
+ * Rpd. | Blz. | B-Year). Só entram em cena para a coluna cujo cabeçalho deixou
+ * de ser reconhecido — melhor que perder o rating inteiro por uma renomeação.
+ */
+const POSICOES_PADRAO: Colunas = {
+  id: 0,
+  nome: 1,
+  titulo: 2,
+  federacao: 4,
+  standard: 5,
+  rapid: 6,
+  blitz: 7,
+  nascimento: 8,
+}
+
+const normalizarCabecalho = (texto: string): string =>
+  texto
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z]/g, '')
+
+/** Texto de uma célula sem as quebras de linha da formatação da tabela. */
+const textoLimpo = (valor: string): string => valor.replace(/\s+/g, ' ').trim()
+
+function extrairBuscaFide(html: string, id: string): LookupResult {
   const $ = cheerio.load(html)
 
-  // O layout já mudou uma vez; os seletores alternativos evitam que uma troca de
-  // classe derrube a consulta inteira.
-  const name = primeiroTexto($, '.player-title, [class*="player-title"], .profile-title')
+  if (SEM_RESULTADO.test($.root().text())) return { status: 'not-found' }
 
-  if (name === '') {
-    const pageText = $('body').text()
+  const tabela = $('#table_results').first()
 
-    // Página sem perfil pode ser "jogador inexistente" ou uma resposta de bloqueio.
-    // Só tratamos como inexistente quando o site diz isso explicitamente.
-    if (/no record found/i.test(pageText)) return { status: 'not-found' }
-
-    // Sem o bloco do jogador: registra o começo da página para saber o que a
-    // FIDE devolveu (bloqueio, captcha, página de erro...).
+  if (tabela.length === 0) {
+    // Sem a tabela: registra o começo da página para saber o que a FIDE
+    // devolveu (bloqueio, captcha, página de erro...).
     console.error(
-      `[consulta-oficial] FIDE devolveu uma página sem o perfil do jogador ${id}: ` +
-        pageText.replace(/\s+/g, ' ').trim().slice(0, 300)
+      `[consulta-oficial] FIDE devolveu uma busca sem a tabela de resultados do jogador ${id}: ` +
+        textoLimpo($.root().text()).slice(0, 300)
     )
 
     return { status: 'unavailable', motivo: 'página inesperada da FIDE' }
   }
 
-  const [standard, rapid, blitz] = $('.profile-games').text().trim().match(/Not rated|\d+/g) ?? []
+  const colunas: Colunas = {}
+  tabela
+    .find('thead th')
+    .toArray()
+    .forEach((cabecalho, indice) => {
+      const chave = COLUNAS[normalizarCabecalho($(cabecalho).text())]
 
-  const flagCode = $('.profile-info-country img')
-    .attr('src')
-    ?.split('/')
-    .pop()
-    ?.replace('.svg', '')
-    .toUpperCase()
+      if (chave && colunas[chave] === undefined) colunas[chave] = indice
+    })
 
-  // O título fica em ".profile-info-title" (por extenso). O fallback lê a linha
-  // "FIDE title" caso a classe mude.
-  const textoDoTitulo =
-    primeiroTexto($, '.profile-info-title') ||
-    $('.profile-info-row')
-      .filter((_, linha) => /fide title/i.test($(linha).text()))
-      .first()
-      .text()
-      .replace(/fide title/i, '')
-      .trim()
+  const coluna = (chave: keyof Colunas) => colunas[chave] ?? POSICOES_PADRAO[chave]
+
+  // A busca é feita pelo ID, mas ela também aceita nome: só a linha cujo ID é o
+  // consultado serve — outra linha seria outro jogador.
+  const linha = tabela
+    .find('tbody tr')
+    .filter((_, elemento) => {
+      const indice = coluna('id')
+
+      return indice !== undefined && textoLimpo($(elemento).find('td').eq(indice).text()) === id.trim()
+    })
+    .first()
+
+  if (linha.length === 0) return { status: 'not-found' }
+
+  const celula = (chave: keyof Colunas): string => {
+    const indice = coluna(chave)
+
+    return indice === undefined ? '' : textoLimpo(linha.find('td').eq(indice).text())
+  }
+
+  const name = celula('nome')
+
+  if (name === '') {
+    console.error(
+      `[consulta-oficial] a busca da FIDE devolveu a linha ${id} sem nome: ` +
+        textoLimpo($.root().text()).slice(0, 300)
+    )
+
+    return { status: 'unavailable', motivo: 'página inesperada da FIDE' }
+  }
+
+  const { titulo, feminino } = lerTitulo(celula('titulo'))
+  const indiceDaFederacao = coluna('federacao')
+  const bandeira =
+    indiceDaFederacao === undefined
+      ? ''
+      : (linha.find('td').eq(indiceDaFederacao).find('img').attr('src')?.split('/').pop()?.replace('.svg', '') ?? '')
 
   return {
     status: 'found',
     player: {
       name,
-      bornYear: $('.profile-info-byear').text().trim(),
-      genre: $('.profile-info-sex').text().trim() === 'Male' ? 'm' : 'f',
-      title: abreviarTitulo(textoDoTitulo),
-      federation: flagCode ? (countries.alpha2ToAlpha3(flagCode) ?? null) : null,
+      bornYear: celula('nascimento'),
+      // A busca não informa o gênero; o título feminino é a única pista que ela
+      // dá. Sem ele o gênero fica nulo — o mesmo que já acontece quando a CBX
+      // confirma o ID no lugar da FIDE.
+      genre: feminino ? 'f' : null,
+      title: titulo,
+      federation: normalizarFederacao(celula('federacao')) ?? normalizarFederacao(bandeira),
       idFide: id,
+      // Os três ratings são sempre coletados juntos: quem chama escolhe o da
+      // classe de tempo do torneio (standard, rapid ou blitz).
       ratings: {
-        standard: toRating(standard),
-        rapid: toRating(rapid),
-        blitz: toRating(blitz),
+        standard: toRating(celula('standard')),
+        rapid: toRating(celula('rapid')),
+        blitz: toRating(celula('blitz')),
       },
     },
   }

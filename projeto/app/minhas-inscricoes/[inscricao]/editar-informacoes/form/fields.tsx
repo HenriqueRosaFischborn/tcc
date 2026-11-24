@@ -41,7 +41,7 @@ export default function Fields({inscricao, playerCbx, playerFide, hasFide, setin
                 setErrorName('')
             }
 
-            
+
             const date = document.getElementById('input-date')
             const genre = Array.from(document.querySelectorAll('.radio-genre')).filter((el) => {
                 if (el instanceof HTMLInputElement && el.checked) {
@@ -49,11 +49,17 @@ export default function Fields({inscricao, playerCbx, playerFide, hasFide, setin
                 }
             })[0].parentElement?.querySelector('h3')?.innerText
 
-            
-            if ((date instanceof HTMLInputElement && date.value.trim() != '' && date.value != playerCbx.bornYear) || (genre == 'Masculino' ? 'm' : 'f') != playerFide.genre) {
-                console.log((genre == 'Masculino' ? 'm' : 'f') != playerFide.genre)
-                
-                setErrorInfo(`*Informações inválidas, as informações cadastradas são: ${playerCbx.bornYear} - ${playerFide.genre == 'm' ? 'Masculino' : 'Feminino' }`)
+            const dataDivergente = date instanceof HTMLInputElement && date.value.trim() != '' && date.value != playerCbx.bornYear
+
+            // A busca da FIDE não informa o gênero: ele só vem quando o jogador
+            // tem título feminino (WFM, WGM...). Sem isso não há o que comparar —
+            // e travar a edição por um dado que a fonte não manda seria errado.
+            const generoDivergente = playerFide.genre !== null && (genre == 'Masculino' ? 'm' : 'f') != playerFide.genre
+
+            if (dataDivergente || generoDivergente) {
+                const generoOficial = playerFide.genre == null ? '' : ` - ${playerFide.genre == 'm' ? 'Masculino' : 'Feminino'}`
+
+                setErrorInfo(`*Informações inválidas, as informações cadastradas são: ${playerCbx.bornYear}${generoOficial}`)
             } else {
                 setErrorInfo('')
             }

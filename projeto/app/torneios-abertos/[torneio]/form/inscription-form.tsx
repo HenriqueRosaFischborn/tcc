@@ -117,7 +117,7 @@ export default function InscriptionForm() {
    * Confere o ID FIDE digitado com o cadastro da CBX, que informa o número.
    *
    * É a segunda opinião: entra quando a consulta direta à FIDE não respondeu.
-   * Quando a FIDE confirmou o ID, o perfil dela é mais completo — nome, gênero,
+   * Quando a FIDE confirmou o ID, o que ela manda é mais completo — nome,
    * federação, título e ratings — e nada do que a CBX diga o substitui.
    */
   function conferirFidePelaCbx(estado: IdState, jogadorCbx: OfficialPlayer | null): IdState {
