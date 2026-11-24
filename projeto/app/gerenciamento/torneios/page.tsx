@@ -84,7 +84,7 @@ export default async function Tournments() {
         <>
             <div id='content'>
                 <div style={{justifyContent: 'space-between'}}>
-                    <h1>Histórico de eventos</h1>
+                    <h1>Gerenciar torneios</h1>
                     <a href="/gerenciamento/torneios/adicionar-torneio"><button className='button gray' style={{display: 'flex', alignItems: 'center', gap: '10px'}}><img src="/icons/plus.png" alt="plus" style={{
                         width: '26px',
                         height: 'auto',
