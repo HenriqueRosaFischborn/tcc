@@ -31,8 +31,9 @@ const TOKEN = 'troque-esta-senha'
 const ALVO_PERMITIDO = 'ratings.fide.com'
 
 // Os mesmos cabeçalhos de navegador que verify-player.ts usa.
-// `X-Requested-With` é obrigatório: a busca da FIDE responde 200 com corpo
-// VAZIO sem ele.
+// `X-Requested-With` é obrigatório: a busca da FIDE (`incl_search_l.php`)
+// responde 200 com corpo VAZIO sem ele. Se o app mandar o cabeçalho, vale o do
+// app; senão, este aqui.
 const HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
@@ -74,7 +75,10 @@ export default {
 
     try {
       const resposta = await fetch(url.toString(), {
-        headers: HEADERS,
+        headers: {
+          ...HEADERS,
+          'X-Requested-With': request.headers.get('X-Requested-With') ?? HEADERS['X-Requested-With'],
+        },
         signal: AbortSignal.timeout(20000),
       })
 

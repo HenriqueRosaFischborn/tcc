@@ -268,22 +268,6 @@ const urlDaBuscaFide = (id: string) =>
   `https://ratings.fide.com/incl_search_l.php?search=${encodeURIComponent(id)}&simple=1`
 
 /**
- * A busca passou pelo proxy e voltou vazia.
- *
- * É a assinatura de um proxy que não repassa o `X-Requested-With` (o Worker da
- * Cloudflare publicado antes desta mudança): a FIDE aceita a conexão e devolve
- * 200 sem corpo. Tentar de novo a cada consulta só gastaria metade do prazo
- * — no envio da inscrição são 3 s no total — numa requisição que já sabemos que
- * volta vazia.
- *
- * Fica na memória do processo: vale para as próximas consultas desta instância e
- * desaparece no próximo deploy (que é quando a correção do Worker entra no ar).
- */
-const MOTIVO_PROXY_SEM_BUSCA = 'proxy sem a busca da FIDE'
-
-let buscarDiretoNoPerfil = false
-
-/**
  * Caminho alternativo: o perfil do jogador.
  *
  * A busca é o caminho principal — é a página que o sistema usa hoje e bem mais
@@ -335,26 +319,17 @@ export async function verifyFideId(
   const prazo = opcoes.prazoMs ?? PRAZO_TOTAL_MS
   const limite = Date.now() + prazo
 
-  const daBusca: LookupResult = buscarDiretoNoPerfil
-    ? { status: 'unavailable', motivo: MOTIVO_PROXY_SEM_BUSCA }
-    : await consultarFide(
-        id,
-        urlDaBuscaFide(id),
-        cabecalhosDaBuscaFide(id),
-        prazo,
-        extrairBuscaFide
-      )
+  // A busca é SEMPRE a primeira tentativa: é a página que fica no ar. O perfil
+  // só entra quando ela não responde de jeito nenhum.
+  const daBusca = await consultarFide(
+    id,
+    urlDaBuscaFide(id),
+    cabecalhosDaBuscaFide(id),
+    prazo,
+    extrairBuscaFide
+  )
 
   if (daBusca.status !== 'unavailable') return daBusca
-
-  // Só o proxy explica o corpo vazio: sem ele, a FIDE tem outros motivos.
-  if (daBusca.motivo === MOTIVO_RESPOSTA_VAZIA && process.env.FIDE_PROXY?.trim()) {
-    buscarDiretoNoPerfil = true
-
-    console.error(
-      '[consulta-oficial] o FIDE_PROXY está engolindo a busca da FIDE (o Worker precisa ser republicado com o cabeçalho X-Requested-With); a partir de agora esta instância usa o perfil'
-    )
-  }
 
   const restante = limite - Date.now()
 
