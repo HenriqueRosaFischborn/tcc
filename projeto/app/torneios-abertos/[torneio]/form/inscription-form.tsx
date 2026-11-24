@@ -175,25 +175,17 @@ export default function InscriptionForm() {
         return { ...atual, verifiedId: id, player: resultado.player, error: '', aviso: '', loading: false }
       }
 
-      // A FIDE respondeu e o número não existe: é erro do jogador.
-      if (resultado.status === 'not-found') {
-        return {
-          ...atual,
-          verifiedId: '',
-          player: null,
-          error: '*ID FIDE não encontrado',
-          aviso: '',
-          loading: false,
-        }
-      }
-
-      // Site fora do ar ou demorou demais: avisa e segue.
+      // A FIDE não confirmou o ID — seja porque não achou, seja porque não
+      // respondeu. A tela NÃO avisa nada: o jogador não tem o que fazer com
+      // isso, e a inscrição não depende dessa confirmação. O servidor consulta
+      // de novo no envio (e completa depois, em segundo plano); o que continuar
+      // faltando o árbitro preenche na análise.
       return {
         ...atual,
         verifiedId: '',
         player: null,
         error: '',
-        aviso: avisoIndisponivel('FIDE', resultado.motivo),
+        aviso: '',
         loading: false,
       }
     })

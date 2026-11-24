@@ -134,7 +134,9 @@ export default function FormEditInscriIndividual() {
 
             if (resultado.status === 'not-found') {
                 setPlayerFide(undefined)
-                setErrorIdFide('*Usuário FIDE não encontrado')
+                // Sem mensagem: o jogador não tem o que fazer com "não encontrei"
+                // — o ID segue como foi digitado e a organização confere depois.
+                setErrorIdFide('')
                 setIdFide('')
                 return
             }
@@ -250,7 +252,11 @@ export default function FormEditInscriIndividual() {
                                 <label htmlFor="idfide">ID FIDE: <p className="ast">*</p></label>
                                 <input id="form-fide" type="text" name="idfide" defaultValue={idFide ? idFide : inscricao.id_fide} onKeyDown={handleEnterBlur} maxLength={8} inputMode="numeric"  onInput={(e) => {e.currentTarget.value = e.currentTarget.value.replace(/\D/g, '')}} onBlur={(e) => sendIds(e.currentTarget)}/>
                                 {errorIdFide != '' ? <p className="error">{errorIdFide}</p> : ''}
-                                {fideIndisponivel != '' ? <p className="obs obs-fide">*A FIDE não respondeu ({fideIndisponivel}). A conferência segue pela CBX — o ID será reconferido pela organização.</p> : ''}
+                                {/* A FIDE não responder não vira aviso na tela: o
+                                    jogador não tem o que fazer com isso, e a
+                                    conferência segue pela CBX. O estado
+                                    `fideIndisponivel` continua existindo só para
+                                    não travar o resto do formulário. */}
                             </div>
                             <input type="text" hidden name="playerFide" value={JSON.stringify(playerFide)}/>
                         
