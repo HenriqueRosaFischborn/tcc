@@ -141,9 +141,12 @@ async function tentarFetch(
  * Vale a pena repetir? Um site que aceitou a conexão e devolveu erro pode
  * responder bem na segunda. Um que estourou o prazo (IP bloqueado, conexão
  * descartada no meio do caminho) não vai responder na segunda — repetir só
- * dobraria a espera do jogador.
+ * dobraria a espera do jogador. O corpo vazio é da mesma família: a FIDE o
+ * devolve quando a requisição não traz o que ela exige, e repetir igual não
+ * muda nada — melhor gastar o tempo restante no caminho alternativo.
  */
-const valeRepetir = (motivo: string) => motivo !== MOTIVO_TEMPO_ESGOTADO
+const valeRepetir = (motivo: string) =>
+  motivo !== MOTIVO_TEMPO_ESGOTADO && motivo !== MOTIVO_RESPOSTA_VAZIA
 
 /**
  * Baixa a página dentro de um orçamento de tempo fixo. O log fica no servidor
@@ -259,13 +262,67 @@ type ConsultaOpcoes = { prazoMs?: number }
  * dados no HTML: é uma casca que preenche a tabela por AJAX. O endereço abaixo
  * é o que ela chama, e devolve a mesma tabela de resultados — nome, título,
  * federação, os três ratings e o ano de nascimento — em ~1,7 KB, contra os
- * 136 KB do antigo `/profile/<id>`.
+ * 136 KB do perfil.
  */
 const urlDaBuscaFide = (id: string) =>
   `https://ratings.fide.com/incl_search_l.php?search=${encodeURIComponent(id)}&simple=1`
 
 /**
- * Extrai os dados do jogador da busca da FIDE.
+ * A busca passou pelo proxy e voltou vazia.
+ *
+ * É a assinatura de um proxy que não repassa o `X-Requested-With` (o Worker da
+ * Cloudflare publicado antes desta mudança): a FIDE aceita a conexão e devolve
+ * 200 sem corpo. Tentar de novo a cada consulta só gastaria metade do prazo
+ * — no envio da inscrição são 3 s no total — numa requisição que já sabemos que
+ * volta vazia.
+ *
+ * Fica na memória do processo: vale para as próximas consultas desta instância e
+ * desaparece no próximo deploy (que é quando a correção do Worker entra no ar).
+ */
+const MOTIVO_PROXY_SEM_BUSCA = 'proxy sem a busca da FIDE'
+
+let buscarDiretoNoPerfil = false
+
+/**
+ * Caminho alternativo: o perfil do jogador.
+ *
+ * A busca é o caminho principal — é a página que o sistema usa hoje e bem mais
+ * leve —, mas ela depende de um cabeçalho que um proxy intermediário pode não
+ * repassar (é o caso do Worker da Cloudflare enquanto ele não for republicado).
+ * Quando a busca não devolve nada, o perfil salva a consulta.
+ */
+const urlDoPerfilFide = (id: string) =>
+  `https://ratings.fide.com/profile/${encodeURIComponent(id)}`
+
+/** Uma consulta completa: baixa o endereço e lê o HTML com o extrator da vez. */
+async function consultarFide(
+  id: string,
+  url: string,
+  headers: Record<string, string>,
+  prazoMs: number,
+  extrair: (html: string, id: string) => LookupResult
+): Promise<LookupResult> {
+  const busca = await fetchHtml(aplicarProxyFide(url), prazoMs, headers)
+
+  if (!busca.ok) return { status: 'unavailable', motivo: busca.motivo }
+
+  try {
+    return extrair(busca.html, id)
+  } catch (error) {
+    const motivo = descreverErro(error)
+
+    console.error(`[consulta-oficial] falha ao ler ${urlParaLog(url)} (${id}): ${motivo}`)
+
+    return { status: 'unavailable', motivo }
+  }
+}
+
+/**
+ * Extrai os dados do jogador da FIDE.
+ *
+ * "Não encontrado" é resposta definitiva: só a busca a dá, e só quando a FIDE
+ * diz isso explicitamente. Qualquer outra falha (tempo esgotado, corpo vazio,
+ * página inesperada) ainda pode ser salva pelo perfil.
  *
  * Nunca lança: uma página que o `cheerio` não consegue montar (HTML truncado,
  * resposta de bloqueio com marcação quebrada) também é uma consulta que falhou,
@@ -275,24 +332,39 @@ export async function verifyFideId(
   id: string,
   opcoes: ConsultaOpcoes = {}
 ): Promise<LookupResult> {
-  const url = aplicarProxyFide(urlDaBuscaFide(id))
-  const busca = await fetchHtml(
-    url,
-    opcoes.prazoMs ?? PRAZO_TOTAL_MS,
-    cabecalhosDaBuscaFide(id)
+  const prazo = opcoes.prazoMs ?? PRAZO_TOTAL_MS
+  const limite = Date.now() + prazo
+
+  const daBusca: LookupResult = buscarDiretoNoPerfil
+    ? { status: 'unavailable', motivo: MOTIVO_PROXY_SEM_BUSCA }
+    : await consultarFide(
+        id,
+        urlDaBuscaFide(id),
+        cabecalhosDaBuscaFide(id),
+        prazo,
+        extrairBuscaFide
+      )
+
+  if (daBusca.status !== 'unavailable') return daBusca
+
+  // Só o proxy explica o corpo vazio: sem ele, a FIDE tem outros motivos.
+  if (daBusca.motivo === MOTIVO_RESPOSTA_VAZIA && process.env.FIDE_PROXY?.trim()) {
+    buscarDiretoNoPerfil = true
+
+    console.error(
+      '[consulta-oficial] o FIDE_PROXY está engolindo a busca da FIDE (o Worker precisa ser republicado com o cabeçalho X-Requested-With); a partir de agora esta instância usa o perfil'
+    )
+  }
+
+  const restante = limite - Date.now()
+
+  if (restante < TEMPO_MINIMO_TENTATIVA_MS) return daBusca
+
+  console.error(
+    `[consulta-oficial] busca da FIDE indisponível para ${id} (${daBusca.motivo}); tentando o perfil`
   )
 
-  if (!busca.ok) return { status: 'unavailable', motivo: busca.motivo }
-
-  try {
-    return extrairBuscaFide(busca.html, id)
-  } catch (error) {
-    const motivo = descreverErro(error)
-
-    console.error(`[consulta-oficial] falha ao ler a busca ${id} da FIDE: ${motivo}`)
-
-    return { status: 'unavailable', motivo }
-  }
+  return consultarFide(id, urlDoPerfilFide(id), BROWSER_HEADERS, restante, extrairPerfilFide)
 }
 
 /**
@@ -439,6 +511,99 @@ function extrairBuscaFide(html: string, id: string): LookupResult {
         standard: toRating(celula('standard')),
         rapid: toRating(celula('rapid')),
         blitz: toRating(celula('blitz')),
+      },
+    },
+  }
+}
+
+/** Texto do primeiro elemento que casar com algum dos seletores. */
+const primeiroTexto = ($: cheerio.CheerioAPI, seletores: string): string => {
+  for (const seletor of seletores.split(',')) {
+    const texto = textoLimpo($(seletor.trim()).first().text())
+    if (texto !== '') return texto
+  }
+
+  return ''
+}
+
+/**
+ * Lê o perfil do jogador (`/profile/<id>`), o caminho alternativo.
+ *
+ * O perfil é mais pesado (uns 136 KB) e é o endereço que vive caindo, por isso
+ * só entra quando a busca não respondeu. Em troca, ele informa o gênero, que a
+ * busca não tem.
+ */
+function extrairPerfilFide(html: string, id: string): LookupResult {
+  const $ = cheerio.load(html)
+
+  // O layout já mudou uma vez; os seletores alternativos evitam que uma troca de
+  // classe derrube a consulta inteira.
+  const name = primeiroTexto($, '.player-title, [class*="player-title"], .profile-title')
+
+  if (name === '') {
+    const textoPagina = textoLimpo($.root().text())
+
+    // Página sem perfil pode ser "jogador inexistente" ou uma resposta de bloqueio.
+    // Só tratamos como inexistente quando o site diz isso explicitamente.
+    if (/no record found/i.test(textoPagina)) return { status: 'not-found' }
+
+    console.error(
+      `[consulta-oficial] FIDE devolveu uma página sem o perfil do jogador ${id}: ` +
+        textoPagina.slice(0, 300)
+    )
+
+    return { status: 'unavailable', motivo: 'página inesperada da FIDE' }
+  }
+
+  // Cada rating tem o seu bloco (o da FIDE escreve "profile-standart", com erro).
+  const ratingDoBloco = (bloco: string): string =>
+    primeiroTexto($, `.profile-games [class*="${bloco}"] p, [class*="profile-${bloco}"] p`)
+
+  const dosBlocos = [
+    ratingDoBloco('standart') || ratingDoBloco('standard'),
+    ratingDoBloco('rapid'),
+    ratingDoBloco('blitz'),
+  ]
+
+  // Se os blocos mudarem de classe, sobra a ordem fixa do bloco: std, rapid, blitz.
+  const [standard, rapid, blitz] = dosBlocos.some((valor) => valor !== '')
+    ? dosBlocos
+    : ($('.profile-games').text().trim().match(/Not rated|\d+/g) ?? [])
+
+  const bandeira = $('.profile-info-country img')
+    .attr('src')
+    ?.split('/')
+    .pop()
+    ?.replace('.svg', '')
+
+  // O título fica em ".profile-info-title" (por extenso). O fallback lê a linha
+  // "FIDE title" caso a classe mude.
+  const textoDoTitulo =
+    primeiroTexto($, '.profile-info-title') ||
+    $('.profile-info-row')
+      .filter((_, linha) => /fide title/i.test($(linha).text()))
+      .first()
+      .text()
+      .replace(/fide title/i, '')
+      .trim()
+
+  const { titulo, feminino } = lerTitulo(textoDoTitulo)
+  const sexo = primeiroTexto($, '.profile-info-sex')
+
+  return {
+    status: 'found',
+    player: {
+      name,
+      bornYear: primeiroTexto($, '.profile-info-byear'),
+      // O perfil diz o gênero por extenso; sem essa linha, sobra o título feminino.
+      genre: sexo === 'Male' ? 'm' : sexo === 'Female' || feminino ? 'f' : null,
+      title: titulo,
+      federation: normalizarFederacao(bandeira ?? ''),
+      idFide: id,
+      ratings: {
+        standard: toRating(standard),
+        rapid: toRating(rapid),
+        blitz: toRating(blitz),
       },
     },
   }

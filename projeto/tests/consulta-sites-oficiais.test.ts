@@ -56,6 +56,21 @@ const paginaDoJogador = paginaDeBusca({
     nascimento: '2009',
 })
 
+/** O perfil (caminho alternativo), com o mesmo esqueleto que a FIDE usa. */
+const paginaDoPerfil = `
+<html><body>
+  <h1 class="player-title">Fischborn, Henrique Da Rosa</h1>
+  <div class="profile-games ">
+    <div class="profile-standart profile-game "><img src="/img/logo_std.svg"><p>Not rated</p><p>STANDARD</p></div>
+    <div class="profile-rapid profile-game "><img src="/img/logo_rpd.svg"><p>1560</p><p>RAPID</p></div>
+    <div class="profile-blitz profile-game "><img src="/img/logo_blitz.svg"><p>1596</p><p>BLITZ</p></div>
+  </div>
+  <div class="profile-info-country"><img src="/images/flags/br.svg" height=30>Brazil</div>
+  <p class="profile-info-byear ">2009 </p>
+  <p class="profile-info-sex ">Male</p>
+  <div class="profile-info-title "><p>FIDE Master</p></div>
+</body></html>`
+
 const paginaDeBloqueio = '<html><body><h1>Access denied</h1></body></html>'
 const paginaSemJogador =
     '<br><br>&nbsp;&nbsp;&nbsp;No results found for your query. Please modify search parameters.<br><br>'
@@ -164,12 +179,52 @@ describe('verifyFideId', () => {
 
     it('trata corpo vazio como falha em vez de "não encontrado"', async () => {
         // É o que a FIDE devolve quando recusa a requisição sem dizer que recusou.
+        // Repetir não muda nada: o tempo restante vai para o perfil.
         fetchMock.mockResolvedValue(resposta(''))
 
         const resultado = await verifyFideId('44731736')
 
         expect(resultado).toEqual({ status: 'unavailable', motivo: 'resposta vazia' })
-        expect(fetchMock).toHaveBeenCalledTimes(2)
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+            'https://ratings.fide.com/incl_search_l.php?search=44731736&simple=1',
+            'https://ratings.fide.com/profile/44731736',
+        ])
+    })
+
+    /**
+     * É o caso da produção enquanto o Worker da Cloudflare estiver numa versão
+     * que não repassa o `X-Requested-With`: a busca volta vazia, e o perfil
+     * precisa salvar a consulta.
+     */
+    it('recorre ao perfil quando a busca volta vazia', async () => {
+        fetchMock
+            .mockResolvedValueOnce(resposta(''))
+            .mockResolvedValueOnce(resposta(paginaDoPerfil))
+
+        const resultado = await verifyFideId('44731736')
+
+        expect(resultado).toMatchObject({
+            status: 'found',
+            player: {
+                name: 'Fischborn, Henrique Da Rosa',
+                bornYear: '2009',
+                genre: 'm',
+                title: 'fm',
+                federation: 'BRA',
+                ratings: { standard: null, rapid: 1560, blitz: 1596 },
+            },
+        })
+
+        // O perfil não depende de cabeçalho de AJAX.
+        const [, opcoesDoPerfil] = fetchMock.mock.calls[1]
+        expect(opcoesDoPerfil.headers['X-Requested-With']).toBeUndefined()
+    })
+
+    it('não recorre ao perfil quando a busca diz que o jogador não existe', async () => {
+        fetchMock.mockResolvedValueOnce(resposta(paginaSemJogador))
+
+        await expect(verifyFideId('9999999')).resolves.toEqual({ status: 'not-found' })
+        expect(fetchMock).toHaveBeenCalledTimes(1)
     })
 
     it('tenta de novo e funciona quando a primeira requisição falha', async () => {
@@ -181,13 +236,18 @@ describe('verifyFideId', () => {
         expect(fetchMock).toHaveBeenCalledTimes(2)
     })
 
-    it('devolve o motivo da falha quando todas as tentativas falham', async () => {
+    it('devolve o motivo da falha quando as duas tentativas de cada caminho falham', async () => {
         fetchMock.mockResolvedValue(resposta('', 503))
 
         const resultado = await verifyFideId('44731736')
 
         expect(resultado).toEqual({ status: 'unavailable', motivo: 'HTTP 503' })
-        expect(fetchMock).toHaveBeenCalledTimes(2)
+        expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+            'https://ratings.fide.com/incl_search_l.php?search=44731736&simple=1',
+            'https://ratings.fide.com/incl_search_l.php?search=44731736&simple=1',
+            'https://ratings.fide.com/profile/44731736',
+            'https://ratings.fide.com/profile/44731736',
+        ])
     })
 
     it('não repete quando o site não responde (conexão descartada)', async () => {

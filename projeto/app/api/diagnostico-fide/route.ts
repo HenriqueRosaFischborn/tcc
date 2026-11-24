@@ -12,6 +12,10 @@ export const dynamic = 'force-dynamic'
  *
  *   /api/diagnostico-fide?id=2108356            → só a FIDE
  *   /api/diagnostico-fide?id=2108356&cbx=25108  → FIDE e CBX
+ *   /api/diagnostico-fide?id=2108356&proxy=0    → ignora o FIDE_PROXY e
+ *     consulta a FIDE direto do servidor da Vercel. Serve para decidir se o
+ *     Worker da Cloudflare ainda é necessário: se der `"status": "found"` sem
+ *     proxy, dá para apagar a variável e parar de manter o Worker.
  *
  * `status: "found"` significa que aquela consulta funciona dali; `"unavailable"`
  * vem com o `motivo` exato, que é o mesmo que a inscrição está recebendo.
@@ -29,6 +33,7 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams
   const idFide = params.get('id') ?? '2108356'
   const idCbx = params.get('cbx')
+  const semProxy = params.get('proxy') === '0'
 
   if (!/^\d{4,9}$/.test(idFide)) {
     return NextResponse.json(
@@ -41,21 +46,31 @@ export async function GET(request: Request) {
     return NextResponse.json({ erro: 'O parâmetro ?cbx= precisa ser numérico' }, { status: 400 })
   }
 
-  const [fide, cbx] = await Promise.all([
-    medir(() => verifyFideId(idFide)),
-    idCbx === null ? null : medir(() => verifyCbxId(idCbx)),
-  ])
+  const proxyConfigurado = Boolean(process.env.FIDE_PROXY?.trim())
+  const proxyOriginal = process.env.FIDE_PROXY
 
-  return NextResponse.json(
-    {
-      onde: process.env.VERCEL
-        ? `Vercel (região ${process.env.VERCEL_REGION ?? 'não informada'})`
-        : 'servidor local',
-      // A URL do proxy não é devolvida: ela carrega a chave da API.
-      proxyConfigurado: Boolean(process.env.FIDE_PROXY?.trim()),
-      resultado: fide,
-      ...(cbx === null ? {} : { cbx }),
-    },
-    { headers: { 'cache-control': 'no-store' } }
-  )
+  // `?proxy=0` é só para esta resposta: a variável volta ao que era no fim.
+  if (semProxy) delete process.env.FIDE_PROXY
+
+  try {
+    const [fide, cbx] = await Promise.all([
+      medir(() => verifyFideId(idFide)),
+      idCbx === null ? null : medir(() => verifyCbxId(idCbx)),
+    ])
+
+    return NextResponse.json(
+      {
+        onde: process.env.VERCEL
+          ? `Vercel (região ${process.env.VERCEL_REGION ?? 'não informada'})`
+          : 'servidor local',
+        // A URL do proxy não é devolvida: ela carrega a chave da API.
+        proxyConfigurado: proxyConfigurado && !semProxy,
+        resultado: fide,
+        ...(cbx === null ? {} : { cbx }),
+      },
+      { headers: { 'cache-control': 'no-store' } }
+    )
+  } finally {
+    if (semProxy && proxyOriginal !== undefined) process.env.FIDE_PROXY = proxyOriginal
+  }
 }
