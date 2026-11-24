@@ -39,28 +39,38 @@ function toText(value: FormDataEntryValue | null): string {
 /**
  * Busca o jogador nas bases oficiais.
  *
- * Devolve `null` tanto para "não existe" quanto para "site fora do ar" — nos
- * dois casos a inscrição segue com o nome digitado, em vez de ser bloqueada.
+ * `indisponivel` é o que separa "não existe" (definitivo) de "não respondeu a
+ * tempo" — o segundo caso é o único que vale repetir depois que o jogador já
+ * recebeu a resposta, em segundo plano.
  *
  * O `try` cobre o que o `verify-player` não cobrir: uma consulta oficial que
  * lance não pode derrubar a inscrição inteira. Sem ele, a rejeição subiria pelo
  * `Promise.all` abaixo, a action terminaria em erro e o jogador perderia o
  * formulário por causa de um site que não é dele.
  */
+type ConsultaOficial = {
+  player: OfficialPlayer | null
+  /** A consulta não chegou ao fim: o site não respondeu dentro do prazo. */
+  indisponivel: boolean
+}
+
 async function buscarJogadorOficial(
   verificar: (id: string) => Promise<LookupResult>,
   id: number | null
-): Promise<OfficialPlayer | null> {
-  if (id === null) return null
+): Promise<ConsultaOficial> {
+  if (id === null) return { player: null, indisponivel: false }
 
   try {
     const resultado = await verificar(String(id))
 
-    return resultado.status === 'found' ? resultado.player : null
+    return {
+      player: resultado.status === 'found' ? resultado.player : null,
+      indisponivel: resultado.status === 'unavailable',
+    }
   } catch (error) {
     console.error('[inscricao] consulta ao site oficial falhou:', error)
 
-    return null
+    return { player: null, indisponivel: true }
   }
 }
 
@@ -78,6 +88,18 @@ async function buscarJogadorOficial(
  * a inscrição seguir sem esses números.
  */
 const PRAZO_CONSULTA_NO_ENVIO_MS = 3000
+
+/**
+ * Prazo da segunda tentativa, feita DEPOIS de o jogador receber a resposta.
+ *
+ * O envio tem 3 s porque é o tempo que alguém aceita olhar "Enviando
+ * inscrição...". A FIDE, porém, às vezes demora mais que isso (quando a busca
+ * está indisponível e a consulta cai no perfil do jogador, são 100 KB vindos de
+ * fora). Antes, quem estourasse o prazo ficava sem o rating FIDE no banco até o
+ * árbitro completar à mão; agora a consulta é refeita em segundo plano e a
+ * inscrição é completada quando o dado chega.
+ */
+const PRAZO_CONSULTA_EM_SEGUNDO_PLANO_MS = 9000
 
 async function uploadReceipt(file: File, tournamentId: bigint, userId: number, inscriptionUuid: string): Promise<boolean> {
   const path = `comprovantes/${tournamentId}/${userId}/${inscriptionUuid}`
@@ -178,14 +200,13 @@ export async function submitInscription(
   // Os dois sites são consultados SEMPRE, em paralelo: um cair não impede o
   // outro de trazer o seu número. Se um deles estiver fora do ar ou demorar
   // demais, a inscrição NÃO é bloqueada: o nome digitado é usado e o rating
-  // daquele site fica vazio — o árbitro pode completá-lo depois na tela de
-  // análise.
+  // daquele site é completado depois, em segundo plano (veja abaixo).
   //
   // As consultas externas são o que domina a espera no envio (a FIDE chega a
   // estourar o prazo inteiro), então elas começam junto com as leituras do
   // banco em vez de esperar por elas — o jogador espera o maior dos dois
   // caminhos, não a soma.
-  const [user, divisions, categorias, oficialFide, oficialCbx] = await Promise.all([
+  const [user, divisions, categorias, consultaFide, consultaCbx] = await Promise.all([
     db.usuario.findUnique({ where: { email } }),
     db.divisoes.findMany({ where: { id_torneio: category.id_torneio } }),
     db.categoria.findMany({
@@ -201,6 +222,9 @@ export async function submitInscription(
     buscarJogadorOficial((id) => verifyFideId(id, { prazoMs: PRAZO_CONSULTA_NO_ENVIO_MS }), fideId),
     buscarJogadorOficial((id) => verifyCbxId(id, { prazoMs: PRAZO_CONSULTA_NO_ENVIO_MS }), cbxId)
   ])
+
+  const oficialFide = consultaFide.player
+  const oficialCbx = consultaCbx.player
 
   if (!user) return { status: 'error', message: GENERIC_ERROR }
 
@@ -336,6 +360,54 @@ export async function submitInscription(
         id: user.id,
         email: user.email,
       },
+    }
+
+    // Quem não respondeu no prazo curto do envio é consultado de novo AGORA,
+    // depois de o jogador já ter recebido a resposta: com 9 s, a consulta chega
+    // ao fim inclusive quando precisa cair no perfil da FIDE. Antes, esses casos
+    // ficavam sem `rtg_fide`/`titulo`/`federação` no banco até o árbitro
+    // completar à mão.
+    if (fideId !== null && consultaFide.indisponivel) {
+      after(async () => {
+        try {
+          const resultado = await verifyFideId(String(fideId), {
+            prazoMs: PRAZO_CONSULTA_EM_SEGUNDO_PLANO_MS,
+          })
+
+          if (resultado.status !== 'found') return
+
+          await db.incricao.update({
+            where: { uuid: inscription.uuid },
+            data: {
+              name: resultado.player.name,
+              federation: resultado.player.federation ?? undefined,
+              titulo: resultado.player.title ?? undefined,
+              rtg_fide: ratingOf(resultado.player),
+            },
+          })
+        } catch (error) {
+          console.error('[inscricao] não foi possível completar os dados da FIDE depois do envio:', error)
+        }
+      })
+    }
+
+    if (cbxId !== null && consultaCbx.indisponivel) {
+      after(async () => {
+        try {
+          const resultado = await verifyCbxId(String(cbxId), {
+            prazoMs: PRAZO_CONSULTA_EM_SEGUNDO_PLANO_MS,
+          })
+
+          if (resultado.status !== 'found') return
+
+          await db.incricao.update({
+            where: { uuid: inscription.uuid },
+            data: { rtg_cbx: ratingOf(resultado.player) },
+          })
+        } catch (error) {
+          console.error('[inscricao] não foi possível completar o rating CBX depois do envio:', error)
+        }
+      })
     }
 
     // Os emails saem DEPOIS da resposta (`after`): o jogador não precisa
