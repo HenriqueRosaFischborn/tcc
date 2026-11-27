@@ -90,7 +90,7 @@ export default async function Home() {
     {
       nome: 'Leandro Ubialli',
       funcao: 'Vice-Presidente',
-      titulo: 'Candidato a Mestre Nacional',
+      titulo: 'Mestre Nacional',
     },
 
     {
@@ -100,7 +100,7 @@ export default async function Home() {
 
     {
       nome: 'Eduardo da Silva Cardoso',
-      titulo: 'Candidato a Mestre FIDE',
+      titulo: 'Candidato a Mestre Nacional',
     },
   ]
 
